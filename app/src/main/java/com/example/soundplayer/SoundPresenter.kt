@@ -51,13 +51,7 @@ class SoundPresenter @Inject constructor(
         return mediaPlayer.isPlaying
     }
 
-     fun convertMilesSecondToMinSec(duration: Long): String {
-        return String.format(
-            "%02d:%02d",
-            TimeUnit.MILLISECONDS.toMinutes(duration) % TimeUnit.HOURS.toMinutes(1),
-            TimeUnit.MILLISECONDS.toSeconds(duration) % TimeUnit.MINUTES.toSeconds(1)
-        )
-    }
+
 
     fun currentPosition():Long{
       return  mediaPlayer.currentPosition.toLong()

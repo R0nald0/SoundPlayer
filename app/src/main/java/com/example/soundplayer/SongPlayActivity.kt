@@ -7,6 +7,7 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import com.example.soundplayer.constants.Constants
 import com.example.soundplayer.databinding.ActivitySongPlayBinding
+import com.example.soundplayer.extension.convertMilesSecondToMinSec
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.SoundList
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,6 +40,7 @@ class SongPlayActivity (): AppCompatActivity() {
         val bundle = intent.extras
 
 
+
         bundle?.let { bundle->
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -61,12 +63,13 @@ class SongPlayActivity (): AppCompatActivity() {
               initPlayer(actualSong)
         }
         initBinding()
-
     }
 
+
     private fun initBinding() {
-        binding.txvNameMusic.isSelected =true
+
        with(binding){
+
 
             binding.btnPlayPause.setOnClickListener {
                  if (soundPresenter.isPlaying()) {
@@ -107,18 +110,20 @@ class SongPlayActivity (): AppCompatActivity() {
     }
 
     private fun updateViewWhenPlaySong(){
+        binding.txvNameMusic.isSelected =true
+        binding.txvNameMusic.text =actualSong.title
+        binding.txvTotalTime.text= applicationContext.convertMilesSecondToMinSec(duration = actualSong.duration.toLong())
+
       job = CoroutineScope(Dispatchers.IO).launch{
           while (soundPresenter.isPlaying()){
 
               currentPosition    = soundPresenter.currentPosition()
-              val timeCurrent    = soundPresenter.convertMilesSecondToMinSec(currentPosition)
-              val totalMusicTime = soundPresenter.convertMilesSecondToMinSec(duration = actualSong.duration.toLong())
+              val timeCurrent    = applicationContext.convertMilesSecondToMinSec(currentPosition)
+              val totalMusicTime = applicationContext.convertMilesSecondToMinSec(duration = actualSong.duration.toLong())
 
-                x++
-
+               // x++
               withContext(Dispatchers.Main){
-                  binding.txvNameMusic.text =actualSong.title
-                  binding.txvTotalTime.text= totalMusicTime
+
                   binding.tvcCurrentTime.text = timeCurrent
                   binding.imvSong.rotation = x
                   binding.progresSong.max = actualSong.duration.toInt()
@@ -135,6 +140,7 @@ class SongPlayActivity (): AppCompatActivity() {
 
 
     private fun initPlayer(sound: Sound){
+
       try {
           soundPresenter.prepareMusicStart(sound)
           binding.btnPlayPause.setImageResource(R.drawable.ic_pause_24)

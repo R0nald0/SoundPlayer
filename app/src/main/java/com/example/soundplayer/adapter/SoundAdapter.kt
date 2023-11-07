@@ -12,6 +12,7 @@ import com.example.soundplayer.SongPlayActivity
 import com.example.soundplayer.SoundPresenter
 import com.example.soundplayer.constants.Constants
 import com.example.soundplayer.databinding.ItemSoundBinding
+import com.example.soundplayer.extension.convertMilesSecondToMinSec
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.SoundList
 import javax.inject.Inject
@@ -34,14 +35,18 @@ class SoundAdapter(
 
     inner class  SoundViewHolder(private val binding : ItemSoundBinding): ViewHolder(binding.root){
      fun bind(soudd :Sound,position: Int){
-         binding.txvDuration.text = soudd.duration
+           val duration =  binding.root.context.convertMilesSecondToMinSec(soudd.duration.toLong())
+         binding.txvDuration.text = "Tempo- $duration"
          binding.txvTitle.text =soudd.title
+
 
 
          if (actualSound!=null && actualSound?.title == soudd.title){
              binding.txvTitle.setTextColor(ContextCompat.getColor(binding.root.context,R.color.red))
+             binding.txvTitle.isSelected = true
          }else{
              binding.txvTitle.setTextColor(ContextCompat.getColor(binding.root.context,R.color.black))
+             binding.txvTitle.isSelected = false
          }
 
          binding.idContraint.setOnClickListener {
