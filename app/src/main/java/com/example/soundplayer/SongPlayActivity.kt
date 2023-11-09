@@ -16,7 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
+
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -29,7 +29,7 @@ class SongPlayActivity (): AppCompatActivity() {
     private lateinit var job: Job
 
     private lateinit var soundList  : SoundList
-    lateinit var  actualSong : Sound
+    private lateinit var  actualSong : Sound
     private  var  currentPosition = 0L
 
     @Inject lateinit var  soundPresenter : SoundPresenter
@@ -41,12 +41,13 @@ class SongPlayActivity (): AppCompatActivity() {
 
 
 
-        bundle?.let { bundle->
+        bundle?.let { itBundle->
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                soundList  = bundle.getParcelable(Constants.KEY_EXTRA_MUSIC,SoundList::class.java)!!
+            soundList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                itBundle.getParcelable(Constants.KEY_EXTRA_MUSIC,SoundList::class.java)!!
+
             } else {
-                soundList  = bundle.getParcelable<SoundList>(Constants.KEY_EXTRA_MUSIC)!!
+                itBundle.getParcelable<SoundList>(Constants.KEY_EXTRA_MUSIC)!!
             }
 
         }

@@ -13,12 +13,24 @@
         android:fontFamily="cursive"
         android:text="Nenhuma Mùsica"
         android:textSize="28sp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="gone" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_find_sounds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Buscar músicas"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/txv_sound_not_found"
+        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintStart_toStartOf="@+id/txv_sound_not_found"
+        app:layout_constraintTop_toTopOf="@+id/txv_sound_not_found"
+        app:layout_constraintVertical_bias="0.344" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_sound"
@@ -32,7 +44,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
         tools:listitem="@layout/item_sound"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
     </androidx.recyclerview.widget.RecyclerView>
 </androidx.constraintlayout.widget.ConstraintLayout>
