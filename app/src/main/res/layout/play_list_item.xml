@@ -2,53 +2,39 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/id_contraint"
+    android:id="@+id/id_contraint_play_list"
 
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     tools:background="@color/black">
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imgPlayList"
         android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_height="100dp"
         android:layout_margin="8dp"
         android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearanceOverlay="@style/ImageRounded"
-        app:srcCompat="@drawable/transferir" />
+        app:srcCompat="@drawable/ic_play_arrow_24" />
 
     <TextView
         android:id="@+id/txv_title"
         android:layout_width="150dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="4dp"
+        android:layout_height="wrap_content"
         android:elevation="5dp"
-
         android:fontFamily="casual"
-
         android:gravity="center"
-
-
-        android:text="TItle musicssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
+        android:text="Play List Name"
         android:textColor="#fff"
         android:textSize="15sp"
         android:textStyle="italic"
-        app:layout_constraintEnd_toEndOf="@+id/imageView"
-        app:layout_constraintStart_toStartOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
-
-    <TextView
-        android:id="@+id/txv_duration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        android:textColor="#fff"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="@+id/txv_title"
-        app:layout_constraintStart_toStartOf="@+id/txv_title"
-        app:layout_constraintTop_toBottomOf="@+id/txv_title" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/imgPlayList"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/imgPlayList"
+        app:layout_constraintTop_toBottomOf="@+id/imgPlayList" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
