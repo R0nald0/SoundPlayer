@@ -15,8 +15,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
-import com.example.soundplayer.adapter.PlayListAdapter
-import com.example.soundplayer.adapter.SoundAdapter
+import com.example.soundplayer.presentation.adapter.PlayListAdapter
+import com.example.soundplayer.presentation.adapter.SoundAdapter
 import com.example.soundplayer.databinding.ActivityMainBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
@@ -25,13 +25,12 @@ import com.example.soundplayer.presentation.fragment.BottomSheetFragment
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
-import javax.inject.Inject
 import kotlin.random.Random
 
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private val listSound = mutableSetOf<Sound>()
+    private val listSoundFromContentProvider = mutableSetOf<Sound>()
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
@@ -39,26 +38,28 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gerenciarPermissoes : ActivityResultLauncher<String>
     private lateinit var  adapterSound : SoundAdapter
     private lateinit var  playListAdapter: PlayListAdapter
-    @Inject lateinit var  soundPresenter : SoundPresenter
-
+    private val  soundPresenter by viewModels<SoundPresenter>();
     private val playListViewModel by viewModels<PlayListViewModel>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         sortBackGraoundImage()
 
+
          initAdapter()
          getPermissions()
-        observersViewModel()
+         observersViewModel()
 
         binding.btnFindSounds.setOnClickListener {
+            //TODO verificar acao do  botao
             requestPermission()
         }
         
         binding.fabAddPlayList.setOnClickListener { 
-              if (listSound.isNotEmpty()){
-                  createPlayList(listSound)
+              if (listSoundFromContentProvider.isNotEmpty()){
+                  createPlayList(listSoundFromContentProvider)
               }
         }
 
@@ -73,8 +74,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private  fun observersViewModel(){
-        playListViewModel.playLists.observe(this){
-
+        playListViewModel.playLists.observe(this){playListObservable->
+                 playListObservable.forEach { playListByUser ->
+                     playListAdapter.addPlayList(playListByUser)
+                     Log.i("INFO_", "uniquePlayList :${playListByUser.name}} ")
+                 }
         }
     }
 
@@ -92,15 +96,13 @@ class MainActivity : AppCompatActivity() {
                 binding.txvSoundNotFound.visibility = View.GONE
                 binding.rvSound.visibility = View.VISIBLE
                 getMusicFromContentProvider()
-               // adapterSound.addSound(listSound)
-                //TODO rever
+                if (listSoundFromContentProvider.isNotEmpty())  playListViewModel.saveAllSoundsByContentProvider(listSoundFromContentProvider)
             }
         }
         requestPermission()
-
     }
 
-    fun sortBackGraoundImage(){
+    private fun sortBackGraoundImage(){
         val listDrawbleImage = listOf(
             R.drawable.feror, R.drawable.tree
         )
@@ -108,7 +110,7 @@ class MainActivity : AppCompatActivity() {
         binding.contstaintLayout.background = ContextCompat.getDrawable(this,listDrawbleImage[numberRanodom])
 
     }
-    fun requestPermission(){
+    private fun requestPermission(){
         gerenciarPermissoes.launch(
             android.Manifest.permission.READ_EXTERNAL_STORAGE
         )
@@ -116,7 +118,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-
+        playListViewModel.getAllPlayList()
     }
 
     override fun onResume() {
@@ -125,6 +127,7 @@ class MainActivity : AppCompatActivity() {
             soundPresenter.actualSound.observe(this){soundLiveData->
                 Toast.makeText(this, "Tocando ${soundLiveData.title} ", Toast.LENGTH_SHORT).show()
                 Log.i("INFO_", "Main:${soundLiveData.title} ")
+                //TODO VERIFICAR CHAMAS MULTIPLAS
                 adapterSound.getActualSound(soundLiveData)
                 binding.rvSound.scrollToPosition(soundPresenter.currentItem)
             }
@@ -136,13 +139,11 @@ class MainActivity : AppCompatActivity() {
         binding.rvSound.adapter = adapterSound
         binding.rvSound.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false)
 
-
-        playListAdapter = PlayListAdapter{actualPlayList->
-            adapterSound.addSound(actualPlayList.listSound)
+        playListAdapter = PlayListAdapter{playListChosedByUser->
+            adapterSound.getPlayList(playListChosedByUser)
         }
         binding.idRvFavoriteList.adapter = playListAdapter
         binding.idRvFavoriteList.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,true)
-
     }
 
     private fun getMusicFromContentProvider(){
@@ -179,6 +180,7 @@ class MainActivity : AppCompatActivity() {
 
 
                     val sound = Sound(
+                        idSound = null,
                         path =  cursor.getString(1),
                         duration =  cursor.getString(2),
                         title=  cursor.getString(0),
@@ -187,8 +189,8 @@ class MainActivity : AppCompatActivity() {
                     )
 
                     if (File(sound.path).exists()){
-                        if (!listSound.contains(sound)){
-                            listSound.add(sound)
+                        if (!listSoundFromContentProvider.contains(sound)){
+                            listSoundFromContentProvider.add(sound)
                         }
                     }
                 }
@@ -200,17 +202,21 @@ class MainActivity : AppCompatActivity() {
     }
 
      private fun verifyListIsEmpty(){
-        if (listSound.isEmpty()){
+        if (listSoundFromContentProvider.isEmpty()){
             binding.linearMusics.visibility =View.GONE
             binding.txvSoundNotFound.visibility =View.VISIBLE
         }else{
-            val playList =  PlayList("All Musiscs",listSound)
+            val playList =  PlayList(
+                idPlayList = null,
+                name="All Musiscs",
+                listSound =  listSoundFromContentProvider,
+                currentMusicPosition = 0
+            )
             playListAdapter.addPlayList(playList)
             binding.linearMusics.visibility =View.VISIBLE
             binding.txvSoundNotFound.visibility =View.GONE
-            binding.txvQuantidadeMusics.text ="Músicas ${listSound.size}"
+            binding.txvQuantidadeMusics.text ="Músicas ${playList.listSound.size}"
         }
     }
-
 
 }

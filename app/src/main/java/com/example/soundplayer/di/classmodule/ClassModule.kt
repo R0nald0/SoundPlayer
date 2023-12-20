@@ -1,8 +1,12 @@
 package com.example.soundplayer.di.classmodule
 
 import android.content.Context
-import android.media.MediaPlayer
 import androidx.media3.exoplayer.ExoPlayer
+import com.example.soundplayer.data.dao.PlayListDAO
+import com.example.soundplayer.data.dao.PlaylistAndSoundCrossDao
+import com.example.soundplayer.data.dao.SoundDao
+import com.example.soundplayer.data.database.DatabasePlaylist
+import com.example.soundplayer.data.repository.SoundPlayListRepository
 import com.example.soundplayer.presentation.SoundPresenter
 import dagger.Module
 import dagger.Provides
@@ -16,8 +20,8 @@ import javax.inject.Singleton
 class ClassModule {
     @Singleton
     @Provides
-    fun provideActualSong(mediaPlayer: MediaPlayer,exoPlayer: ExoPlayer): SoundPresenter {
-        return  SoundPresenter(mediaPlayer,exoPlayer)
+    fun provideActualSong(exoPlayer: ExoPlayer): SoundPresenter {
+        return  SoundPresenter(exoPlayer)
     }
 
     @Singleton
@@ -27,9 +31,26 @@ class ClassModule {
             .build()
     }
 
-    @Singleton
     @Provides
-    fun provideMediaPlayer():MediaPlayer{
-          return  MediaPlayer()
+    fun providePlayListDao(databasePlaylist: DatabasePlaylist):PlayListDAO{
+        return databasePlaylist.playlistDao()
+    }
+    @Provides
+    fun soundDao(databasePlaylist: DatabasePlaylist):SoundDao{
+        return databasePlaylist.soundDao()
+    }
+
+    @Provides
+    fun providePlaylistAndSoundCross(databasePlaylist: DatabasePlaylist):PlaylistAndSoundCrossDao{
+        return  databasePlaylist.playListAndSoundCrossDao();
+    }
+    @Provides
+    fun provideSoundPlayListRepository(playListDAO: PlayListDAO ,playlistAndSoundCross: PlaylistAndSoundCrossDao,soundDao: SoundDao):SoundPlayListRepository{
+         return  SoundPlayListRepository(playListDAO, playlistAndSoundCross,soundDao)
+    }
+
+    @Provides
+    fun provideRoomDatabase(@ApplicationContext context: Context):DatabasePlaylist{
+            return  DatabasePlaylist.getInstance(context)
     }
 }

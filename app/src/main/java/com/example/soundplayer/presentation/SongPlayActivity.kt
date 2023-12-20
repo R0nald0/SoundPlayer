@@ -2,6 +2,7 @@ package com.example.soundplayer.presentation
 
 import android.content.ComponentName
 import android.os.Bundle
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -11,6 +12,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
+import com.example.soundplayer.R
 import com.example.soundplayer.databinding.ActivitySongPlayBinding
 import com.example.soundplayer.service.SoundService
 import com.google.common.util.concurrent.MoreExecutors
@@ -27,13 +29,11 @@ class SongPlayActivity (): AppCompatActivity() {
         ActivitySongPlayBinding.inflate(layoutInflater)
     }
 
-    var x = 0.0f
     @Inject lateinit var  soundPresenter : SoundPresenter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         initPlayer()
-
 
         soundPresenter.playAllMusicFromFist()
         observer()
@@ -44,7 +44,14 @@ class SongPlayActivity (): AppCompatActivity() {
            CoroutineScope(Dispatchers.Main).launch {
               // binding.txvNameMusic.isSelected = true
                binding.txvNameMusic.text = sound.title
-              // var intentSoundService = Intent(this@SongPlayActivity,)
+
+               if (sound.uriMediaAlbum != null){
+                   binding.imvSong.setImageURI(sound.uriMediaAlbum)
+                   if (binding.imvSong.drawable == null){
+                       binding.imvSong.setImageResource(R.drawable.transferir)
+                   }
+               }
+
            }
        }
    }
@@ -53,9 +60,11 @@ class SongPlayActivity (): AppCompatActivity() {
     fun  initPlayer(){
          soundPresenter.getPlayer()
          soundPresenter.getPlayer().let { exoPlayer ->
+
              binding.myPlayerView.player = exoPlayer
              soundPresenter.playAllMusicFromFist()
          }
+
     }
 
     @OptIn(UnstableApi::class) override fun onStart() {

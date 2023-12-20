@@ -1,4 +1,4 @@
-package com.example.soundplayer.adapter
+package com.example.soundplayer.presentation.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -13,13 +13,9 @@ class PlayListAdapter(
 ) :RecyclerView.Adapter<PlayListAdapter.PlayLisViewHolder>(){
 
 
-    private  val playLists = mutableSetOf<PlayList>(
-        PlayList("Rock", mutableSetOf()),
-        PlayList("MPB",mutableSetOf()),
-        PlayList("Sertanejo", mutableSetOf()),
-        PlayList("Favoritas", mutableSetOf()),
-    )
+    private  val playLists = mutableSetOf<PlayList>()
     fun addPlayList(playList: PlayList){
+
         playLists.add(playList)
         notifyDataSetChanged()
     }

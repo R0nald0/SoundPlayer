@@ -9,14 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.example.soundplayer.R
-import com.example.soundplayer.adapter.BottomPlayListAdapter
-import com.example.soundplayer.adapter.SoundAdapter
-import com.example.soundplayer.databinding.FragmentItemListDialogListDialogItemBinding
+import com.example.soundplayer.presentation.adapter.BottomPlayListAdapter
 import com.example.soundplayer.databinding.FragmentItemListDialogListDialogBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
@@ -56,13 +52,19 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         binding.btnCreatePlayList.setOnClickListener {
-             bottomSheetAdapter.getSoundselecionados()
+             bottomSheetAdapter.getSoundSelected() //<- Todo Verificar se necessario alterar metodo para retornar lista
               val namePlayList  = binding.edtPlayList.text.toString()
               if (createdSounds.isNotEmpty() && namePlayList.isNotEmpty()){
-                   val playList = PlayList( name = namePlayList, listSound =  createdSounds.toMutableSet())
+                   val playList = PlayList(
+                        idPlayList = null,
+                        name = namePlayList,
+                        listSound =  createdSounds.toMutableSet(),
+                        currentMusicPosition = 0,
+                       )
                    playListViewModel.savePlayList(playList = playList)
                    dismiss()
               }else{
+                  // Todo Verificar erro quando createdSound é vazio
                   Toast.makeText(binding.root.context, "Play list vazia ou nome invalido", Toast.LENGTH_SHORT).show()
               }
         }
@@ -72,14 +74,14 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        bottomSheetAdapter = BottomPlayListAdapter{returnedCreatedList->
 
-            if (returnedCreatedList.isNotEmpty() ){
-                 createdSounds = returnedCreatedList.toSet()
+        bottomSheetAdapter = BottomPlayListAdapter{returnedChosedSoundList->
+
+            if (returnedChosedSoundList.isNotEmpty() ){
+                 createdSounds = returnedChosedSoundList.toSet()
             }else{
                 Toast.makeText(binding.root.context, "Play list vazia", Toast.LENGTH_SHORT).show()
             }
-
         };
 
         binding.rvMusics.adapter = bottomSheetAdapter
@@ -87,10 +89,22 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         binding.rvMusics.layoutManager = LinearLayoutManager(binding.root.context,LinearLayoutManager.VERTICAL,false)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        observerViewModel()
+    }
+
     override fun onStart() {
         super.onStart()
-        bottomSheetAdapter.getListSound(listSounds)
-
+        playListViewModel.saveAllSoundsByContentProvider(listSounds.toMutableSet())
     }
+    private fun observerViewModel(){
+        playListViewModel.soundListBd.observe(this){listSoundsDatabase->
+            bottomSheetAdapter.getListSound(listSoundsDatabase.toMutableSet())
+            Log.i("INFO_", "observerViewModel: ${listSoundsDatabase.size}")
+        }
+    }
+
 
 }

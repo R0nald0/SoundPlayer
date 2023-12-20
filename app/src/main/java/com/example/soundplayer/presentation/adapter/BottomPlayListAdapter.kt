@@ -1,4 +1,4 @@
-package com.example.soundplayer.adapter
+package com.example.soundplayer.presentation.adapter
 
 import android.util.Log
 import android.util.SparseBooleanArray
@@ -15,11 +15,12 @@ class BottomPlayListAdapter (
     private val soundSelecionados  = mutableSetOf<Sound>()
     private val sparseBooleanArray  = SparseBooleanArray()
 
-   fun getSoundselecionados(){
+   fun getSoundSelected(){
          getItemns(soundSelecionados.toSet())
    }
     fun getListSound(listMusics : Set<Sound>){
          sounds.addAll(listMusics)
+
         notifyDataSetChanged()
     }
      inner class ViewHolder(private val binding: FragmentItemListDialogListDialogItemBinding) :RecyclerView.ViewHolder(binding.root) {

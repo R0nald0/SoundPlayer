@@ -1,8 +1,9 @@
-package com.example.soundplayer.adapter
+package com.example.soundplayer.presentation.adapter
 
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -11,17 +12,18 @@ import com.example.soundplayer.presentation.SongPlayActivity
 import com.example.soundplayer.presentation.SoundPresenter
 import com.example.soundplayer.databinding.ItemSoundBinding
 import com.example.soundplayer.extension.convertMilesSecondToMinSec
+import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.SoundList
 
 class SoundAdapter(
  private val soundPresenter: SoundPresenter
 ) :RecyclerView.Adapter<SoundAdapter.SoundViewHolder>() {
-   private  val sounds = mutableSetOf<Sound>()
+   private  var soundsPlayList: PlayList? = null
    private  var actualSound :Sound? = null
 
-    fun addSound(list: MutableSet<Sound>){
-        sounds.addAll(list)
+    fun getPlayList(actualPlayList: PlayList){
+        soundsPlayList = actualPlayList
         notifyDataSetChanged()
     }
     fun getActualSound(sound :Sound){
@@ -32,8 +34,9 @@ class SoundAdapter(
 
     inner class  SoundViewHolder(private val binding : ItemSoundBinding): ViewHolder(binding.root){
      fun bind(soudd :Sound,position: Int){
+         //TODO crirar metoddo para salvar no banco a posicao da musica atual
          val duration =  binding.root.context.convertMilesSecondToMinSec(soudd.duration.toLong())
-         binding.txvDuration.text = "$duration"
+         binding.txvDuration.text = duration
          binding.txvTitle.text =soudd.title
          binding.imageView.setImageURI(soudd.uriMediaAlbum)
 
@@ -56,11 +59,16 @@ class SoundAdapter(
 
 
          binding.idContraint.setOnClickListener {
-             val sounds = SoundList(position,sounds)
-             val intent= Intent(binding.root.context, SongPlayActivity::class.java)
              ///intent.putExtra(Constants.KEY_EXTRA_MUSIC,sounds)
-             soundPresenter.getAllMusics(sounds)
-             ContextCompat.startActivity(binding.root.context,intent,null)
+             if (soundsPlayList != null){
+                 soundsPlayList!!.currentMusicPosition = position
+                 val intent= Intent(binding.root.context, SongPlayActivity::class.java)
+                 soundPresenter.getAllMusics(soundsPlayList!!)
+                 ContextCompat.startActivity(binding.root.context,intent,null)
+             }else {
+                 Toast.makeText(it.context, "PlayList null", Toast.LENGTH_SHORT).show()
+             }
+
          }
      }
     }
@@ -76,12 +84,14 @@ class SoundAdapter(
     }
 
     override fun getItemCount(): Int {
-       return sounds.size
+       return soundsPlayList?.listSound?.size ?:0
     }
 
     override fun onBindViewHolder(holder: SoundViewHolder, position: Int) {
-        val sound = sounds.elementAt(position)
-        holder.bind(sound,position)
+        val sound = soundsPlayList?.listSound?.elementAt(position)
+        if (sound != null) {
+            holder.bind(sound,position)
+        }
     }
 
 }

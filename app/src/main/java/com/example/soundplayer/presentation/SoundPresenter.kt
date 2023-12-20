@@ -1,21 +1,20 @@
 package com.example.soundplayer.presentation
 
 
-import android.media.MediaPlayer
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
-import com.example.soundplayer.model.SoundList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class SoundPresenter @Inject constructor(
-    private val mediaPlayer: MediaPlayer,
     private val exoPlayer: ExoPlayer
 ) :ViewModel(){
      var playerWhenRead = true
@@ -23,39 +22,47 @@ class SoundPresenter @Inject constructor(
      var playBackPosition = 0L
 
     var actualSound  = MutableLiveData<Sound>()
-    var currentLivePosition  = MutableLiveData<Long>()
     var isPlayingObserver  = MutableLiveData<Boolean>()
-    lateinit var allMusics : SoundList
-    lateinit var listMediaItem  : List<MediaItem>
-
+    private var currentPlayList : PlayList ? = null
+    private lateinit var listMediaItem  : List<MediaItem>
 
      fun getPlayer():ExoPlayer{
        return exoPlayer
      }
 
-    fun getAllMusics(sounds: SoundList) {
-        if (!exoPlayer.isPlaying || sounds.currentMusic != allMusics.currentMusic){
-            allMusics = sounds
-            listMediaItem= sounds.listMusic.map{sound->
-                MediaItem.Builder()
-                    .setMediaMetadata(createMetaData(sound))
-                    .setUri(sound.path)
-                    .build()
-            }
-            exoPlayer.seekTo(sounds.currentMusic,playBackPosition)
-            currentItem = sounds.currentMusic
-        }
+    fun getAllMusics(playList: PlayList) {
 
+           if (currentPlayList != null &&  currentPlayList!!.name != playList.name){
+               exoPlayer.stop()
+               exoPlayer.clearMediaItems()
+            }
+
+            if (!exoPlayer.isPlaying || playList.currentMusicPosition !=currentItem ){
+                currentPlayList = playList
+                listMediaItem= playList.listSound.map{ sound ->
+                    MediaItem.Builder()
+                        .setMediaMetadata(createMetaData(sound))
+                        .setUri(sound.path)
+                        .build()
+                }
+
+                exoPlayer.seekTo(playList.currentMusicPosition,playBackPosition)
+                currentItem = playList.currentMusicPosition
+            }
     }
     private fun createMetaData(sound :Sound):MediaMetadata{
+
         return MediaMetadata.Builder()
             .setTitle(sound.title)
+            .setArtworkUri(sound.uriMediaAlbum)
+            .setDisplayTitle(sound.title)
             .build()
     }
     private fun configActualSound(){
       val mediaItem   = exoPlayer.currentMediaItem
             if (mediaItem != null) {
                 val sound =Sound(
+                    idSound = null,
                     path = "",
                     title = mediaItem.mediaMetadata.title.toString(),
                     duration = exoPlayer.duration.toString()
@@ -66,10 +73,13 @@ class SoundPresenter @Inject constructor(
         exoPlayer.addListener(object :Player.Listener{
             override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
                 super.onMediaMetadataChanged(mediaMetadata)
+
                     val sound =Sound(
+                        idSound = null,
                         path = "",
-                        title = mediaMetadata.title.toString(),
-                        duration = exoPlayer.duration.toString()
+                        title = mediaMetadata.displayTitle.toString(),
+                        duration = exoPlayer.duration.toString(),
+                        uriMediaAlbum = mediaMetadata.artworkUri
                     )
                     actualSound.value= sound
             }
@@ -82,6 +92,7 @@ class SoundPresenter @Inject constructor(
     }
 
     fun playAllMusicFromFist(){
+
         exoPlayer.addMediaItems(listMediaItem)
         exoPlayer.playWhenReady = playerWhenRead
         exoPlayer.prepare()
@@ -91,6 +102,9 @@ class SoundPresenter @Inject constructor(
         return isPlayingObserver.value
     }
 
-
+    fun destroyPlayer(){
+        exoPlayer.stop()
+        exoPlayer.release()
+    }
 
 }
