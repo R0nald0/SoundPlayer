@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="cursive"
         android:text="Nenhuma Mùsica"
+        android:textColor="@color/white"
         android:textSize="28sp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
