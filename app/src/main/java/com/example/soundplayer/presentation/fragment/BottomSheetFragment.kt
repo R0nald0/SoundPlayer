@@ -9,15 +9,18 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.example.soundplayer.R
 import com.example.soundplayer.presentation.adapter.BottomPlayListAdapter
 import com.example.soundplayer.databinding.FragmentItemListDialogListDialogBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.SoundList
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -30,16 +33,20 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
    private  lateinit var  bottomSheetAdapter  : BottomPlayListAdapter
    private val playListViewModel by activityViewModels<PlayListViewModel>()
 
+   private var bottomSheetPeekHeight = 0
+
+
    private lateinit var listSounds : Set<Sound>
    private lateinit var createdSounds : Set<Sound>
     override fun onCreateView(
-
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding.edtPlayList.clearFocus()
         binding.textInputLayoutCratePlayList.clearFocus()
-        
+
+        bottomSheetPeekHeight  =  resources.getDimensionPixelOffset(R.dimen.expanded_bottom_sheet)
+
         val bundle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requireArguments().getParcelable("list",SoundList::class.java)
         } else {
@@ -47,7 +54,6 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         if (bundle != null) {
-            Log.i("INFO_", "onCreateView: ${bundle.listMusic.size}")
             listSounds = bundle.listMusic
         }
 
@@ -99,11 +105,25 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         super.onStart()
         playListViewModel.saveAllSoundsByContentProvider(listSounds.toMutableSet())
     }
+
+    override fun onResume() {
+        super.onResume()
+       
+    }
     private fun observerViewModel(){
         playListViewModel.soundListBd.observe(this){listSoundsDatabase->
             bottomSheetAdapter.getListSound(listSoundsDatabase.toMutableSet())
             Log.i("INFO_", "observerViewModel: ${listSoundsDatabase.size}")
         }
+    }
+
+    private fun sizeView(){
+     val bottomSheetBehavior  = BottomSheetBehavior.from(view?.parent as View)
+        bottomSheetBehavior.peekHeight = bottomSheetPeekHeight
+
+       val layoutManager  = binding.root.rootView.layoutParams
+
+
     }
 
 

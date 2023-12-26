@@ -18,5 +18,5 @@ interface PlayListDAO {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun updatePlayList(playList: PlayListEntity)
     @Delete
-    fun deletePlayList(playList: PlayListEntity)
+  suspend  fun deletePlayList(playList: PlayListEntity) :Int
 }

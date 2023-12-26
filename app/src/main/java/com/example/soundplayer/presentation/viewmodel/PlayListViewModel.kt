@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.data.repository.SoundPlayListRepository
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
@@ -31,23 +32,18 @@ class PlayListViewModel @Inject constructor(
 
     fun savePlayList(playList: PlayList){
         viewModelScope.launch {
-
           val retor  = soundPlayListRepository.savePlayList(playList)
-            Log.i("INFO_", "verifi reotno:${retor.size}} ")
             if (retor.isNotEmpty()){
                 getAllPlayList()
             }
         }
-        playList.listSound.forEach {
-            Log.i("INFO_", "verifi savePlayList:${it.title}} ")
-        }
+
     }
     fun getAllPlayList(){
-       viewModelScope.launch(Dispatchers.IO) {
+       viewModelScope.launch {
           val playListsRetorno =soundPlayListRepository.findAllPlayList()
               withContext(Dispatchers.Main){
                   _playLists.value = playListsRetorno
-                  Log.i("INFO_", "getAllPlayList  $playListsRetorno ")
               }
        }
     }
@@ -74,5 +70,19 @@ class PlayListViewModel @Inject constructor(
                 _soundListBd.value = listBd
             }
         }
+    }
+
+   fun deletePlayList(playList: PlayList) {
+        viewModelScope.launch {
+
+          val reterno   = soundPlayListRepository.deletePlaylist(playList)
+          if (reterno != 0){
+              getAllPlayList()
+          }
+        }
+    }
+
+    fun updatePlayList(playList: PlayList) {
+
     }
 }

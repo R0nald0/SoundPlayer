@@ -22,15 +22,21 @@ class SoundPlayListRepository @Inject constructor (
 
  suspend fun savePlayList(playList: PlayList):List<Long>{
        try {
-            val idPlayList =playlistAndSoundCross.createPlayList(playList.toEntity())
-        val  playlistAndSoundCrossDaoList = playList.listSound.map {soundFromPlayList->
-               PlayListAndSoundCrossEntity(
-                   idPlayList,
-                   soundFromPlayList.idSound!!
-               )
-           }
+            val list = findAllPlayList()
+            list.forEach {
+                if (it.name == playList.name) return listOf();
+            }
+
+           val idPlayList =playlistAndSoundCross.createPlayList(playList.toEntity())
+           val  playlistAndSoundCrossDaoList = playList.listSound.map {soundFromPlayList->
+                  PlayListAndSoundCrossEntity(
+                         idPlayList,
+                         soundFromPlayList.idSound!!
+                     )
+                 }
 
            return  playlistAndSoundCross.savePlayListAndSoundCroos(playlistAndSoundCrossDaoList)
+
        } catch (exception: Exception) {
            exception.printStackTrace()
            throw Exception("Erro ao salvar play list")
@@ -58,5 +64,17 @@ class SoundPlayListRepository @Inject constructor (
         return soundDao.findAllSound().map {soundEntity ->
             Sound(soundEntity)
         }
+    }
+
+   suspend fun deletePlaylist(playList: PlayList) : Int{
+      try {
+          var retorno = playListDAO.deletePlayList(playList = playList.toEntity())
+          if (retorno != 0){
+              retorno=  playlistAndSoundCross.deletePlayListAndSoundCroos(playList.toEntity().playListId!!)
+          }
+          return retorno
+      }catch (exeption : Exception){
+           throw exeption;
+      }
     }
 }

@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.soundplayer.constants.Constants
+import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.data.dao.PlayListDAO
 import com.example.soundplayer.data.dao.PlaylistAndSoundCrossDao
 import com.example.soundplayer.data.dao.SoundDao

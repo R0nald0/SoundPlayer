@@ -11,7 +11,7 @@ import com.example.soundplayer.R
 import com.example.soundplayer.presentation.SongPlayActivity
 import com.example.soundplayer.presentation.SoundPresenter
 import com.example.soundplayer.databinding.ItemSoundBinding
-import com.example.soundplayer.extension.convertMilesSecondToMinSec
+import com.example.soundplayer.commons.extension.convertMilesSecondToMinSec
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.SoundList
