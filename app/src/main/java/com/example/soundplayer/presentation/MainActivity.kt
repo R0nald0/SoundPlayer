@@ -17,12 +17,11 @@ import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
 import com.example.soundplayer.commons.constants.Constants
-import com.example.soundplayer.presentation.adapter.PlayListAdapter
-import com.example.soundplayer.presentation.adapter.SoundAdapter
 import com.example.soundplayer.databinding.ActivityMainBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
-import com.example.soundplayer.model.SoundList
+import com.example.soundplayer.presentation.adapter.PlayListAdapter
+import com.example.soundplayer.presentation.adapter.SoundAdapter
 import com.example.soundplayer.presentation.fragment.BottomSheetFragment
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var gerenciarPermissoes : ActivityResultLauncher<String>
+    private var playList: PlayList? = null
     private lateinit var  adapterSound : SoundAdapter
     private lateinit var  playListAdapter: PlayListAdapter
     private val  soundPresenter by viewModels<SoundPresenter>();
@@ -47,35 +47,39 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        sortBackGraoundImage()
 
          initAdapter()
          getPermissions()
          observersViewModel()
 
         binding.btnFindSounds.setOnClickListener {
-            Log.i("INFO_", "btnFindSounds: teste ?")
             requestPermission()
         }
         
-        binding.fabAddPlayList.setOnClickListener { 
-              if (listSoundFromContentProvider.isNotEmpty()){
-                  createPlayListFragment(listSoundFromContentProvider)
-              }
+        binding.fabAddPlayList.setOnClickListener {
+            createPlayListFragment(null)
         }
     }
 
-    private fun createPlayListFragment(listSound: MutableSet<Sound>) {
-        val bottoSheet =BottomSheetFragment()
-        val bundle = bundleOf("list" to SoundList(0,listSound))
-        bottoSheet.arguments = bundle
-        bottoSheet.show(supportFragmentManager,"tag")
+    override fun onStart() {
+        super.onStart()
+        playListViewModel.findPlayListById(1)
+    }
+
+    private fun createPlayListFragment(playList: PlayList?) {
+        val bottomSheetFragment =BottomSheetFragment()
+        val bundle = bundleOf("list" to playList)
+        bottomSheetFragment.arguments = bundle
+        bottomSheetFragment.show(supportFragmentManager,"tag")
     }
 
     private  fun observersViewModel(){
         playListViewModel.playLists.observe(this){playListObservable->
              playListAdapter.addPlayList(playListObservable)
         }
+       playListViewModel.uniquePlayList.observe(this){uniquePlayList->
+              playList = uniquePlayList
+       }
 
         playListViewModel.soundListBd.observe(this){listSound->
               if (listSound.isNotEmpty()){
@@ -91,7 +95,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getPermissions(){
-
         gerenciarPermissoes =  registerForActivityResult(ActivityResultContracts.RequestPermission()){ isPermitted->
 
             if (!isPermitted){
@@ -107,8 +110,7 @@ class MainActivity : AppCompatActivity() {
                 binding.fabAddPlayList.visibility = View.VISIBLE
                 getMusicFromContentProvider()
                 if (listSoundFromContentProvider.isNotEmpty()) playListViewModel.saveAllSoundsByContentProvider(listSoundFromContentProvider)
-
-
+                playListViewModel.getAllPlayList()
             }
         }
         requestPermission()
@@ -133,11 +135,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        playListViewModel.getAllPlayList()
-    }
-
     override fun onResume() {
         super.onResume()
         if (soundPresenter.isPlaying() == true){
@@ -154,14 +151,17 @@ class MainActivity : AppCompatActivity() {
     private fun initAdapter() {
         adapterSound = SoundAdapter(soundPresenter)
         binding.rvSound.adapter = adapterSound
-        binding.rvSound.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false)
+        binding.rvSound.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
 
         playListAdapter = PlayListAdapter(
+            soundPresenter = soundPresenter,
             onclick = { playListChoseByUser -> adapterSound.getPlayList(playListChoseByUser) },
             onDelete = {playList ->
-                         playListViewModel.deletePlayList(playList)
+                            playListViewModel.deletePlayList(playList)
                        },
-            onEdit = {playList -> playListViewModel.updatePlayList(playList) }
+            onEdit = {playList ->
+                createPlayListFragment(playList)
+            }
         )
 
         binding.idRvFavoriteList.adapter = playListAdapter
@@ -229,7 +229,6 @@ class MainActivity : AppCompatActivity() {
             binding.linearMusics.visibility =View.GONE
             binding.txvSoundNotFound.visibility =View.VISIBLE
         }else{
-
             binding.linearMusics.visibility =View.VISIBLE
             binding.txvSoundNotFound.visibility =View.GONE
             binding.txvQuantidadeMusics.text ="Total de Músicas ${listSoundFromContentProvider.size}"

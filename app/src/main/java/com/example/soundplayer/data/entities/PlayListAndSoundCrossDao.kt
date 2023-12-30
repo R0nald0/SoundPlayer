@@ -1,6 +1,5 @@
 package com.example.soundplayer.data.entities
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 
 @Entity(primaryKeys = ["playListId","soundId"])

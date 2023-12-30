@@ -3,16 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/id_contraint_play_list"
-
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    tools:background="@color/black">
+    android:layout_width="120dp"
+    android:layout_height="110dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="16dp"
+    android:background="@drawable/border_playlist_item"
+    tools:background="@drawable/border_playlist_item">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imgPlayList"
-        android:layout_width="150dp"
-        android:layout_height="100dp"
-        android:layout_margin="8dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="8dp"
         android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,13 +30,13 @@
         android:fontFamily="casual"
         android:gravity="center"
         android:text="Play List Name"
-        android:textColor="#fff"
-        android:textSize="15sp"
-        android:textStyle="italic"
+        android:textColor="@color/black"
+        android:textSize="13sp"
+        android:textStyle="bold|italic"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/imgPlayList"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/imgPlayList"
-        app:layout_constraintTop_toBottomOf="@+id/imgPlayList" />
+        app:layout_constraintTop_toBottomOf="@+id/imgPlayList"
+        app:layout_constraintVertical_bias="0.38" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

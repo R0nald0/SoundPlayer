@@ -16,7 +16,7 @@ interface PlayListDAO {
     @Query(value = "SELECT * FROM playList")
     fun findAllPlayList():List<PlayListWithSong>
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun updatePlayList(playList: PlayListEntity)
+   suspend fun updatePlayList(playList: PlayListEntity):Int
     @Delete
   suspend  fun deletePlayList(playList: PlayListEntity) :Int
 }

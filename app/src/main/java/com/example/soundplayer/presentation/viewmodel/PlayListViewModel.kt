@@ -5,11 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.data.repository.SoundPlayListRepository
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
-
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,6 +19,9 @@ import javax.inject.Inject
 class PlayListViewModel @Inject constructor(
     private val soundPlayListRepository: SoundPlayListRepository
 ):ViewModel() {
+    private val _uniquePlayList = MutableLiveData<PlayList>()
+    val uniquePlayList : LiveData<PlayList>
+        get() = _uniquePlayList
 
     private val _playLists = MutableLiveData<List<PlayList>>()
      val playLists : LiveData<List<PlayList>>
@@ -41,7 +42,7 @@ class PlayListViewModel @Inject constructor(
     }
     fun getAllPlayList(){
        viewModelScope.launch {
-          val playListsRetorno =soundPlayListRepository.findAllPlayList()
+          val playListsRetorno =soundPlayListRepository.findAllPlayListWithSong()
               withContext(Dispatchers.Main){
                   _playLists.value = playListsRetorno
               }
@@ -74,7 +75,6 @@ class PlayListViewModel @Inject constructor(
 
    fun deletePlayList(playList: PlayList) {
         viewModelScope.launch {
-
           val reterno   = soundPlayListRepository.deletePlaylist(playList)
           if (reterno != 0){
               getAllPlayList()
@@ -82,7 +82,17 @@ class PlayListViewModel @Inject constructor(
         }
     }
 
-    fun updatePlayList(playList: PlayList) {
+    fun updatePlayList(playList: PlayList,newList: MutableSet<Sound>) {
+          viewModelScope.launch {
+                  soundPlayListRepository.updateplaylistAndSoundCrossDaoList(playList,newList)
+                   getAllPlayList();
+          }
+    }
 
+    fun findPlayListById(idPlayList:Long) {
+        viewModelScope.launch {
+             val resultPlayList = soundPlayListRepository.findPlayListByName(idPlayList)
+            _uniquePlayList.postValue(resultPlayList)
+        }
     }
 }

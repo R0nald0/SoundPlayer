@@ -2,9 +2,6 @@ package com.example.soundplayer.commons.extension
 
 import android.app.AlertDialog
 import android.content.Context
-import androidx.core.content.ContextCompat
-import com.example.soundplayer.R
-import com.example.soundplayer.model.PlayList
 import java.util.concurrent.TimeUnit
 
 fun Context.convertMilesSecondToMinSec(duration: Long): String {

@@ -1,26 +1,30 @@
 package com.example.soundplayer.presentation.adapter
 
+import android.util.Log
+import android.util.SparseBooleanArray
+import android.util.SparseIntArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.util.contains
 import androidx.recyclerview.widget.RecyclerView
 import com.example.soundplayer.R
 import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.commons.extension.showAlerDialog
 import com.example.soundplayer.databinding.PlayListItemBinding
 import com.example.soundplayer.model.PlayList
-import com.example.soundplayer.model.Sound
+import com.example.soundplayer.presentation.SoundPresenter
 
 class PlayListAdapter(
+    private val soundPresenter: SoundPresenter,
     val onclick :(PlayList)->Unit,
     val onDelete :(PlayList)->Unit,
     val onEdit :(PlayList)->Unit
-
 ) :RecyclerView.Adapter<PlayListAdapter.PlayLisViewHolder>(){
-
+    private val sparseArray  = SparseIntArray()
     private var playLists = mutableSetOf<PlayList>()
     fun addPlayList(playList: List<PlayList>){
         playLists = playList.toMutableSet()
@@ -34,21 +38,20 @@ class PlayListAdapter(
 
     inner class  PlayLisViewHolder(private val binding : PlayListItemBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(actualPlayList: PlayList, position: Int){
+
             binding.txvTitle.text = actualPlayList.name
             binding.idContraintPlayList.setOnClickListener {
-               if (actualPlayList.listSound.isEmpty()){
-                   Toast.makeText(binding.root.context, "PlayLis vazia", Toast.LENGTH_SHORT).show()
+                if (actualPlayList.listSound.isEmpty()){
+                   Toast.makeText(binding.root.context, "PlayList vazia", Toast.LENGTH_SHORT).show()
                }else{
                    onclick(actualPlayList)
                }
             }
 
-
             binding.idContraintPlayList.setOnLongClickListener {view->
                 if (actualPlayList.name != Constants.ALL_MUSIC_NAME){
                     createOptionsMenu(view,actualPlayList)
                 }
-
                 true
             }
         }
@@ -69,6 +72,7 @@ class PlayListAdapter(
     override fun onBindViewHolder(holder: PlayLisViewHolder, position: Int) {
         val playList = playLists.elementAt(position)
         holder.bind(playList,position)
+
     }
 
     private fun createOptionsMenu(view : View,playList: PlayList){
@@ -79,7 +83,6 @@ class PlayListAdapter(
         popupMenu.setOnMenuItemClickListener {
             when(it.itemId){
                 R.id.idEdit->{
-                    Toast.makeText(view.context, "edit", Toast.LENGTH_SHORT).show()
                     onEdit(playList)
                     true
                 }

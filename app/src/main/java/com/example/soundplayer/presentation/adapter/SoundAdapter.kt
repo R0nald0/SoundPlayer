@@ -8,13 +8,12 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.soundplayer.R
-import com.example.soundplayer.presentation.SongPlayActivity
-import com.example.soundplayer.presentation.SoundPresenter
-import com.example.soundplayer.databinding.ItemSoundBinding
 import com.example.soundplayer.commons.extension.convertMilesSecondToMinSec
+import com.example.soundplayer.databinding.ItemSoundBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
-import com.example.soundplayer.model.SoundList
+import com.example.soundplayer.presentation.SongPlayActivity
+import com.example.soundplayer.presentation.SoundPresenter
 
 class SoundAdapter(
  private val soundPresenter: SoundPresenter
@@ -52,7 +51,7 @@ class SoundAdapter(
              binding.txvTitle.setTextColor(ContextCompat.getColor(binding.root.context,R.color.red))
              binding.txvTitle.isSelected = true
          }else{
-             binding.txvTitle.setTextColor(ContextCompat.getColor(binding.root.context,R.color.white))
+             binding.txvTitle.setTextColor(ContextCompat.getColor(binding.root.context,R.color.black))
              binding.txvTitle.isSelected = false
          }
 

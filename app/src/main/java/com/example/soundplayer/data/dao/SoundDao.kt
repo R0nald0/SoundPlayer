@@ -6,13 +6,12 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.soundplayer.data.entities.PlayListEntity
 import com.example.soundplayer.data.entities.SoundEntity
 
 @Dao
 interface SoundDao {
     @Insert
-    suspend   fun createSound(sound : SoundEntity):Long
+    suspend  fun createSound(sound : SoundEntity):Long
     @Query(value = "SELECT * FROM sound")
     suspend  fun findAllSound():List<SoundEntity>
     @Update(onConflict = OnConflictStrategy.REPLACE)

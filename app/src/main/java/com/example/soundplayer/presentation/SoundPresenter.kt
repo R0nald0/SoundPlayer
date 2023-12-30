@@ -1,7 +1,6 @@
 package com.example.soundplayer.presentation
 
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
@@ -23,7 +22,9 @@ class SoundPresenter @Inject constructor(
 
     var actualSound  = MutableLiveData<Sound>()
     var isPlayingObserver  = MutableLiveData<Boolean>()
-    private var currentPlayList : PlayList ? = null
+    private var _currentPlayList : PlayList ? = null
+    val currentPlayList : PlayList?
+           get() = _currentPlayList
     private lateinit var listMediaItem  : List<MediaItem>
 
      fun getPlayer():ExoPlayer{
@@ -32,13 +33,13 @@ class SoundPresenter @Inject constructor(
 
     fun getAllMusics(playList: PlayList) {
 
-           if (currentPlayList != null &&  currentPlayList!!.name != playList.name){
+           if (_currentPlayList != null &&  _currentPlayList!!.name != playList.name){
                exoPlayer.stop()
                exoPlayer.clearMediaItems()
             }
 
             if (!exoPlayer.isPlaying || playList.currentMusicPosition !=currentItem ){
-                currentPlayList = playList
+                _currentPlayList = playList
                 listMediaItem= playList.listSound.map{ sound ->
                     MediaItem.Builder()
                         .setMediaMetadata(createMetaData(sound))

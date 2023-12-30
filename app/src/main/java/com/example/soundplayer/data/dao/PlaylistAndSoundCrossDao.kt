@@ -1,30 +1,36 @@
 package com.example.soundplayer.data.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.example.soundplayer.data.entities.PlayListAndSoundCrossEntity
-import com.example.soundplayer.data.entities.PlayListEntity
 import com.example.soundplayer.data.entities.PlayListWithSong
-import com.example.soundplayer.data.entities.SoundEntity
 
 @Dao
 interface PlaylistAndSoundCrossDao {
-    @Insert
-  suspend fun createSound(sound : SoundEntity):Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend  fun insertPlayListAndSoundCroos(playListAndSoundCrossEntity: List<PlayListAndSoundCrossEntity>):List<Long>
 
-    @Insert
-   suspend  fun createPlayList(playListEntity: PlayListEntity):Long
-
-   @Insert
-   suspend  fun savePlayListAndSoundCroos(playListAndSoundCrossEntity: List<PlayListAndSoundCrossEntity>):List<Long>
-
+   @Transaction
    @Query( value ="DELETE FROM playlistandsoundcrossentity WHERE playListId = :idPlaylist")
- suspend  fun deletePlayListAndSoundCroos(idPlaylist:Long) : Int
-  @Transaction
-  @Query(value = "SELECT * FROM playList")
-   suspend fun findAllPlayList():List<PlayListWithSong>
+   suspend  fun deletePlayListAndSoundCross(idPlaylist:Long) : Int
+
+    @Transaction
+    @Query( value ="DELETE FROM playlistandsoundcrossentity WHERE playListId = :idPlaylist AND soundId = :idSound")
+    suspend  fun deleteItemPlayListAndSoundCroos(idPlaylist:Long , idSound : Long) : Int
+
+    @Update
+    suspend  fun updatePlayListAndSoundCross(playListAndSoundCrossEntity: List<PlayListAndSoundCrossEntity>) : Int
+
+    @Transaction
+    @Query(value = "SELECT * FROM playList")
+    suspend fun findAllPlayListWithSong():List<PlayListWithSong>
+
+    @Transaction
+    @Query(value = "SELECT * FROM playList WHERE playListId = :idPlaylist ")
+    suspend fun findPlayListById(idPlaylist: Long) : PlayListWithSong
 
 }

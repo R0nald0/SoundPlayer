@@ -2,7 +2,6 @@ package com.example.soundplayer.presentation
 
 import android.content.ComponentName
 import android.os.Bundle
-import android.util.Log
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
