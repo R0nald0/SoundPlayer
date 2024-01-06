@@ -2,6 +2,7 @@ package com.example.soundplayer.commons.extension
 
 import android.app.AlertDialog
 import android.content.Context
+import android.view.View
 import java.util.concurrent.TimeUnit
 
 fun Context.convertMilesSecondToMinSec(duration: Long): String {
@@ -12,16 +13,19 @@ fun Context.convertMilesSecondToMinSec(duration: Long): String {
     )
 }
 
-fun Context.showAlerDialog(messenger :String, onPositive :()->Unit){
-    AlertDialog.Builder(this)
-        .setMessage(messenger)
-        .setNegativeButton("Não") { dialog, id ->
-            dialog.cancel()
-            dialog.dismiss()
-        }
-        .setPositiveButton("Sim"){dialog, id ->
-            dialog.cancel()
-            dialog.dismiss()
-            onPositive()
-        }.create().show()
+fun Context.showAlerDialog(messenger :String, positiveButton:String, negativeButton:String, layoutResid : View?, onPositive :()->Unit){
+    if (layoutResid != null) {
+        AlertDialog.Builder(this)
+            .setView(layoutResid)
+            .setMessage(messenger)
+            .setNegativeButton(negativeButton) { dialog, id ->
+                dialog.cancel()
+                dialog.dismiss()
+            }
+            .setPositiveButton(positiveButton){dialog, id ->
+                dialog.cancel()
+                dialog.dismiss()
+                onPositive()
+            }.create().show()
+    }
 }

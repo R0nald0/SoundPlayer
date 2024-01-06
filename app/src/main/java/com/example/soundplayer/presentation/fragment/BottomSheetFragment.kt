@@ -1,6 +1,5 @@
 package com.example.soundplayer.presentation.fragment
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,12 +28,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     }
    private  lateinit var  bottomSheetAdapter  : BottomPlayListAdapter
    private val playListViewModel by activityViewModels<PlayListViewModel>()
-
    private var bottomSheetPeekHeight = 0
-
-
-   private  var playList : PlayList? = null
-   private lateinit var listSound : List<Sound>
    private lateinit var createdSounds : Set<Sound>
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,24 +39,11 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
 
         bottomSheetPeekHeight  =  resources.getDimensionPixelOffset(R.dimen.expanded_bottom_sheet)
 
-        val bundle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requireArguments().getParcelable("list",PlayList::class.java)
-        } else {
-            requireArguments().getParcelable<PlayList>("list")
-        }
-
-        if (bundle != null) {
-            playList = bundle
-        }
-
         binding.btnCreatePlayList.setOnClickListener {
               bottomSheetAdapter.getSoundSelected() //<- Todo Verificar se necessario alterar metodo para retornar lista
               val namePlayList  = binding.edtPlayList.text.toString()
               if (createdSounds.isNotEmpty() && namePlayList.isNotEmpty()){
-                     if (playList != null) updatePlayList( playList!!.copy( name = namePlayList),createdSounds.toMutableSet()
-                     )
-
-                     else savePlayList(namePlayList,createdSounds.toMutableSet())
+                     savePlayList(namePlayList,createdSounds.toMutableSet())
                      dismiss()
               }else{
                   // Todo Verificar erro quando createdSound é vazio
@@ -72,7 +53,6 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
 
         return binding.root
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         bottomSheetAdapter = BottomPlayListAdapter{returnedChosedSoundList->
@@ -91,47 +71,30 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         observerLiveData()
     }
 
     override fun onStart() {
         super.onStart()
-        if (playList !=null) {
-            binding.edtPlayList.setText(playList!!.name)
-            binding.btnCreatePlayList.text = getString(R.string.text_atualizar_playlist)
-        }
-        else {
-            binding.edtPlayList.setText("")
             binding.btnCreatePlayList.text = getString(R.string.text_criar_playlist)
-        }
-
     }
-
     override fun onResume() {
         super.onResume()
     }
-
     private fun sizeView(){
      val bottomSheetBehavior  = BottomSheetBehavior.from(view?.parent as View)
         bottomSheetBehavior.peekHeight = bottomSheetPeekHeight
-
        val layoutManager  = binding.root.rootView.layoutParams
-
-
     }
 
     private fun observerLiveData(){
          playListViewModel.soundListBd.observe(this){soundsDatabase->
               if (soundsDatabase.isNotEmpty()){
-                  bottomSheetAdapter.getListSound(
-                      soundsDatabase.toSet(), playList = playList)
+                  bottomSheetAdapter.getListSound(soundsDatabase.toSet())
               }
          }
     }
-    private fun  updatePlayList(playList: PlayList,newListSound : MutableSet<Sound>){
-        playListViewModel.updatePlayList(playList = playList, newList =newListSound)
-    }
+
     private fun savePlayList(namePlayList :String, listSound : MutableSet<Sound>){
         val playList = PlayList(
             idPlayList = null,

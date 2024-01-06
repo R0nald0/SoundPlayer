@@ -1,30 +1,26 @@
 package com.example.soundplayer.presentation.adapter
 
-import android.util.Log
-import android.util.SparseBooleanArray
-import android.util.SparseIntArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.util.contains
 import androidx.recyclerview.widget.RecyclerView
 import com.example.soundplayer.R
 import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.commons.extension.showAlerDialog
 import com.example.soundplayer.databinding.PlayListItemBinding
+import com.example.soundplayer.databinding.UpadateNamePlaylistLayoutBinding
 import com.example.soundplayer.model.PlayList
-import com.example.soundplayer.presentation.SoundPresenter
+import com.example.soundplayer.presentation.SoundViewModel
 
 class PlayListAdapter(
-    private val soundPresenter: SoundPresenter,
+    private val soundViewModel: SoundViewModel,
     val onclick :(PlayList)->Unit,
     val onDelete :(PlayList)->Unit,
     val onEdit :(PlayList)->Unit
 ) :RecyclerView.Adapter<PlayListAdapter.PlayLisViewHolder>(){
-    private val sparseArray  = SparseIntArray()
     private var playLists = mutableSetOf<PlayList>()
     fun addPlayList(playList: List<PlayList>){
         playLists = playList.toMutableSet()
@@ -83,17 +79,40 @@ class PlayListAdapter(
         popupMenu.setOnMenuItemClickListener {
             when(it.itemId){
                 R.id.idEdit->{
-                    onEdit(playList)
+                    val upadateNameBinding =UpadateNamePlaylistLayoutBinding.inflate(LayoutInflater.from(view.context),null, false)
+
+                    view.context.showAlerDialog(
+                        messenger = String.format(ContextCompat.getString(view.context,R.string.atualizar_nome_playlist),playList.name),
+                        negativeButton = view.context.getString(R.string.cancelar),
+                        positiveButton = view.context.getString(R.string.editar),
+                        layoutResid = upadateNameBinding.root,
+                        onPositive = {
+                            val namePlayList = upadateNameBinding.edtextPlaylist.text.toString()
+                            if (namePlayList.isNotEmpty()){
+                                val playListToUpdate = PlayList(
+                                    idPlayList = playList.idPlayList,
+                                    listSound = playList.listSound,
+                                    name =namePlayList,
+                                    currentMusicPosition = playList.currentMusicPosition
+                                )
+                                onEdit(playListToUpdate)
+                            }else{
+                                Toast.makeText(view.context, "Nome da playlist não pode ser vazio", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                    )
                     true
                 }
                 R.id.id_delete ->{
                     view.context.showAlerDialog(
                         messenger = String.format(ContextCompat.getString(view.context,R.string.text_delete_playlist),playList.name),
-                        onPositive = { onDelete(playList) }
+                        negativeButton = view.context.getString(R.string.n_o),
+                        positiveButton = view.context.getString(R.string.sim),
+                        layoutResid = View.inflate(view.context, androidx.appcompat.R.layout.abc_action_menu_layout,null),
+                        onPositive = {  onDelete(playList)}
                     )
                     true
                 }
-
                 else -> false
             }
         }

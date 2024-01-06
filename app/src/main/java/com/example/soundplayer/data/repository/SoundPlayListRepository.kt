@@ -75,7 +75,7 @@ class SoundPlayListRepository @Inject constructor (
       }
     }
 
-    suspend fun findPlayListByName(idPlayList: Long): PlayList {
+    suspend fun findPlayListById(idPlayList: Long): PlayList {
          try {
              val playList =playlistAndSoundCross.findPlayListById(idPlayList)
              return  PlayList(
@@ -94,42 +94,65 @@ class SoundPlayListRepository @Inject constructor (
              val result = playListDAO.updatePlayList(playList.toEntity())
              if ( result != 0){
                   val listUpdate =compareListToUpdate(newList, playList)
-                  if (listUpdate.isNotEmpty()){
+                 return if (listUpdate.isNotEmpty()){
                      val  playlistAndSoundCrossDaoList = listUpdate.map {soundFromPlayList->
                          PlayListAndSoundCrossEntity(
                              playList.idPlayList!!,
                              soundFromPlayList.idSound!!
                          )
                      }
-                     return  playlistAndSoundCross.insertPlayListAndSoundCroos(playlistAndSoundCrossDaoList)
+                     playlistAndSoundCross.insertPlayListAndSoundCroos(playlistAndSoundCrossDaoList)
                  }else{
-                      deleteItemPlayListSoundAcross(playList, newList)
-                  }
-
-
+                     deleteItemPlayListSoundAcross(playList, newList)
+                 }
              }
              return emptyList()
 
          }catch (exeption:Exception){
-            exeption.printStackTrace()
+             exeption.printStackTrace()
              throw Exception("Erro ao Atualizar play list : ${exeption.message}")
          }
     }
-
+    suspend fun addSountToPlayList(idPlayList: Long, listToAdd :Set<Sound>):List<Long>{
+        try {
+            val listAcrossPlayListSound = listToAdd.map { sound ->
+                PlayListAndSoundCrossEntity(
+                    playListId = idPlayList,
+                    soundId = sound.idSound!!
+                )
+            }
+            return playlistAndSoundCross.insertPlayListAndSoundCroos(listAcrossPlayListSound)
+        }catch (exeption:Exception){
+            throw exeption;
+        }
+    }
     private suspend fun deleteItemPlayListSoundAcross(
         playList: PlayList,
         newList: MutableSet<Sound>
-    ) {
+    ) :List<Long> {
+        val modifaildField = mutableListOf<Long>()
         if (playList.listSound.isNotEmpty() && newList.isNotEmpty()){
             playList.listSound.forEach { sound ->
                 if (!newList.contains(sound)) {
-                    playlistAndSoundCross.deleteItemPlayListAndSoundCroos(
+                  val modi = playlistAndSoundCross.deleteItemPlayListAndSoundCroos(
                         idPlaylist = playList.idPlayList!!,
                         idSound = sound.idSound!!
                     )
+                    modifaildField.add(modi.toLong())
                 }
             }
         }
+        return modifaildField
+    }
+
+    suspend fun  removeSoundItemsFromPlayList(idPlayList: Long, soudsToRemove:Set<Sound>){
+         try {
+             soudsToRemove.forEach {sound ->
+                 playlistAndSoundCross.deleteItemPlayListAndSoundCroos(idPlayList,sound.idSound!!)
+             }
+         }catch (exec :Exception){
+             throw exec;
+         }
     }
 
     suspend fun compareListToUpdate(newList:MutableSet<Sound>, playList: PlayList):MutableSet<Sound> {
@@ -144,5 +167,13 @@ class SoundPlayListRepository @Inject constructor (
              }
           return listToUpdate;
 
+    }
+
+    suspend fun updateNamePlayList(playList: PlayList) :Int {
+          try {
+            return playListDAO.updatePlayList(playList.toEntity())
+          } catch(exeption:Exception){
+               throw  exeption;
+          }
     }
 }

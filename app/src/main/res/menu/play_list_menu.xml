@@ -5,10 +5,10 @@
         android:id="@+id/idEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="Editar Playlist" />
+        android:title="@string/editar_nome_playlist" />
     <item
         android:id="@+id/id_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="Excluir" />
+        android:title="@string/excluir" />
 </menu>

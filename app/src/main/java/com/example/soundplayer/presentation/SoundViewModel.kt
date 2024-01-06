@@ -1,6 +1,7 @@
 package com.example.soundplayer.presentation
 
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
@@ -13,12 +14,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class SoundPresenter @Inject constructor(
+class SoundViewModel @Inject constructor(
     private val exoPlayer: ExoPlayer
 ) :ViewModel(){
-     var playerWhenRead = true
+     private var playerWhenRead = true
      var currentItem = 0
-     var playBackPosition = 0L
+     private var playBackPosition = 0L
 
     var actualSound  = MutableLiveData<Sound>()
     var isPlayingObserver  = MutableLiveData<Boolean>()
@@ -31,6 +32,50 @@ class SoundPresenter @Inject constructor(
        return exoPlayer
      }
 
+    fun updatePlayList(listSound: MutableSet<Sound>){
+        if (currentPlayList != null){
+           val retorno  = addItemFromListMusic(listSound);
+             if (retorno.isEmpty()){
+                 removeItemFromListMusic(listSound)
+             }
+            Log.i("INFO_", "countPlayList: ${exoPlayer.mediaItemCount}")
+
+        }
+    }
+
+    fun addItemFromListMusic(listSound:MutableSet<Sound>):MutableSet<Sound>{
+        val listToUpdate = mutableSetOf<Sound>()
+        if (currentPlayList!!.listSound != listSound){
+            listSound.forEachIndexed {index , sound->
+                if (listSound.contains(sound) && !currentPlayList!!.listSound.contains(sound)) {
+                    listToUpdate.add(sound)
+                    exoPlayer.addMediaItem(
+                        index,
+                        MediaItem.Builder()
+                            .setMediaMetadata(createMetaData(sound))
+                            .setUri(sound.path)
+                            .build()
+                    )
+
+                }else if(listSound.contains(sound) && currentPlayList!!.listSound.contains(sound)){}
+            }
+        }
+        return listToUpdate;
+    }
+    fun removeItemFromListMusic(listSound:MutableSet<Sound>):MutableSet<Sound>{
+        val modifaildField = mutableSetOf<Sound>()
+        if (currentPlayList!!.listSound.isNotEmpty() && listSound.isNotEmpty()){
+            currentPlayList!!.listSound.forEachIndexed { index, sound ->
+                if (!listSound.contains(sound)) {
+                    exoPlayer.removeMediaItem(index);
+                    modifaildField.add(sound)
+                }
+                Log.i("INFO_", "getMediaItemAt: ${exoPlayer.getMediaItemAt(index)}")
+            }
+        }
+
+        return modifaildField
+    }
     fun getAllMusics(playList: PlayList) {
 
            if (_currentPlayList != null &&  _currentPlayList!!.name != playList.name){
@@ -40,16 +85,20 @@ class SoundPresenter @Inject constructor(
 
             if (!exoPlayer.isPlaying || playList.currentMusicPosition !=currentItem ){
                 _currentPlayList = playList
-                listMediaItem= playList.listSound.map{ sound ->
-                    MediaItem.Builder()
-                        .setMediaMetadata(createMetaData(sound))
-                        .setUri(sound.path)
-                        .build()
-                }
+                listMediaItem= createMediaItemList(playList.listSound)
 
                 exoPlayer.seekTo(playList.currentMusicPosition,playBackPosition)
                 currentItem = playList.currentMusicPosition
             }
+    }
+
+    private fun createMediaItemList(list: MutableSet<Sound>):List<MediaItem>{
+        return list.map{ sound ->
+             MediaItem.Builder()
+                 .setMediaMetadata(createMetaData(sound))
+                 .setUri(sound.path)
+                 .build()
+         }
     }
     private fun createMetaData(sound :Sound):MediaMetadata{
 
@@ -94,9 +143,14 @@ class SoundPresenter @Inject constructor(
 
     fun playAllMusicFromFist(){
 
-        exoPlayer.addMediaItems(listMediaItem)
-        exoPlayer.playWhenReady = playerWhenRead
-        exoPlayer.prepare()
+        Log.i("INFO_", "ListMidia item: ${listMediaItem.size}")
+        Log.i("INFO_", "countPlayList: ${exoPlayer.mediaItemCount}")
+        if (exoPlayer.mediaItemCount == 0){
+            exoPlayer.addMediaItems(listMediaItem)
+            exoPlayer.playWhenReady = playerWhenRead
+            exoPlayer.prepare()
+        }
+
         configActualSound()
     }
     fun isPlaying(): Boolean? {

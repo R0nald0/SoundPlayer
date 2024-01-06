@@ -28,18 +28,16 @@ class SongPlayActivity (): AppCompatActivity() {
         ActivitySongPlayBinding.inflate(layoutInflater)
     }
 
-    @Inject lateinit var  soundPresenter : SoundPresenter
+    @Inject lateinit var  soundViewModel : SoundViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         initPlayer()
-
-        soundPresenter.playAllMusicFromFist()
         observer()
     }
 
     private fun observer() {
-       soundPresenter.actualSound.observe(this) { sound ->
+       soundViewModel.actualSound.observe(this) { sound ->
            CoroutineScope(Dispatchers.Main).launch {
               // binding.txvNameMusic.isSelected = true
                binding.txvNameMusic.text = sound.title
@@ -56,12 +54,11 @@ class SongPlayActivity (): AppCompatActivity() {
    }
 
 
-    fun  initPlayer(){
-         soundPresenter.getPlayer()
-         soundPresenter.getPlayer().let { exoPlayer ->
-
+    private fun  initPlayer(){
+         soundViewModel.getPlayer()
+         soundViewModel.getPlayer().let { exoPlayer ->
              binding.myPlayerView.player = exoPlayer
-             soundPresenter.playAllMusicFromFist()
+             soundViewModel.playAllMusicFromFist()
          }
 
     }

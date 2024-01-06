@@ -12,7 +12,7 @@ import com.example.soundplayer.data.entities.PlayListWithSong
 @Dao
 interface PlayListDAO {
     @Insert
-    fun createPlayList(playList : PlayListEntity):Long
+ suspend   fun createPlayList(playList : PlayListEntity):Long
     @Query(value = "SELECT * FROM playList")
     fun findAllPlayList():List<PlayListWithSong>
     @Update(onConflict = OnConflictStrategy.REPLACE)

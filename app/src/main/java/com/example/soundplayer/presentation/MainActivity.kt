@@ -12,10 +12,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.soundplayer.R
 import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.databinding.ActivityMainBinding
 import com.example.soundplayer.model.PlayList
@@ -26,7 +24,6 @@ import com.example.soundplayer.presentation.fragment.BottomSheetFragment
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
-import kotlin.random.Random
 
 
 @AndroidEntryPoint
@@ -36,11 +33,11 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-    private lateinit var gerenciarPermissoes : ActivityResultLauncher<String>
-    private var playList: PlayList? = null
+    var cont = 0
+        private lateinit var gerenciarPermissoes : ActivityResultLauncher<String>
     private lateinit var  adapterSound : SoundAdapter
     private lateinit var  playListAdapter: PlayListAdapter
-    private val  soundPresenter by viewModels<SoundPresenter>();
+    private val  soundViewModel by viewModels<SoundViewModel>();
     private val playListViewModel by viewModels<PlayListViewModel>()
 
 
@@ -51,22 +48,27 @@ class MainActivity : AppCompatActivity() {
          initAdapter()
          getPermissions()
          observersViewModel()
+         setupToolbar()
 
         binding.btnFindSounds.setOnClickListener {
             requestPermission()
         }
         
         binding.fabAddPlayList.setOnClickListener {
-            createPlayListFragment(null)
+            createEditPlayListFragment(null)
         }
+    }
+
+
+    private fun setupToolbar() {
+        binding.include.materialToolbar.visibility
     }
 
     override fun onStart() {
         super.onStart()
-        playListViewModel.findPlayListById(1)
     }
 
-    private fun createPlayListFragment(playList: PlayList?) {
+    private fun createEditPlayListFragment(playList: PlayList?) {
         val bottomSheetFragment =BottomSheetFragment()
         val bundle = bundleOf("list" to playList)
         bottomSheetFragment.arguments = bundle
@@ -74,11 +76,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private  fun observersViewModel(){
-        playListViewModel.playLists.observe(this){playListObservable->
-             playListAdapter.addPlayList(playListObservable)
+        playListViewModel.playLists.observe(this){listOfplayListObservable->
+             playListAdapter.addPlayList(listOfplayListObservable)
         }
-       playListViewModel.uniquePlayList.observe(this){uniquePlayList->
-              playList = uniquePlayList
+       playListViewModel.uniquePlayList.observe(this){uniquePlayListWithSongs->
+              soundViewModel.updatePlayList(uniquePlayListWithSongs.listSound)
+              adapterSound.getPlayList(uniquePlayListWithSongs)
        }
 
         playListViewModel.soundListBd.observe(this){listSound->
@@ -115,14 +118,7 @@ class MainActivity : AppCompatActivity() {
         }
         requestPermission()
     }
-    private fun sortBackGraoundImage(){
-        val listDrawbleImage = listOf(
-            R.drawable.feror, R.drawable.tree
-        )
-        val numberRanodom = Random.nextInt(2)
-        binding.contstaintLayout.background = ContextCompat.getDrawable(this,listDrawbleImage[numberRanodom])
 
-    }
     private fun requestPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             gerenciarPermissoes.launch(
@@ -137,33 +133,48 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (soundPresenter.isPlaying() == true){
-            soundPresenter.actualSound.observe(this){soundLiveData->
+        if (soundViewModel.isPlaying() == true){
+            soundViewModel.actualSound.observe(this){ soundLiveData->
                 Toast.makeText(this, "Tocando ${soundLiveData.title} ", Toast.LENGTH_SHORT).show()
-                Log.i("INFO_", "Main:${soundLiveData.title} ")
+                Log.i("INFO_", "Main:${soundLiveData.title} ${cont++}")
                 //TODO VERIFICAR CHAMAS MULTIPLAS
                 adapterSound.getActualSound(soundLiveData)
-                binding.rvSound.scrollToPosition(soundPresenter.currentItem)
+                binding.rvSound.scrollToPosition(soundViewModel.currentItem)
             }
         }
     }
 
     private fun initAdapter() {
-        adapterSound = SoundAdapter(soundPresenter)
+        adapterSound = SoundAdapter(
+           soundViewModel =  soundViewModel,
+            isUpdateList = {isUpdate->
+                             if (isUpdate){
+                                 binding.include.toolbarPrincipal.visibility = View.GONE
+                                 binding.includeSelectItem.toolbarSelecrionItems.visibility = View.VISIBLE
+                                 binding.includeSelectItem.backButton.setOnClickListener {
+                                     adapterSound.clearSoundListSelected()
+                                 }
+                             }else{
+                                 binding.include.toolbarPrincipal.visibility = View.VISIBLE
+                                 binding.includeSelectItem.toolbarSelecrionItems.visibility = View.GONE
+                             }
+            },
+            onAddInToPlayList = {idPlayLisy,setOfSongs->
+
+            },
+            onRemoveSoundToPlayList = {idPlayLisy,setOfSongs->
+
+              }
+            )
         binding.rvSound.adapter = adapterSound
         binding.rvSound.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
 
         playListAdapter = PlayListAdapter(
-            soundPresenter = soundPresenter,
+            soundViewModel = soundViewModel,
             onclick = { playListChoseByUser -> adapterSound.getPlayList(playListChoseByUser) },
-            onDelete = {playList ->
-                            playListViewModel.deletePlayList(playList)
-                       },
-            onEdit = {playList ->
-                createPlayListFragment(playList)
-            }
+            onDelete = {playList -> playListViewModel.deletePlayList(playList)},
+            onEdit = {playList -> playListViewModel.updateNamePlayList(playList) }
         )
-
         binding.idRvFavoriteList.adapter = playListAdapter
         binding.idRvFavoriteList.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false)
 
@@ -236,8 +247,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        soundPresenter.destroyPlayer()
+        soundViewModel.destroyPlayer()
         super.onDestroy()
     }
+
 
 }

@@ -2,6 +2,16 @@
     <string name="app_name">SoundPlayer</string>
     <string name="text_delete_playlist">"Deseja deletar a %1$s ?"</string>
     <string name="text_edit_playlist">"Deseja deletar a %1$s ?"</string>
-    <string name="text_atualizar_playlist">Atualizar Playlist</string>
+    <string name="text_atualizar_playlist">Atualizar Playlist %1$s</string>
     <string name="text_criar_playlist">Criar Playlist</string>
+    <string name="editar_nome_playlist">Editar nome playlist</string>
+    <string name="excluir">Excluir</string>
+    <string name="atualizar_nome_playlist">Atualizar nome Playlist</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="editar">Editar</string>
+    <string name="n_o">Não</string>
+    <string name="sim">Sim</string>
+    <string name="adicionar_a_playlist">adicionar a playlist</string>
+    <string name="remover_da_playlist">remover da playlist</string>
+    <string name="selecionar_items">Selecionar Items</string>
 </resources>

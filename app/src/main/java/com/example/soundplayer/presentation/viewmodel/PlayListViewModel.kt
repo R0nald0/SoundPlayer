@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PlayListViewModel @Inject constructor(
-    private val soundPlayListRepository: SoundPlayListRepository
+    private val soundPlayListRepository: SoundPlayListRepository,
 ):ViewModel() {
     private val _uniquePlayList = MutableLiveData<PlayList>()
     val uniquePlayList : LiveData<PlayList>
@@ -81,18 +81,33 @@ class PlayListViewModel @Inject constructor(
           }
         }
     }
-
-    fun updatePlayList(playList: PlayList,newList: MutableSet<Sound>) {
-          viewModelScope.launch {
-                  soundPlayListRepository.updateplaylistAndSoundCrossDaoList(playList,newList)
-                   getAllPlayList();
-          }
+    fun updateNamePlayList(playList: PlayList){
+         viewModelScope.launch {
+            val numberModifiedField  =soundPlayListRepository.updateNamePlayList(playList)
+             if (numberModifiedField !=0 ){
+                 getAllPlayList()
+             }
+         }
     }
 
+    fun addSountToPlayList(idPlayList: Long,listSound:Set<Sound>){
+         viewModelScope.launch{
+            val result = soundPlayListRepository.addSountToPlayList(idPlayList,listSound)
+             if (result.isNotEmpty()) getAllPlayList()
+         }
+    }
+    fun removePlaySoundFromPlayList(playList: PlayList,listRemovedItems: Set<Sound>){
+         viewModelScope.launch {
+             soundPlayListRepository.removeSoundItemsFromPlayList(playList.idPlayList!!,listRemovedItems)
+             getAllPlayList()
+         }
+    }
     fun findPlayListById(idPlayList:Long) {
         viewModelScope.launch {
-             val resultPlayList = soundPlayListRepository.findPlayListByName(idPlayList)
-            _uniquePlayList.postValue(resultPlayList)
+             val resultPlayList = soundPlayListRepository.findPlayListById(idPlayList)
+             withContext(Dispatchers.Main){
+                 _uniquePlayList.postValue(resultPlayList)
+             }
         }
     }
 }
