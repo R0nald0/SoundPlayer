@@ -93,19 +93,26 @@ class PlayListViewModel @Inject constructor(
     fun addSountToPlayList(idPlayList: Long,listSound:Set<Sound>){
          viewModelScope.launch{
             val result = soundPlayListRepository.addSountToPlayList(idPlayList,listSound)
-             if (result.isNotEmpty()) getAllPlayList()
+             if (result.isNotEmpty()) {
+                 getAllPlayList()
+                 findPlayListById(idPlayList)
+             }
          }
     }
-    fun removePlaySoundFromPlayList(playList: PlayList,listRemovedItems: Set<Sound>){
+    fun removePlaySoundFromPlayList(playListId: Long,listRemovedItems: Set<Sound>){
          viewModelScope.launch {
-             soundPlayListRepository.removeSoundItemsFromPlayList(playList.idPlayList!!,listRemovedItems)
-             getAllPlayList()
+             val itemsRemoved  =soundPlayListRepository.removeSoundItemsFromPlayList(idPlayList = playListId,listRemovedItems)
+             if (itemsRemoved.isNotEmpty()){
+                 findPlayListById(idPlayList = playListId)
+                 getAllPlayList()
+             }
+
          }
     }
     fun findPlayListById(idPlayList:Long) {
         viewModelScope.launch {
              val resultPlayList = soundPlayListRepository.findPlayListById(idPlayList)
-             withContext(Dispatchers.Main){
+              withContext(Dispatchers.Main){
                  _uniquePlayList.postValue(resultPlayList)
              }
         }

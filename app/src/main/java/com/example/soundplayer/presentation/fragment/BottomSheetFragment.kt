@@ -37,7 +37,6 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         binding.edtPlayList.clearFocus()
         binding.textInputLayoutCratePlayList.clearFocus()
 
-        bottomSheetPeekHeight  =  resources.getDimensionPixelOffset(R.dimen.expanded_bottom_sheet)
 
         binding.btnCreatePlayList.setOnClickListener {
               bottomSheetAdapter.getSoundSelected() //<- Todo Verificar se necessario alterar metodo para retornar lista

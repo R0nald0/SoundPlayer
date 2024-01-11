@@ -1,5 +1,6 @@
 package com.example.soundplayer.presentation.adapter
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.util.Log
@@ -17,30 +18,34 @@ import com.example.soundplayer.commons.extension.convertMilesSecondToMinSec
 import com.example.soundplayer.databinding.ItemSoundBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
+import com.example.soundplayer.presentation.MainActivity
 import com.example.soundplayer.presentation.SongPlayActivity
 import com.example.soundplayer.presentation.SoundViewModel
 
 class SoundAdapter(
     private val soundViewModel: SoundViewModel,
     val isUpdateList :(Boolean)->Unit,
-    val onRemoveSoundToPlayList :(Long,Set<Sound>)->Unit,
-    val onAddInToPlayList :(Long,Set<Sound>)->Unit
 ) :RecyclerView.Adapter<SoundAdapter.SoundViewHolder>() {
    private  var soundsPlayList: PlayList? = null
    private  var actualSound :Sound? = null
     private val soundSelecionados  = mutableSetOf<Sound>()
 
 
-
+    @SuppressLint("NotifyDataSetChanged")
     fun getPlayList(actualPlayList: PlayList){
         soundSelecionados.clear()
         isUpdateList(false)
         soundsPlayList = actualPlayList
         notifyDataSetChanged()
     }
+    @SuppressLint("NotifyDataSetChanged")
     fun getActualSound(sound :Sound){
         actualSound = sound
         notifyDataSetChanged()
+    }
+
+    fun getSoundSelecionados(): Pair<Long,MutableSet<Sound>> {
+        return Pair (soundsPlayList?.idPlayList!! , soundSelecionados)
     }
 
 
@@ -53,7 +58,7 @@ class SoundAdapter(
          binding.imageView.setImageURI(soudd.uriMediaAlbum)
 
          if (soundSelecionados.isNotEmpty()){
-             isUpdateList(true)
+
              if (soundSelecionados.contains(soudd)){
                  binding.idContraint.setBackgroundColor(Color.GRAY)
              }else{
@@ -96,7 +101,6 @@ class SoundAdapter(
                     if (!soundSelecionados.contains(soudd)){
                         binding.idContraint.setBackgroundColor(Color.GRAY)
                         soundSelecionados.add(soudd)
-                        if (soundSelecionados.isEmpty())isUpdateList(true)
                     }else{
                         binding.idContraint.setBackgroundColor(ContextCompat.getColor(it.context,R.color.white_activity_main))
                         soundSelecionados.remove(soudd)
@@ -107,13 +111,12 @@ class SoundAdapter(
          }
 
          binding.idContraint.setOnLongClickListener {view->
-             if (soundsPlayList!!.name != Constants.ALL_MUSIC_NAME){
-                 isUpdateList(true)
-                 soundSelecionados.add(soudd)
-                 binding.idContraint.setBackgroundColor(Color.GRAY)
-                 Log.i("INFO_", "bind: ${soundSelecionados.size}")
-             }
-
+                if (soundSelecionados.size == 0){
+                    isUpdateList(true)
+                    soundSelecionados.add(soudd)
+                    binding.idContraint.setBackgroundColor(Color.GRAY)
+                    Log.i("INFO_", "bind: ${soundSelecionados.size}")
+                }
              true
          }
      }
@@ -139,38 +142,10 @@ class SoundAdapter(
         }
     }
 
-    private fun createOptionsMenu(view : View, playList: PlayList){
-
-        val popupMenu  = PopupMenu(view.context,view)
-
-        popupMenu.inflate(R.menu.sound_menu)
-        if (playList.name == Constants.ALL_MUSIC_NAME){
-            popupMenu.menu.removeItem(R.id.id_remove)
-        }
-
-        playList.listSound
-        popupMenu.show()
-        popupMenu.setOnMenuItemClickListener {
-
-            when(it.itemId){
-                R.id.id_update->{
-
-                    //receberlista de item para adicionar
-                    true
-                }
-                R.id.id_remove ->{
-                    onRemoveSoundToPlayList
-                    //receberlista de item para remover
-                    Toast.makeText(view.context, "PlayList ${"remover da playList"}", Toast.LENGTH_SHORT).show()
-                    true
-                }
-                else ->false
-            }
-        }
-    }
    fun clearSoundListSelected(){
        getPlayList(soundsPlayList!!)
        Log.i("INFO_", "bind: ${soundSelecionados.size}")
   }
+
     private fun verifyItemContainInTosoundSelecionados(){}
 }

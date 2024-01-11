@@ -14,4 +14,5 @@
     <string name="adicionar_a_playlist">adicionar a playlist</string>
     <string name="remover_da_playlist">remover da playlist</string>
     <string name="selecionar_items">Selecionar Items</string>
+    <string name="escolha_o_playlist">Escolha o PlayList</string>
 </resources>

@@ -145,10 +145,10 @@ class SoundPlayListRepository @Inject constructor (
         return modifaildField
     }
 
-    suspend fun  removeSoundItemsFromPlayList(idPlayList: Long, soudsToRemove:Set<Sound>){
+    suspend fun  removeSoundItemsFromPlayList(idPlayList: Long, soudsToRemove:Set<Sound>) :List<Int>{
          try {
-             soudsToRemove.forEach {sound ->
-                 playlistAndSoundCross.deleteItemPlayListAndSoundCroos(idPlayList,sound.idSound!!)
+             return soudsToRemove.map {sound ->
+                  playlistAndSoundCross.deleteItemPlayListAndSoundCroos(idPlayList,sound.idSound!!)
              }
          }catch (exec :Exception){
              throw exec;

@@ -6,6 +6,9 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -13,14 +16,19 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.core.view.MenuProvider
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.soundplayer.R
 import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.databinding.ActivityMainBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
+import com.example.soundplayer.model.SoundList
 import com.example.soundplayer.presentation.adapter.PlayListAdapter
 import com.example.soundplayer.presentation.adapter.SoundAdapter
 import com.example.soundplayer.presentation.fragment.BottomSheetFragment
+import com.example.soundplayer.presentation.fragment.SelectPlayListDialogFragment
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -32,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
-
+    lateinit var myMenuProvider: MenuProvider
     var cont = 0
         private lateinit var gerenciarPermissoes : ActivityResultLauncher<String>
     private lateinit var  adapterSound : SoundAdapter
@@ -45,10 +53,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-         initAdapter()
-         getPermissions()
-         observersViewModel()
-         setupToolbar()
+        setupToolbar()
+        initAdapter()
+        getPermissions()
+        observersViewModel()
 
         binding.btnFindSounds.setOnClickListener {
             requestPermission()
@@ -58,10 +66,9 @@ class MainActivity : AppCompatActivity() {
             createEditPlayListFragment(null)
         }
     }
-
-
     private fun setupToolbar() {
-        binding.include.materialToolbar.visibility
+        setSupportActionBar(binding.includeSelectItem.toolbarSelecrionItemsMaterial)
+        myMenuProvider = MyMenuProvider()
     }
 
     override fun onStart() {
@@ -79,6 +86,7 @@ class MainActivity : AppCompatActivity() {
         playListViewModel.playLists.observe(this){listOfplayListObservable->
              playListAdapter.addPlayList(listOfplayListObservable)
         }
+
        playListViewModel.uniquePlayList.observe(this){uniquePlayListWithSongs->
               soundViewModel.updatePlayList(uniquePlayListWithSongs.listSound)
               adapterSound.getPlayList(uniquePlayListWithSongs)
@@ -94,6 +102,16 @@ class MainActivity : AppCompatActivity() {
                   )
                   playListViewModel.savePlayList(playList)
               }
+        }
+
+        if (soundViewModel.isPlaying() == true){
+            soundViewModel.actualSound.observe(this){ soundLiveData->
+                Toast.makeText(this, "Tocando ${soundLiveData.title} ", Toast.LENGTH_SHORT).show()
+                Log.i("INFO_", "Main:${soundLiveData.title} ${cont++}")
+                //TODO VERIFICAR CHAMAS MULTIPLAS
+                adapterSound.getActualSound(soundLiveData)
+                binding.rvSound.scrollToPosition(soundViewModel.currentItem)
+            }
         }
     }
 
@@ -131,41 +149,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (soundViewModel.isPlaying() == true){
-            soundViewModel.actualSound.observe(this){ soundLiveData->
-                Toast.makeText(this, "Tocando ${soundLiveData.title} ", Toast.LENGTH_SHORT).show()
-                Log.i("INFO_", "Main:${soundLiveData.title} ${cont++}")
-                //TODO VERIFICAR CHAMAS MULTIPLAS
-                adapterSound.getActualSound(soundLiveData)
-                binding.rvSound.scrollToPosition(soundViewModel.currentItem)
-            }
-        }
-    }
-
     private fun initAdapter() {
         adapterSound = SoundAdapter(
            soundViewModel =  soundViewModel,
-            isUpdateList = {isUpdate->
-                             if (isUpdate){
-                                 binding.include.toolbarPrincipal.visibility = View.GONE
-                                 binding.includeSelectItem.toolbarSelecrionItems.visibility = View.VISIBLE
-                                 binding.includeSelectItem.backButton.setOnClickListener {
-                                     adapterSound.clearSoundListSelected()
-                                 }
-                             }else{
-                                 binding.include.toolbarPrincipal.visibility = View.VISIBLE
-                                 binding.includeSelectItem.toolbarSelecrionItems.visibility = View.GONE
-                             }
-            },
-            onAddInToPlayList = {idPlayLisy,setOfSongs->
-
-            },
-            onRemoveSoundToPlayList = {idPlayLisy,setOfSongs->
-
-              }
+            isUpdateList = {isUpdate-> updateViewWhenMenuChange(isUpdate) }
             )
+
         binding.rvSound.adapter = adapterSound
         binding.rvSound.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
 
@@ -179,6 +168,24 @@ class MainActivity : AppCompatActivity() {
         binding.idRvFavoriteList.layoutManager = LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false)
 
     }
+
+    private fun updateViewWhenMenuChange(isUpdate: Boolean) {
+        if (isUpdate) {
+            addMenuProvider(myMenuProvider)
+            binding.include.toolbarPrincipal.visibility = View.GONE
+            binding.includeSelectItem.toolbarSelecrionItems.visibility = View.VISIBLE
+            binding.fabAddPlayList.isVisible = false
+            binding.includeSelectItem.backButton.setOnClickListener {
+                adapterSound.clearSoundListSelected()
+            }
+        } else {
+            removeMenuProvider(myMenuProvider)
+            binding.fabAddPlayList.isVisible = true
+            binding.include.toolbarPrincipal.visibility = View.VISIBLE
+            binding.includeSelectItem.toolbarSelecrionItems.visibility = View.GONE
+        }
+    }
+
 
     private fun getMusicFromContentProvider(){
         val projection = arrayOf(
@@ -246,10 +253,48 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
+     override fun onDestroy() {
         soundViewModel.destroyPlayer()
         super.onDestroy()
     }
+
+   inner class  MyMenuProvider() : MenuProvider {
+       override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+           menuInflater.inflate(R.menu.sound_menu,menu)
+         val pairPlayList = adapterSound.getSoundSelecionados()
+           if (pairPlayList.first.toInt() == 1){
+               menu.removeItem(R.id.id_remove)
+           }
+
+       }
+
+       override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+
+           val pairPlayList  =  adapterSound.getSoundSelecionados()
+
+           return   when(menuItem.itemId){
+
+               R.id.id_update->{
+                 val sound = SoundList(0,pairPlayList.second)
+                   val  bottomSheetFragment =SelectPlayListDialogFragment()
+                   val bundle = bundleOf("listSound" to sound)
+                   bottomSheetFragment.arguments = bundle
+                   bottomSheetFragment.show(supportFragmentManager,"tag")
+                   true
+               }
+               R.id.id_remove ->{
+                   playListViewModel.removePlaySoundFromPlayList(
+                        playListId = pairPlayList.first,
+                        listRemovedItems =pairPlayList.second.toSet()
+                   )
+                   true
+               }
+               else ->false
+           }
+
+       }
+    }
+
 
 
 }
