@@ -16,4 +16,8 @@
     <style name="ToolbarTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorControlNormal">@color/white</item>
     </style>
+    
+    <style name="ThemeCustomSelecteItemPlayList" parent="Theme.AppCompat.Light.Dialog">
+         <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
 </resources>

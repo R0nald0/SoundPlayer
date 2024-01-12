@@ -1,11 +1,14 @@
 package com.example.soundplayer.presentation.adapter
 
+import android.annotation.SuppressLint
+import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.util.containsValue
 import androidx.recyclerview.widget.RecyclerView
 import com.example.soundplayer.R
 import com.example.soundplayer.commons.constants.Constants
@@ -22,6 +25,7 @@ class PlayListAdapter(
     val onEdit :(PlayList)->Unit
 ) :RecyclerView.Adapter<PlayListAdapter.PlayLisViewHolder>(){
     private var playLists = mutableSetOf<PlayList>()
+    var positionPlayListClicked = SparseArray<Int>()
     fun addPlayList(playList: List<PlayList>){
         playLists = playList.toMutableSet()
         notifyDataSetChanged()
@@ -33,15 +37,18 @@ class PlayListAdapter(
 
 
     inner class  PlayLisViewHolder(private val binding : PlayListItemBinding): RecyclerView.ViewHolder(binding.root){
+        @SuppressLint("NotifyDataSetChanged")
         fun bind(actualPlayList: PlayList, position: Int){
-
+            if(!positionPlayListClicked.containsValue(position)){
+                 binding.idContraintPlayList.background = ContextCompat.getDrawable(binding.root.context,R.drawable.border_playlist_item_selected)
+              }
+            initBindings(actualPlayList, position)
+        }
+        private fun  initBindings(actualPlayList :PlayList, position: Int){
             binding.txvTitle.text = actualPlayList.name
             binding.idContraintPlayList.setOnClickListener {
-                if (actualPlayList.listSound.isEmpty()){
-                   Toast.makeText(binding.root.context, "PlayList vazia", Toast.LENGTH_SHORT).show()
-               }else{
-                   onclick(actualPlayList)
-               }
+                setUpBorderPlayList(position)
+                verifyPlayListEmpty(actualPlayList)
             }
 
             binding.idContraintPlayList.setOnLongClickListener {view->
@@ -49,6 +56,22 @@ class PlayListAdapter(
                     createOptionsMenu(view,actualPlayList)
                 }
                 true
+            }
+        }
+        private fun verifyPlayListEmpty(actualPlayList: PlayList) {
+            if (actualPlayList.listSound.isEmpty()) {
+                Toast.makeText(binding.root.context, "PlayList vazia", Toast.LENGTH_SHORT).show()
+            } else {
+                onclick(actualPlayList)
+            }
+        }
+        private fun setUpBorderPlayList(position: Int) {
+            positionPlayListClicked.clear()
+            positionPlayListClicked.put(position, position)
+            if (positionPlayListClicked.containsValue(position)) {
+                binding.idContraintPlayList.background =
+                    ContextCompat.getDrawable(binding.root.context, R.drawable.border_playlist_item)
+                notifyDataSetChanged()
             }
         }
     }
@@ -117,4 +140,5 @@ class PlayListAdapter(
             }
         }
     }
+
 }
