@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SoundViewModel @Inject constructor(
-    private val exoPlayer: ExoPlayer
+    private val  exoPlayer: ExoPlayer
 ) :ViewModel(){
      private var playerWhenRead = true
      var currentItem = 0
@@ -39,7 +39,6 @@ class SoundViewModel @Inject constructor(
                  removeItemFromListMusic(listSound)
              }
             Log.i("INFO_", "countPlayList: ${exoPlayer.mediaItemCount}")
-
         }
     }
 
@@ -142,15 +141,11 @@ class SoundViewModel @Inject constructor(
     }
 
     fun playAllMusicFromFist(){
-
-        Log.i("INFO_", "ListMidia item: ${listMediaItem.size}")
-        Log.i("INFO_", "countPlayList: ${exoPlayer.mediaItemCount}")
         if (exoPlayer.mediaItemCount == 0){
             exoPlayer.addMediaItems(listMediaItem)
             exoPlayer.playWhenReady = playerWhenRead
             exoPlayer.prepare()
         }
-
         configActualSound()
     }
     fun isPlaying(): Boolean? {

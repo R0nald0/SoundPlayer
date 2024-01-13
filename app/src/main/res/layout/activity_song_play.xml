@@ -54,6 +54,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
+        app:repeat_toggle_modes="all|none|one"
+        app:show_shuffle_button="true"
         app:show_timeout="0"
         app:show_vr_button="false" />
 

@@ -36,16 +36,17 @@ import java.io.File
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
     private val listSoundFromContentProvider = mutableSetOf<Sound>()
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
     lateinit var myMenuProvider: MenuProvider
     var cont = 0
-        private lateinit var gerenciarPermissoes : ActivityResultLauncher<String>
+    private lateinit var gerenciarPermissoes : ActivityResultLauncher<String>
     private lateinit var  adapterSound : SoundAdapter
     private lateinit var  playListAdapter: PlayListAdapter
-    private val  soundViewModel by viewModels<SoundViewModel>();
+    private val  soundViewModel by viewModels<SoundViewModel>()
     private val playListViewModel by viewModels<PlayListViewModel>()
 
 
@@ -73,6 +74,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        if (soundViewModel.isPlaying() == true){
+            soundViewModel.actualSound.observe(this){ soundLiveData->
+                Toast.makeText(this, "Tocando ${soundLiveData.title} ", Toast.LENGTH_SHORT).show()
+                Log.i("INFO_", "Main:${soundLiveData.title} ${cont++}")
+                //TODO VERIFICAR CHAMAS MULTIPLAS
+                adapterSound.getActualSound(soundLiveData)
+                binding.rvSound.scrollToPosition(soundViewModel.currentItem)
+            }
+        }
     }
 
     private fun createEditPlayListFragment(playList: PlayList?) {
@@ -102,16 +112,6 @@ class MainActivity : AppCompatActivity() {
                   )
                   playListViewModel.savePlayList(playList)
               }
-        }
-
-        if (soundViewModel.isPlaying() == true){
-            soundViewModel.actualSound.observe(this){ soundLiveData->
-                Toast.makeText(this, "Tocando ${soundLiveData.title} ", Toast.LENGTH_SHORT).show()
-                Log.i("INFO_", "Main:${soundLiveData.title} ${cont++}")
-                //TODO VERIFICAR CHAMAS MULTIPLAS
-                adapterSound.getActualSound(soundLiveData)
-                binding.rvSound.scrollToPosition(soundViewModel.currentItem)
-            }
         }
     }
 

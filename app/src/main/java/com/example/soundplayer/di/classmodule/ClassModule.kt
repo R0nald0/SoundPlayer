@@ -18,11 +18,13 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class ClassModule {
+
     @Singleton
     @Provides
     fun provideActualSong(exoPlayer: ExoPlayer): SoundViewModel {
         return  SoundViewModel(exoPlayer)
     }
+
 
     @Singleton
     @Provides

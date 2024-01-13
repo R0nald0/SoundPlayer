@@ -37,7 +37,6 @@ class PlayListAdapter(
 
 
     inner class  PlayLisViewHolder(private val binding : PlayListItemBinding): RecyclerView.ViewHolder(binding.root){
-        @SuppressLint("NotifyDataSetChanged")
         fun bind(actualPlayList: PlayList, position: Int){
             if(!positionPlayListClicked.containsValue(position)){
                  binding.idContraintPlayList.background = ContextCompat.getDrawable(binding.root.context,R.drawable.border_playlist_item_selected)
@@ -65,6 +64,7 @@ class PlayListAdapter(
                 onclick(actualPlayList)
             }
         }
+        @SuppressLint("NotifyDataSetChanged")
         private fun setUpBorderPlayList(position: Int) {
             positionPlayListClicked.clear()
             positionPlayListClicked.put(position, position)

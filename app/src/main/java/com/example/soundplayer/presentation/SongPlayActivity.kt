@@ -2,11 +2,14 @@ package com.example.soundplayer.presentation
 
 import android.content.ComponentName
 import android.os.Bundle
+import android.util.Log
+import androidx.activity.viewModels
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.session.MediaController
@@ -20,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.log
 
 @AndroidEntryPoint
 class SongPlayActivity (): AppCompatActivity() {
@@ -54,13 +58,12 @@ class SongPlayActivity (): AppCompatActivity() {
    }
 
 
+    @OptIn(UnstableApi::class)
     private fun  initPlayer(){
-         soundViewModel.getPlayer()
          soundViewModel.getPlayer().let { exoPlayer ->
              binding.myPlayerView.player = exoPlayer
              soundViewModel.playAllMusicFromFist()
          }
-
     }
 
     @OptIn(UnstableApi::class) override fun onStart() {
