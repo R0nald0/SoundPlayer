@@ -5,20 +5,16 @@ import android.content.Intent
 import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.soundplayer.R
-import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.commons.extension.convertMilesSecondToMinSec
 import com.example.soundplayer.databinding.ItemSoundBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
-import com.example.soundplayer.presentation.MainActivity
 import com.example.soundplayer.presentation.SongPlayActivity
 import com.example.soundplayer.presentation.SoundViewModel
 
@@ -60,15 +56,17 @@ class SoundAdapter(
          if (soundSelecionados.isNotEmpty()){
 
              if (soundSelecionados.contains(soudd)){
-                 binding.idContraint.setBackgroundColor(Color.GRAY)
+                binding.cardItemSound.setCardBackgroundColor(Color.GRAY)
              }else{
-                 binding.idContraint.setBackgroundColor(ContextCompat.getColor(
-                     binding.root.context,R.color.white_activity_main))
+                 binding.cardItemSound.setCardBackgroundColor(ContextCompat.getColor(
+                     binding.root.context,R.color.colorSurfaceVariant
+                 ))
              }
          }else{
              isUpdateList(false)
-             binding.idContraint.setBackgroundColor(ContextCompat.getColor(
-                 binding.root.context,R.color.white_activity_main))
+             binding.cardItemSound.setCardBackgroundColor(ContextCompat.getColor(
+                 binding.root.context,R.color.colorSurfaceVariant
+             ))
          }
 
          if (soudd.uriMediaAlbum != null){
@@ -81,7 +79,7 @@ class SoundAdapter(
              binding.txvTitle.setTextColor(ContextCompat.getColor(binding.root.context,R.color.red))
              binding.txvTitle.isSelected = true
          }else{
-             binding.txvTitle.setTextColor(ContextCompat.getColor(binding.root.context,R.color.black))
+             binding.txvTitle.setTextColor(ContextCompat.getColor(binding.root.context,R.color.my_primary))
              binding.txvTitle.isSelected = false
          }
 
@@ -99,22 +97,25 @@ class SoundAdapter(
                 }
                  else{
                     if (!soundSelecionados.contains(soudd)){
-                        binding.idContraint.setBackgroundColor(Color.GRAY)
+                        binding.cardItemSound.setCardBackgroundColor(Color.GRAY)
                         soundSelecionados.add(soudd)
                     }else{
-                        binding.idContraint.setBackgroundColor(ContextCompat.getColor(it.context,R.color.white_activity_main))
+                        binding.cardItemSound.setCardBackgroundColor(ContextCompat.getColor(
+                            binding.root.context,R.color.colorSurfaceVariant
+                        ))
                         soundSelecionados.remove(soudd)
                         if (soundSelecionados.isEmpty())isUpdateList(false)
                     }
                     Log.i("INFO_", "bind: ${soundSelecionados.size}")
                  }
+
          }
 
          binding.idContraint.setOnLongClickListener {view->
                 if (soundSelecionados.size == 0){
                     isUpdateList(true)
                     soundSelecionados.add(soudd)
-                    binding.idContraint.setBackgroundColor(Color.GRAY)
+                    binding.cardItemSound.setCardBackgroundColor(Color.GRAY)
                     Log.i("INFO_", "bind: ${soundSelecionados.size}")
                 }
              true

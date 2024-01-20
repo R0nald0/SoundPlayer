@@ -1,6 +1,9 @@
 package com.example.soundplayer.presentation
 
+import android.annotation.SuppressLint
 import android.content.ContentUris
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -16,10 +19,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
+import com.example.soundplayer.SoundPlayerReceiver
 import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.databinding.ActivityMainBinding
 import com.example.soundplayer.model.PlayList
@@ -42,22 +47,44 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
     lateinit var myMenuProvider: MenuProvider
+    private val myReceiver =SoundPlayerReceiver()
     var cont = 0
-    private lateinit var gerenciarPermissoes : ActivityResultLauncher<String>
+    private lateinit var gerenciarPermissoes : ActivityResultLauncher<Array<String>>
     private lateinit var  adapterSound : SoundAdapter
     private lateinit var  playListAdapter: PlayListAdapter
     private val  soundViewModel by viewModels<SoundViewModel>()
     private val playListViewModel by viewModels<PlayListViewModel>()
+    private var isLoading = true
 
+
+    private val listPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        listOf(
+            android.Manifest.permission.READ_MEDIA_AUDIO,
+            android.Manifest.permission.FOREGROUND_SERVICE,
+            android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK,
+        )
+    } else {
+       listOf(
+           android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+           android.Manifest.permission.READ_EXTERNAL_STORAGE,
+       )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen().apply {
+            setKeepOnScreenCondition{
+
+                isLoading
+            }
+        }
         setContentView(binding.root)
 
         setupToolbar()
         initAdapter()
         getPermissions()
         observersViewModel()
+       // createReceiver()
 
         binding.btnFindSounds.setOnClickListener {
             requestPermission()
@@ -76,7 +103,6 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         if (soundViewModel.isPlaying() == true){
             soundViewModel.actualSound.observe(this){ soundLiveData->
-                Toast.makeText(this, "Tocando ${soundLiveData.title} ", Toast.LENGTH_SHORT).show()
                 Log.i("INFO_", "Main:${soundLiveData.title} ${cont++}")
                 //TODO VERIFICAR CHAMAS MULTIPLAS
                 adapterSound.getActualSound(soundLiveData)
@@ -94,6 +120,7 @@ class MainActivity : AppCompatActivity() {
 
     private  fun observersViewModel(){
         playListViewModel.playLists.observe(this){listOfplayListObservable->
+             isLoading =false
              playListAdapter.addPlayList(listOfplayListObservable)
         }
 
@@ -116,37 +143,46 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getPermissions(){
-        gerenciarPermissoes =  registerForActivityResult(ActivityResultContracts.RequestPermission()){ isPermitted->
+         gerenciarPermissoes =  registerForActivityResult(ActivityResultContracts
+               .RequestMultiplePermissions()){permission: Map<String, Boolean> ->
 
-            if (!isPermitted){
-                binding.btnFindSounds.visibility = View.VISIBLE
-                binding.txvSoundNotFound.visibility = View.VISIBLE
-                binding.linearMusics.visibility = View.GONE
-                binding.fabAddPlayList.visibility = View.GONE
-                Toast.makeText(this, "Permissão necessaria para carragar as músicas", Toast.LENGTH_SHORT).show()
-            }else{
-                binding.btnFindSounds.visibility = View.GONE
-                binding.txvSoundNotFound.visibility = View.GONE
-                binding.linearMusics.visibility = View.VISIBLE
-                binding.fabAddPlayList.visibility = View.VISIBLE
-                getMusicFromContentProvider()
-                if (listSoundFromContentProvider.isNotEmpty()) playListViewModel.saveAllSoundsByContentProvider(listSoundFromContentProvider)
-                playListViewModel.getAllPlayList()
-            }
+               if (!permission.values.contains(false)){
+                    verifyPermissions(true)
+               }else{
+                   verifyPermissions(false)
+               }
+         }
+
+         requestPermission()
+
+    }
+
+    private fun verifyPermissions(isPermitted : Boolean) {
+        if (!isPermitted) {
+            binding.btnFindSounds.visibility = View.VISIBLE
+            binding.txvSoundNotFound.visibility = View.VISIBLE
+            binding.linearMusics.visibility = View.GONE
+            binding.fabAddPlayList.visibility = View.GONE
+            Toast.makeText(
+                this,
+                "Permissão necessaria para carragar as músicas",
+                Toast.LENGTH_SHORT
+            ).show()
+        } else {
+            binding.btnFindSounds.visibility = View.GONE
+            binding.txvSoundNotFound.visibility = View.GONE
+            binding.linearMusics.visibility = View.VISIBLE
+            binding.fabAddPlayList.visibility = View.VISIBLE
+            getMusicFromContentProvider()
+            if (listSoundFromContentProvider.isNotEmpty()) playListViewModel.saveAllSoundsByContentProvider(
+                listSoundFromContentProvider
+            )
+            playListViewModel.getAllPlayList()
         }
-        requestPermission()
     }
 
     private fun requestPermission(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            gerenciarPermissoes.launch(
-                android.Manifest.permission.READ_MEDIA_AUDIO
-            )
-        }else{
-            gerenciarPermissoes.launch(
-                android.Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-        }
+        gerenciarPermissoes.launch(listPermission.toTypedArray())
     }
 
     private fun initAdapter() {
@@ -207,24 +243,25 @@ class MainActivity : AppCompatActivity() {
             try {
                 val id =cursor.getColumnIndexOrThrow( MediaStore.Audio.Media._ID)
                 val albumid =cursor.getColumnIndexOrThrow( MediaStore.Audio.Media.ALBUM_ID)
+                val duarution = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+                val path  = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+                val title = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
 
                 while (cursor.moveToNext()){
 
                     val idMedia = cursor.getLong(id)
                     val albumidMedia = cursor.getLong(albumid)
-
                     val mediaUriAlbum  = ContentUris.withAppendedId(
                         Uri.parse("content://media/external/audio/albumart"),albumidMedia)
 
                     val mediaUri  = ContentUris.withAppendedId(
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,idMedia)
 
-
                     val sound = Sound(
                         idSound = null,
-                        path =  cursor.getString(1),
-                        duration =  cursor.getString(2),
-                        title=  cursor.getString(0),
+                        path = cursor.getString(path),
+                        duration =cursor.getInt(duarution).toString(),
+                        title= cursor.getString(title),
                         uriMedia = mediaUri,
                         uriMediaAlbum = mediaUriAlbum
                     )
@@ -235,8 +272,10 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
+                cursor.close()
             }catch (nullPointer : NullPointerException){
-                Toast.makeText(this, "Null ${nullPointer.printStackTrace()}", Toast.LENGTH_SHORT).show()
+                nullPointer.printStackTrace()
+               Toast.makeText(this, "Null ${nullPointer.printStackTrace()}", Toast.LENGTH_SHORT).show()
             }
         }
         verifyListIsEmpty()
@@ -253,12 +292,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun createReceiver(){
+         val intentFilter = IntentFilter().apply {
+             addAction(Intent.ACTION_MEDIA_SCANNER_STARTED)
+             addAction(Intent.ACTION_MEDIA_SHARED)
+             addAction(Intent.ACTION_BATTERY_LOW)
+         }
+
+        registerReceiver(myReceiver,intentFilter)
+
+    }
      override fun onDestroy() {
-        soundViewModel.destroyPlayer()
+      //   unregisterReceiver(myReceiver)
+      //  soundViewModel.destroyPlayer()
         super.onDestroy()
     }
 
+
    inner class  MyMenuProvider() : MenuProvider {
+       @SuppressLint("SuspiciousIndentation")
        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
            menuInflater.inflate(R.menu.sound_menu,menu)
          val pairPlayList = adapterSound.getSoundSelecionados()
