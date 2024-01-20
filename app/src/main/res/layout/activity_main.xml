@@ -5,7 +5,7 @@
     android:id="@+id/contstaintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E3D4D4"
+
     tools:context=".presentation.MainActivity">
 
     <include
@@ -46,7 +46,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="cursive"
         android:text="Nenhuma Mùsica"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="28sp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -89,8 +89,8 @@
             android:lines="1"
             android:padding="4dp"
             android:text="Musicas : 20"
-            android:textColor="#000"
-            android:textSize="15sp"
+            style="@style/TextAppearance.Material3.HeadlineMedium"
+            android:textSize="12sp"
             android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -136,7 +136,7 @@
         android:background="@drawable/border_playlist_item"
         android:clickable="true"
         android:src="@drawable/baseline_playlist_add_24"
-        app:backgroundTint="@color/gray"
+        style="@style/ThemeOverlay.Material3.FloatingActionButton.Secondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

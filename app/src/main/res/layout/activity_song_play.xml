@@ -10,23 +10,23 @@
 
     <TextView
         android:id="@+id/txv_name_music"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="8dp"
         android:layout_marginEnd="16dp"
         android:focusableInTouchMode="true"
         android:marqueeRepeatLimit="marquee_forever"
+         android:scrollbars="horizontal"
+        android:ellipsize="marquee"
         android:maxLines="1"
-
         android:singleLine="true"
         android:text="Song Title"
         android:textColor="@color/white"
         android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_back"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/btn_back"
+        app:layout_constraintTop_toTopOf="@+id/btn_back" />
 
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -43,7 +43,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txv_name_music"
-        tools:srcCompat="@drawable/vinyl" />
+       />
 
     <androidx.media3.ui.PlayerControlView
         android:id="@+id/myPlayerView"
@@ -58,5 +58,16 @@
         app:show_shuffle_button="true"
         app:show_timeout="0"
         app:show_vr_button="false" />
+
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/back_ios_24" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

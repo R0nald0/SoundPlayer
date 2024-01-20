@@ -2,12 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <application
         android:name=".di.SoundBaseApplication"
@@ -16,26 +16,35 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SoundPlayer"
+        android:theme="@style/Theme.MySplahs"
         tools:targetApi="31">
+
         <service
-            android:name=".service.SoundService"
-            android:foregroundServiceType="mediaPlayback"
+            android:name=".presentation.service.SoundService"
             android:enabled="true"
-            android:exported="true">
-             <intent-filter>
-                 <action android:name="androidx.media3.session.MediaSessionService"/>
-             </intent-filter>
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback"
+            android:icon="@drawable/ic_play_arrow_24">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService" />
+            </intent-filter>
         </service>
 
         <activity
             android:name=".presentation.SongPlayActivity"
-            android:exported="false" />
+            android:configChanges="orientation"
+            android:theme="@style/Theme.SoundPlayer"
+            android:parentActivityName=".presentation.MainActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".presentation.MainActivity"
-            android:exported="true">
+            android:configChanges="orientation"
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

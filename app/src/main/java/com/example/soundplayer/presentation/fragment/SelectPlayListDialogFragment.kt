@@ -1,23 +1,15 @@
 package com.example.soundplayer.presentation.fragment
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.view.ContextThemeWrapper
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.example.soundplayer.R
-import com.example.soundplayer.databinding.FragmentSelectPlayListDialogListDialogItemBinding
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.databinding.FragmentSelectPlayListDialogListDialogBinding
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.SoundList

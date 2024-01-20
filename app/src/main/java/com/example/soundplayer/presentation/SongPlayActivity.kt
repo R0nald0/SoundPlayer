@@ -2,28 +2,24 @@ package com.example.soundplayer.presentation
 
 import android.content.ComponentName
 import android.os.Bundle
-import android.util.Log
-import androidx.activity.viewModels
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.example.soundplayer.R
 import com.example.soundplayer.databinding.ActivitySongPlayBinding
-import com.example.soundplayer.service.SoundService
+import com.example.soundplayer.presentation.service.SoundService
 import com.google.common.util.concurrent.MoreExecutors
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.log
 
 @AndroidEntryPoint
 class SongPlayActivity (): AppCompatActivity() {
@@ -38,12 +34,15 @@ class SongPlayActivity (): AppCompatActivity() {
         setContentView(binding.root)
         initPlayer()
         observer()
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
     }
 
     private fun observer() {
        soundViewModel.actualSound.observe(this) { sound ->
            CoroutineScope(Dispatchers.Main).launch {
-              // binding.txvNameMusic.isSelected = true
+               binding.txvNameMusic.isSelected = true
                binding.txvNameMusic.text = sound.title
 
                if (sound.uriMediaAlbum != null){
@@ -71,7 +70,7 @@ class SongPlayActivity (): AppCompatActivity() {
         if (Util.SDK_INT > 23){
             initPlayer()
         }
-        val sessonToken = SessionToken(this, ComponentName(this,SoundService::class.java))
+        val sessonToken = SessionToken(this, ComponentName(this, SoundService::class.java))
         val controllerAsync =MediaController.Builder(this,sessonToken).buildAsync()
         controllerAsync.addListener({
             binding.myPlayerView.player = controllerAsync.get()

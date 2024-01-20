@@ -68,6 +68,11 @@ dependencies {
     implementation ("androidx.media3:media3-ui:1.2.0")
     implementation ("androidx.media3:media3-session:1.2.0")
 
+
+    //splshScreen
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
+
    //GLide
     implementation ("com.github.bumptech.glide:glide:4.16.0")
 

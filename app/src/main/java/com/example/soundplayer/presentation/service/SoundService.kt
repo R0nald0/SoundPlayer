@@ -1,6 +1,7 @@
-package com.example.soundplayer.service
+package com.example.soundplayer.presentation.service
 
 
+import android.content.Intent
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
@@ -14,9 +15,19 @@ class SoundService : MediaSessionService() {
 
     override fun onCreate() {
         super.onCreate()
-        mediaSession =MediaSession.Builder(this,exoPlayer).build()
+
+        mediaSession =MediaSession.Builder(this,exoPlayer)
+            .build()
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        if (!exoPlayer.playWhenReady  || exoPlayer.mediaItemCount == 0){
+            stopSelf()
+        }
     }
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
+
             return  mediaSession
     }
 
