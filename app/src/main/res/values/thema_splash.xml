@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.MySplahs" parent="Theme.SplashScreen">
+       <item name="windowSplashScreenBackground">@color/red</item>
+       <item name="windowSplashScreenAnimatedIcon">@drawable/ic_play_arrow_24</item>
+       <item name="android:windowSplashScreenBrandingImage" tools:targetApi="s">@drawable/bg_selected_playlist</item>
+       <item name="postSplashScreenTheme">@style/Base.Theme.SoundPlayer</item>
+    </style>
+</resources>

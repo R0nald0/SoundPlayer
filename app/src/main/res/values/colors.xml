@@ -6,4 +6,11 @@
     <color name="red">#E35252</color>
     <color name="white_activity_main">#E3D4D4</color>
     <color name="gray">#E88F8F</color>
+
+    <color name="colorPrimaryContainer">#4CAF50</color>
+    <color name="colorOnPrimaryContainer">#FFFFFF</color>
+
+    <color name="colorSurfaceVariant">#e7e0ec</color>
+    <color name="my_primary">#242325</color>
+
 </resources>
