@@ -55,7 +55,6 @@ class PlayListViewModel @Inject constructor(
             Log.i("INFO_", "saveSound id :id music $id ")
         }
     }
-
     fun saveAllSoundsByContentProvider(sizeListAllMusic: MutableSet<Sound>){
         viewModelScope.launch {
            var listBd = soundPlayListRepository.sizeListSound()
@@ -72,8 +71,7 @@ class PlayListViewModel @Inject constructor(
             }
         }
     }
-
-   fun deletePlayList(playList: PlayList) {
+    fun deletePlayList(playList: PlayList) {
         viewModelScope.launch {
           val reterno   = soundPlayListRepository.deletePlaylist(playList)
           if (reterno != 0){

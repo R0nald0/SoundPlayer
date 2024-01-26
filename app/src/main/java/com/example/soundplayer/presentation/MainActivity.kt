@@ -74,7 +74,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen().apply {
             setKeepOnScreenCondition{
-
                 isLoading
             }
         }
@@ -101,6 +100,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        soundViewModel.readPreferences()
         if (soundViewModel.isPlaying() == true){
             soundViewModel.actualSound.observe(this){ soundLiveData->
                 Log.i("INFO_", "Main:${soundLiveData.title} ${cont++}")
@@ -119,6 +119,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private  fun observersViewModel(){
+        soundViewModel.userDataPreferecence.observe(this){userDataPreference->
+            if (userDataPreference != null){
+                userDataPreference.idPreference?.let { playListViewModel.findPlayListById(it) }
+            }
+        }
+
         playListViewModel.playLists.observe(this){listOfplayListObservable->
              isLoading =false
              playListAdapter.addPlayList(listOfplayListObservable)
@@ -196,7 +202,7 @@ class MainActivity : AppCompatActivity() {
 
         playListAdapter = PlayListAdapter(
             soundViewModel = soundViewModel,
-            onclick = { playListChoseByUser -> adapterSound.getPlayList(playListChoseByUser) },
+            onclick = { playListChoseByUser -> adapterSound.getPlayList(playListChoseByUser)},
             onDelete = {playList -> playListViewModel.deletePlayList(playList)},
             onEdit = {playList -> playListViewModel.updateNamePlayList(playList) }
         )
@@ -288,7 +294,7 @@ class MainActivity : AppCompatActivity() {
         }else{
             binding.linearMusics.visibility =View.VISIBLE
             binding.txvSoundNotFound.visibility =View.GONE
-            binding.txvQuantidadeMusics.text ="Total de Músicas ${listSoundFromContentProvider.size}"
+            binding.txvQuantidadeMusics.text = getString(R.string.total_de_m_sicas, listSoundFromContentProvider.size)
         }
     }
 

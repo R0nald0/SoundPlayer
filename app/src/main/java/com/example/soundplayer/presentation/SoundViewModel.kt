@@ -2,30 +2,44 @@ package com.example.soundplayer.presentation
 
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.example.soundplayer.data.entities.UserDataPreferecence
+import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SoundViewModel @Inject constructor(
-    private val  exoPlayer: ExoPlayer
+    private val exoPlayer: ExoPlayer,
+    private  val dataStorePreferenceRepository: DataStorePreferenceRepository
 ) :ViewModel(){
+
      private var playerWhenRead = true
      var currentItem = 0
      private var playBackPosition = 0L
 
     var actualSound  = MutableLiveData<Sound>()
     var isPlayingObserver  = MutableLiveData<Boolean>()
-    private var _currentPlayList : PlayList ? = null
-    val currentPlayList : PlayList?
+
+    private var _currentPlayList = MutableLiveData<PlayList>()
+    val currentPlayList :LiveData<PlayList>
            get() = _currentPlayList
+
+    private val _userDataPreferecenceObs = MutableLiveData<UserDataPreferecence?>()
+    val userDataPreferecence : LiveData<UserDataPreferecence?>
+        get() = _userDataPreferecenceObs
+
+
     private lateinit var listMediaItem  : List<MediaItem>
 
      fun getPlayer():ExoPlayer{
@@ -33,7 +47,7 @@ class SoundViewModel @Inject constructor(
      }
 
     fun updatePlayList(listSound: MutableSet<Sound>){
-        if (currentPlayList != null){
+        if (currentPlayList.value != null){
            val retorno  = addItemFromListMusic(listSound);
              if (retorno.isEmpty()){
                  removeItemFromListMusic(listSound)
@@ -44,9 +58,9 @@ class SoundViewModel @Inject constructor(
 
     fun addItemFromListMusic(listSound:MutableSet<Sound>):MutableSet<Sound>{
         val listToUpdate = mutableSetOf<Sound>()
-        if (currentPlayList!!.listSound != listSound){
+        if (currentPlayList.value!!.listSound != listSound){
             listSound.forEachIndexed {index , sound->
-                if (listSound.contains(sound) && !currentPlayList!!.listSound.contains(sound)) {
+                if (listSound.contains(sound) && !currentPlayList.value!!.listSound.contains(sound)) {
                     listToUpdate.add(sound)
                     exoPlayer.addMediaItem(
                         index,
@@ -56,15 +70,15 @@ class SoundViewModel @Inject constructor(
                             .build()
                     )
 
-                }else if(listSound.contains(sound) && currentPlayList!!.listSound.contains(sound)){}
+                }else if(listSound.contains(sound) && currentPlayList.value!!.listSound.contains(sound)){}
             }
         }
         return listToUpdate;
     }
     fun removeItemFromListMusic(listSound:MutableSet<Sound>):MutableSet<Sound>{
         val modifaildField = mutableSetOf<Sound>()
-        if (currentPlayList!!.listSound.isNotEmpty() && listSound.isNotEmpty()){
-            currentPlayList!!.listSound.forEachIndexed { index, sound ->
+        if (currentPlayList.value!!.listSound.isNotEmpty() && listSound.isNotEmpty()){
+            currentPlayList.value!!.listSound.forEachIndexed { index, sound ->
                 if (!listSound.contains(sound)) {
                     exoPlayer.removeMediaItem(index);
                     modifaildField.add(sound)
@@ -77,18 +91,22 @@ class SoundViewModel @Inject constructor(
     }
     fun getAllMusics(playList: PlayList) {
 
-           if (_currentPlayList != null &&  _currentPlayList!!.name != playList.name){
+           if (_currentPlayList.value != null &&  _currentPlayList.value!!.name != playList.name){
                exoPlayer.stop()
                exoPlayer.clearMediaItems()
             }
 
             if (!exoPlayer.isPlaying || playList.currentMusicPosition !=currentItem ){
-                _currentPlayList = playList
+                _currentPlayList.value = playList
                 listMediaItem= createMediaItemList(playList.listSound)
 
                 exoPlayer.seekTo(playList.currentMusicPosition,playBackPosition)
                 currentItem = playList.currentMusicPosition
             }
+
+           viewModelScope.launch {
+               dataStorePreferenceRepository.savePreference(playList.idPlayList, positionSoundKey = playList.currentMusicPosition)
+           }
     }
 
     private fun createMediaItemList(list: MutableSet<Sound>):List<MediaItem>{
@@ -155,6 +173,15 @@ class SoundViewModel @Inject constructor(
     fun destroyPlayer(){
         exoPlayer.stop()
         exoPlayer.release()
+    }
+    fun readPreferences(){
+        viewModelScope.launch {
+            val readAllPreferecenceData = dataStorePreferenceRepository.readAllPreferecenceData()
+            if (readAllPreferecenceData != null){
+                _userDataPreferecenceObs.postValue(readAllPreferecenceData)
+            }
+        }
+
     }
 
 }
