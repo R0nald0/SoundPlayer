@@ -15,4 +15,5 @@
     <string name="remover_da_playlist">remover da playlist</string>
     <string name="selecionar_items">Selecionar Items</string>
     <string name="escolha_o_playlist">Escolha o PlayList</string>
+    <string name="total_de_m_sicas">Total de Músicas %1$s</string>
 </resources>

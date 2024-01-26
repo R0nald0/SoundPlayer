@@ -62,6 +62,8 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
     // LiveData
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
+    //DATASTORe
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation( "androidx.media3:media3-exoplayer:1.2.0")
     implementation( "androidx.media3:media3-exoplayer-dash:1.2.0")
