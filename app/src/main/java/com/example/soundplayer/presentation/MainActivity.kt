@@ -2,6 +2,7 @@ package com.example.soundplayer.presentation
 
 import android.annotation.SuppressLint
 import android.content.ContentUris
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
@@ -22,10 +23,14 @@ import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
 import com.example.soundplayer.SoundPlayerReceiver
 import com.example.soundplayer.commons.constants.Constants
+import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.databinding.ActivityMainBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
@@ -37,6 +42,7 @@ import com.example.soundplayer.presentation.fragment.SelectPlayListDialogFragmen
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -55,7 +61,6 @@ class MainActivity : AppCompatActivity() {
     private val  soundViewModel by viewModels<SoundViewModel>()
     private val playListViewModel by viewModels<PlayListViewModel>()
     private var isLoading = true
-
 
     private val listPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
         listOf(
@@ -100,6 +105,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        Log.i("play_", "on Start")
+
         soundViewModel.readPreferences()
         if (soundViewModel.isPlaying() == true){
             soundViewModel.actualSound.observe(this){ soundLiveData->
@@ -111,6 +118,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+
+    }
+
     private fun createEditPlayListFragment(playList: PlayList?) {
         val bottomSheetFragment =BottomSheetFragment()
         val bundle = bundleOf("list" to playList)
@@ -119,9 +132,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private  fun observersViewModel(){
+
         soundViewModel.userDataPreferecence.observe(this){userDataPreference->
             if (userDataPreference != null){
-                userDataPreference.idPreference?.let { playListViewModel.findPlayListById(it) }
+                userDataPreference.idPreference?.let {
+                    playListViewModel.findPlayListById(it)
+                    playListAdapter.setLastOpenPlayListBorder(it.toInt() -1 )
+                }
             }
         }
 
@@ -201,7 +218,7 @@ class MainActivity : AppCompatActivity() {
         binding.rvSound.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
 
         playListAdapter = PlayListAdapter(
-            soundViewModel = soundViewModel,
+
             onclick = { playListChoseByUser -> adapterSound.getPlayList(playListChoseByUser)},
             onDelete = {playList -> playListViewModel.deletePlayList(playList)},
             onEdit = {playList -> playListViewModel.updateNamePlayList(playList) }
@@ -308,10 +325,16 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(myReceiver,intentFilter)
 
     }
+
+    override fun onStop() {
+        Log.i("play_", "onStop")
+        super.onStop()
+    }
      override fun onDestroy() {
       //   unregisterReceiver(myReceiver)
       //  soundViewModel.destroyPlayer()
-        super.onDestroy()
+         Log.i("play_", "onDestroy")
+         super.onDestroy()
     }
 
 

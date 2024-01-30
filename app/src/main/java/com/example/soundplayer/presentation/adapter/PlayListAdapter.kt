@@ -1,6 +1,7 @@
 package com.example.soundplayer.presentation.adapter
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
@@ -19,25 +20,31 @@ import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.presentation.SoundViewModel
 
 class PlayListAdapter(
-    private val soundViewModel: SoundViewModel,
     val onclick :(PlayList)->Unit,
     val onDelete :(PlayList)->Unit,
     val onEdit :(PlayList)->Unit
 ) :RecyclerView.Adapter<PlayListAdapter.PlayLisViewHolder>(){
     private var playLists = mutableSetOf<PlayList>()
+    private var userPositionPreferePlayList =-1
+
+    @SuppressLint("UseSparseArrays")
     var positionPlayListClicked = SparseArray<Int>()
+    @SuppressLint("NotifyDataSetChanged")
     fun addPlayList(playList: List<PlayList>){
         playLists = playList.toMutableSet()
         notifyDataSetChanged()
     }
-    fun updateList(){
-        playLists.clear()
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setLastOpenPlayListBorder(postionLastOpenIdPlayList: Int){
+        userPositionPreferePlayList =postionLastOpenIdPlayList
         notifyDataSetChanged()
     }
 
 
-    inner class  PlayLisViewHolder(private val binding : PlayListItemBinding): RecyclerView.ViewHolder(binding.root){
+    inner class  PlayLisViewHolder( val binding : PlayListItemBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(actualPlayList: PlayList, position: Int){
+
             if(!positionPlayListClicked.containsValue(position)){
                  binding.idContraintPlayList.background = ContextCompat.getDrawable(binding.root.context,R.drawable.border_playlist_item_selected)
               }
@@ -46,6 +53,7 @@ class PlayListAdapter(
         private fun  initBindings(actualPlayList :PlayList, position: Int){
             binding.txvTitle.text = actualPlayList.name
             binding.idContraintPlayList.setOnClickListener {
+
                 setUpBorderPlayList(position)
                 verifyPlayListEmpty(actualPlayList)
             }
@@ -65,13 +73,23 @@ class PlayListAdapter(
             }
         }
         @SuppressLint("NotifyDataSetChanged")
-        private fun setUpBorderPlayList(position: Int) {
+       private  fun setUpBorderPlayList(position: Int) {
             positionPlayListClicked.clear()
             positionPlayListClicked.put(position, position)
             if (positionPlayListClicked.containsValue(position)) {
                 binding.idContraintPlayList.background =
                     ContextCompat.getDrawable(binding.root.context, R.drawable.border_playlist_item)
                 notifyDataSetChanged()
+            }
+        }
+
+
+        fun setUpBorderPlayListFirst(position: Int) {
+            positionPlayListClicked.clear()
+            positionPlayListClicked.put(position, position)
+            if (positionPlayListClicked.containsValue(position)) {
+                binding.idContraintPlayList.background =
+                    ContextCompat.getDrawable(binding.root.context, R.drawable.border_playlist_item)
             }
         }
     }
@@ -89,11 +107,13 @@ class PlayListAdapter(
 
     override fun getItemCount() = playLists.size
     override fun onBindViewHolder(holder: PlayLisViewHolder, position: Int) {
+        if (userPositionPreferePlayList >= 0) {
+            holder.setUpBorderPlayListFirst(userPositionPreferePlayList)
+            userPositionPreferePlayList = -1
+        }
         val playList = playLists.elementAt(position)
         holder.bind(playList,position)
-
     }
-
     private fun createOptionsMenu(view : View,playList: PlayList){
 
         val popupMenu  =PopupMenu(view.context,view)
@@ -140,5 +160,7 @@ class PlayListAdapter(
             }
         }
     }
+
+
 
 }
