@@ -3,6 +3,7 @@ package com.example.soundplayer.commons.extension
 import android.app.AlertDialog
 import android.content.Context
 import android.view.View
+import android.widget.Toast
 import java.util.concurrent.TimeUnit
 
 fun Context.convertMilesSecondToMinSec(duration: Long): String {
@@ -28,4 +29,8 @@ fun Context.showAlerDialog(messenger :String, positiveButton:String, negativeBut
                 onPositive()
             }.create().show()
     }
+}
+
+fun Context.exibirToast(messenger: String){
+    Toast.makeText(this, messenger, Toast.LENGTH_SHORT).show()
 }

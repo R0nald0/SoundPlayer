@@ -2,7 +2,6 @@ package com.example.soundplayer.presentation
 
 import android.annotation.SuppressLint
 import android.content.ContentUris
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
@@ -23,14 +22,11 @@ import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
 import com.example.soundplayer.SoundPlayerReceiver
 import com.example.soundplayer.commons.constants.Constants
-import com.example.soundplayer.data.repository.DataStorePreferenceRepository
+import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.databinding.ActivityMainBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
@@ -42,7 +38,6 @@ import com.example.soundplayer.presentation.fragment.SelectPlayListDialogFragmen
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
-import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -89,7 +84,6 @@ class MainActivity : AppCompatActivity() {
         getPermissions()
         observersViewModel()
        // createReceiver()
-
         binding.btnFindSounds.setOnClickListener {
             requestPermission()
         }
@@ -108,14 +102,7 @@ class MainActivity : AppCompatActivity() {
         Log.i("play_", "on Start")
 
         soundViewModel.readPreferences()
-        if (soundViewModel.isPlaying() == true){
-            soundViewModel.actualSound.observe(this){ soundLiveData->
-                Log.i("INFO_", "Main:${soundLiveData.title} ${cont++}")
-                //TODO VERIFICAR CHAMAS MULTIPLAS
-                adapterSound.getActualSound(soundLiveData)
-                binding.rvSound.scrollToPosition(soundViewModel.currentItem)
-            }
-        }
+
     }
 
     override fun onResume() {
@@ -137,19 +124,44 @@ class MainActivity : AppCompatActivity() {
             if (userDataPreference != null){
                 userDataPreference.idPreference?.let {
                     playListViewModel.findPlayListById(it)
-                    playListAdapter.setLastOpenPlayListBorder(it.toInt() -1 )
                 }
             }
         }
 
-        playListViewModel.playLists.observe(this){listOfplayListObservable->
-             isLoading =false
-             playListAdapter.addPlayList(listOfplayListObservable)
+
+        soundViewModel.isPlayingObserver.observe(this){ isPlaying ->
+            if (isPlaying){
+                applicationContext.exibirToast("Esta tocando")
+
+                  soundViewModel.currentPlayList.observe(this){currentPlayList->
+                      if (currentPlayList != null && isPlaying){
+                          playListAdapter.getCurrentPlayListPlayind(
+                              playList = currentPlayList,
+                              playIng = isPlaying
+                          )
+                      }
+                  }
+
+                  soundViewModel.actualSound.observe(this){ soundLiveData->
+                      Log.i("INFO_", "Main:${soundLiveData.title} ${cont++}")
+                      //TODO VERIFICAR CHAMAS MULTIPLAS
+                      adapterSound.getActualSound(soundLiveData)
+                      binding.rvSound.scrollToPosition(soundViewModel.currentItem)
+                  }
+              }
+
+
         }
 
-       playListViewModel.uniquePlayList.observe(this){uniquePlayListWithSongs->
+        playListViewModel.playLists.observe(this){listOfplayListObservable->
+            playListAdapter.addPlayList(listOfplayListObservable)
+            isLoading =false
+        }
+
+        playListViewModel.uniquePlayList.observe(this){uniquePlayListWithSongs->
               soundViewModel.updatePlayList(uniquePlayListWithSongs.listSound)
               adapterSound.getPlayList(uniquePlayListWithSongs)
+              playListAdapter.setLastOpenPlayListBorder(uniquePlayListWithSongs.idPlayList!!)
        }
 
         playListViewModel.soundListBd.observe(this){listSound->

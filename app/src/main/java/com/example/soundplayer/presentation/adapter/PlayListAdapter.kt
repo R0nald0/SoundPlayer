@@ -1,7 +1,6 @@
 package com.example.soundplayer.presentation.adapter
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +9,7 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.util.containsValue
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.soundplayer.R
 import com.example.soundplayer.commons.constants.Constants
@@ -17,7 +17,6 @@ import com.example.soundplayer.commons.extension.showAlerDialog
 import com.example.soundplayer.databinding.PlayListItemBinding
 import com.example.soundplayer.databinding.UpadateNamePlaylistLayoutBinding
 import com.example.soundplayer.model.PlayList
-import com.example.soundplayer.presentation.SoundViewModel
 
 class PlayListAdapter(
     val onclick :(PlayList)->Unit,
@@ -25,7 +24,9 @@ class PlayListAdapter(
     val onEdit :(PlayList)->Unit
 ) :RecyclerView.Adapter<PlayListAdapter.PlayLisViewHolder>(){
     private var playLists = mutableSetOf<PlayList>()
-    private var userPositionPreferePlayList =-1
+    private var userPositionPreferePlayListId = -1L
+    private var isPlaying = false
+    private var currentPlayListPlaying : PlayList? = null
 
     @SuppressLint("UseSparseArrays")
     var positionPlayListClicked = SparseArray<Int>()
@@ -36,8 +37,15 @@ class PlayListAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setLastOpenPlayListBorder(postionLastOpenIdPlayList: Int){
-        userPositionPreferePlayList =postionLastOpenIdPlayList
+    fun getCurrentPlayListPlayind(playList: PlayList, playIng:Boolean){
+         isPlaying =playIng
+         currentPlayListPlaying = playList
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setLastOpenPlayListBorder(idPlayListPrefe:Long){
+        userPositionPreferePlayListId =idPlayListPrefe
         notifyDataSetChanged()
     }
 
@@ -83,13 +91,22 @@ class PlayListAdapter(
             }
         }
 
-
+        fun setUpImageActualPlayListPlaying(currentPlayList: PlayList,playIng: Boolean ,actualPlayList: PlayList){
+            if (playIng && currentPlayList.idPlayList == actualPlayList.idPlayList ){
+                binding.lottieAnimePlaying.isVisible =true
+                binding.imgPlayList.isVisible =false
+            }else{
+                binding.lottieAnimePlaying.isVisible =false
+                binding.imgPlayList.isVisible =true
+            }
+        }
         fun setUpBorderPlayListFirst(position: Int) {
             positionPlayListClicked.clear()
             positionPlayListClicked.put(position, position)
             if (positionPlayListClicked.containsValue(position)) {
                 binding.idContraintPlayList.background =
                     ContextCompat.getDrawable(binding.root.context, R.drawable.border_playlist_item)
+
             }
         }
     }
@@ -107,11 +124,21 @@ class PlayListAdapter(
 
     override fun getItemCount() = playLists.size
     override fun onBindViewHolder(holder: PlayLisViewHolder, position: Int) {
-        if (userPositionPreferePlayList >= 0) {
-            holder.setUpBorderPlayListFirst(userPositionPreferePlayList)
-            userPositionPreferePlayList = -1
-        }
+
         val playList = playLists.elementAt(position)
+
+        if (userPositionPreferePlayListId == playList.idPlayList){
+            holder.setUpBorderPlayListFirst(position)
+            userPositionPreferePlayListId =-1
+        }
+
+        currentPlayListPlaying?.let {actualPlayListPlaying->
+            holder.setUpImageActualPlayListPlaying(
+                currentPlayList = actualPlayListPlaying,
+                playIng = isPlaying,
+                actualPlayList =  playList
+            )
+        }
         holder.bind(playList,position)
     }
     private fun createOptionsMenu(view : View,playList: PlayList){

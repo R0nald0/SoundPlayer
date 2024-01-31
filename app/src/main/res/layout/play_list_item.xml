@@ -28,6 +28,19 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottie_anime_playing"
+                android:layout_width="60dp"
+                android:visibility="gone"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:scaleType="centerCrop"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/music_playing"
+                />
+
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imgPlayList"
                 android:layout_width="60dp"
@@ -35,6 +48,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
                 android:scaleType="centerCrop"
+                android:visibility="visible"
                 app:shapeAppearanceOverlay="@style/ImageRounded"
                 app:srcCompat="@drawable/ic_play_arrow_24" />
 

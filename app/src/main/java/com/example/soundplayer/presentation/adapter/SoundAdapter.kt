@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.soundplayer.R
@@ -78,9 +79,11 @@ class SoundAdapter(
          if (actualSound!=null && actualSound?.title == soudd.title){
              binding.txvTitle.setTextColor(ContextCompat.getColor(binding.root.context,R.color.red))
              binding.txvTitle.isSelected = true
+             binding.lottieSoundAnimePlaying.isVisible =true
          }else{
              binding.txvTitle.setTextColor(ContextCompat.getColor(binding.root.context,R.color.my_primary))
              binding.txvTitle.isSelected = false
+             binding.lottieSoundAnimePlaying.isVisible =false
          }
 
 

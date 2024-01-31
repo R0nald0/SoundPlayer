@@ -43,12 +43,14 @@ android {
 }
 
 dependencies {
+    val lottieVersion = "6.1.0"
+    val lifecycle_version = "2.6.2"
+    val roomVersion = "2.5.0"
+
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     testImplementation("junit:junit:4.12")
-    val lifecycle_version = "2.6.2"
 
-    val roomVersion = "2.5.0"
 
     implementation("androidx.room:room-runtime:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
@@ -62,8 +64,11 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
     // LiveData
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
-    //DATASTORe
+    //datatore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    //Lottie  https://github.com/airbnb/lottie-android
+    implementation ("com.airbnb.android:lottie:$lottieVersion")
 
     implementation( "androidx.media3:media3-exoplayer:1.2.0")
     implementation( "androidx.media3:media3-exoplayer-dash:1.2.0")

@@ -24,7 +24,7 @@ import com.example.soundplayer.model.PlayList
     inner class  ItemSelectViewHolder(private val binding : ItemSelectPlaylistBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(actualPlayList: PlayList, position: Int){
               binding.txNamePlayList.text = actualPlayList.name
-             binding.idContraint.setOnClickListener {
+              binding.idContraint.setOnClickListener {
                  onClick(actualPlayList)
              }
         }
