@@ -369,6 +369,7 @@ class MainFragment : Fragment() {
                     val  bottomSheetFragment =SelectPlayListDialogFragment()
                     val bundle = bundleOf("listSound" to sound)
                     bottomSheetFragment.arguments = bundle
+                    findNavController().navigate(R.id.action_mainFragment_to_selectPlayListDialogFragment)
                     //bottomSheetFragment.show(supportFragmentManager,"tag")
                     true
                 }

@@ -177,8 +177,7 @@ class SoundViewModel @Inject constructor(
                     positionSoundKey = currentItem
                 )
             }
-
-
+           readPreferences()
     }
     suspend fun readPreferences(){
 

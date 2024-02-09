@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient_play"
     android:orientation="vertical"
-    tools:context=".presentation.SongPlayActivity">
+   >
 
     <TextView
         android:id="@+id/txv_name_music"
@@ -16,7 +16,6 @@
         android:layout_marginEnd="16dp"
         android:focusableInTouchMode="true"
         android:marqueeRepeatLimit="marquee_forever"
-        android:scrollbars="horizontal"
         android:ellipsize="marquee"
         android:maxLines="1"
         android:singleLine="true"
