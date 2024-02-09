@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient_play"
+    android:orientation="vertical"
+    tools:context=".presentation.SongPlayActivity">
+
+    <TextView
+        android:id="@+id/txv_name_music"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:focusableInTouchMode="true"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollbars="horizontal"
+        android:ellipsize="marquee"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:text="Song Title"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btn_back"
+        app:layout_constraintTop_toTopOf="@+id/btn_back" />
+
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/imv_song"
+        app:shapeAppearanceOverlay="@style/ImageRounded"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:contentDescription="image album sound"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toTopOf="@+id/myPlayerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txv_name_music"
+        />
+
+    <androidx.media3.ui.PlayerControlView
+        android:id="@+id/myPlayerView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:controller_layout_id="@layout/player_view"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:repeat_toggle_modes="all|none|one"
+        app:show_shuffle_button="true"
+        app:show_timeout="0"
+        app:show_vr_button="false" />
+
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/back_ios_24" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

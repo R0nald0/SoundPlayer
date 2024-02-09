@@ -32,6 +32,7 @@ class PlayListAdapter(
     var positionPlayListClicked = SparseArray<Int>()
     @SuppressLint("NotifyDataSetChanged")
     fun addPlayList(playList: List<PlayList>){
+        positionPlayListClicked.clear()
         playLists = playList.toMutableSet()
         notifyDataSetChanged()
     }
@@ -40,7 +41,7 @@ class PlayListAdapter(
     fun getCurrentPlayListPlayind(playList: PlayList, playIng:Boolean){
          isPlaying =playIng
          currentPlayListPlaying = playList
-        notifyDataSetChanged()
+         notifyDataSetChanged()
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -61,7 +62,6 @@ class PlayListAdapter(
         private fun  initBindings(actualPlayList :PlayList, position: Int){
             binding.txvTitle.text = actualPlayList.name
             binding.idContraintPlayList.setOnClickListener {
-
                 setUpBorderPlayList(position)
                 verifyPlayListEmpty(actualPlayList)
             }
@@ -106,7 +106,6 @@ class PlayListAdapter(
             if (positionPlayListClicked.containsValue(position)) {
                 binding.idContraintPlayList.background =
                     ContextCompat.getDrawable(binding.root.context, R.drawable.border_playlist_item)
-
             }
         }
     }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/sound_navigation_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.soundplayer.presentation.fragment.MainFragment"
+        android:label="MainFragment" >
+        <action
+            android:id="@+id/action_mainFragment_to_bottomSheetFragment"
+            app:destination="@id/bottomSheetFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_soundPlayingFragment"
+            app:destination="@id/soundPlayingFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_selectPlayListDialogFragment"
+            app:destination="@id/selectPlayListDialogFragment" />
+    </fragment>
+    <dialog
+        android:id="@+id/bottomSheetFragment"
+        android:name="com.example.soundplayer.presentation.fragment.BottomSheetFragment"
+        android:label="BottomSheetFragment" />
+    <dialog
+        android:id="@+id/selectPlayListDialogFragment"
+        android:name="com.example.soundplayer.presentation.fragment.SelectPlayListDialogFragment"
+        android:label="fragment_select_play_list_dialog_list_dialog"
+        tools:layout="@layout/fragment_select_play_list_dialog_list_dialog" />
+    <fragment
+        android:id="@+id/soundPlayingFragment"
+        android:name="com.example.soundplayer.presentation.fragment.SoundPlayingFragment"
+        android:label="fragment_sound_playing"
+        tools:layout="@layout/fragment_sound_playing" />
+</navigation>
