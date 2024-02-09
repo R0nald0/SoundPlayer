@@ -32,14 +32,14 @@ class ClassModule {
 
     @Singleton
     @Provides
-    fun provideActualSong(exoPlayer: ExoPlayer,dataStorePreferenceRepository: DataStorePreferenceRepository): SoundViewModel {
+    fun provideActualSong(exoPlayer: ExoPlayer, dataStorePreferenceRepository: DataStorePreferenceRepository): SoundViewModel {
         return  SoundViewModel(exoPlayer,dataStorePreferenceRepository)
     }
 
-   @Singleton
+    @Singleton
     @Provides
     fun provideDataStore( @ApplicationContext context :Context) :DataStore<Preferences> {
-        return    PreferenceDataStoreFactory.create(
+        return  PreferenceDataStoreFactory.create(
                 corruptionHandler = ReplaceFileCorruptionHandler(
                     produceNewData = { emptyPreferences() }
                 ),
@@ -48,7 +48,8 @@ class ClassModule {
             )
     }
 
-    @Singleton
+
+
     @Provides
     fun provideDataStorePreferenceRespository(dataStore: DataStore<Preferences>):DataStorePreferenceRepository{
           return  DataStorePreferenceRepository(dataStore)
@@ -56,7 +57,7 @@ class ClassModule {
 
     @Singleton
     @Provides
-    fun provideExoPlayer(@ApplicationContext context :Context):ExoPlayer{
+    fun provideExoPlayer(@ApplicationContext context : Context):ExoPlayer{
         return  ExoPlayer.Builder(context)
             .build()
     }
@@ -66,7 +67,7 @@ class ClassModule {
         return databasePlaylist.playlistDao()
     }
     @Provides
-    fun soundDao(databasePlaylist: DatabasePlaylist):SoundDao{
+    fun provideSoundDao(databasePlaylist: DatabasePlaylist):SoundDao{
         return databasePlaylist.soundDao()
     }
 
@@ -79,6 +80,7 @@ class ClassModule {
          return  SoundPlayListRepository(playListDAO, playlistAndSoundCross,soundDao)
     }
 
+    @Singleton
     @Provides
     fun provideRoomDatabase(@ApplicationContext context: Context):DatabasePlaylist{
             return  DatabasePlaylist.getInstance(context)

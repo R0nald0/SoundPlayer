@@ -15,6 +15,7 @@ import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -102,11 +103,8 @@ class SoundViewModel @Inject constructor(
 
                 exoPlayer.seekTo(playList.currentMusicPosition,playBackPosition)
                 currentItem = playList.currentMusicPosition
-            }
 
-           viewModelScope.launch {
-               dataStorePreferenceRepository.savePreference(playList.idPlayList, positionSoundKey = playList.currentMusicPosition)
-           }
+            }
     }
 
     private fun createMediaItemList(list: MutableSet<Sound>):List<MediaItem>{
@@ -166,22 +164,37 @@ class SoundViewModel @Inject constructor(
         }
         configActualSound()
     }
-    fun isPlaying(): Boolean? {
-        return isPlayingObserver.value
-    }
-
     fun destroyPlayer(){
         exoPlayer.stop()
         exoPlayer.release()
     }
-    fun readPreferences(){
-        viewModelScope.launch {
-            val readAllPreferecenceData = dataStorePreferenceRepository.readAllPreferecenceData()
-            if (readAllPreferecenceData != null){
-                _userDataPreferecenceObs.postValue(readAllPreferecenceData)
-            }
-        }
 
+  suspend fun savePreference(){
+
+            if(_currentPlayList.value != null){
+                dataStorePreferenceRepository.savePreference(
+                    _currentPlayList.value!!.idPlayList,
+                    positionSoundKey = currentItem
+                )
+            }
+
+
+    }
+    suspend fun readPreferences(){
+
+             runCatching {
+
+             }.fold(
+                 onSuccess = {
+                     val readAllPreferecenceData = dataStorePreferenceRepository.readAllPreferecenceData()
+                     if (readAllPreferecenceData != null){
+                         _userDataPreferecenceObs.value = readAllPreferecenceData
+                     }
+                 },
+                 onFailure = {
+                     Log.i("Play_", "readPreferences: erro ao ler dados da store : ${it.message}")
+                 }
+             )
     }
 
 }

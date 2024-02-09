@@ -5,24 +5,25 @@ import android.content.Intent
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import com.example.soundplayer.presentation.SoundViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SoundService : MediaSessionService() {
-    @Inject  lateinit var  exoPlayer :ExoPlayer
+    @Inject  lateinit var soundViewModel:SoundViewModel
     private var mediaSession :MediaSession? = null
 
     override fun onCreate() {
         super.onCreate()
 
-        mediaSession =MediaSession.Builder(this,exoPlayer)
+        mediaSession =MediaSession.Builder(this,soundViewModel.getPlayer())
             .build()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        if (!exoPlayer.playWhenReady  || exoPlayer.mediaItemCount == 0){
+        if (!soundViewModel.getPlayer().playWhenReady  || soundViewModel.getPlayer().mediaItemCount == 0){
             stopSelf()
         }
     }
@@ -34,7 +35,7 @@ class SoundService : MediaSessionService() {
 
     override fun onDestroy() {
         mediaSession.run {
-            exoPlayer.release()
+            soundViewModel.destroyPlayer()
             this?.release()
             mediaSession =null
         }

@@ -19,7 +19,7 @@ class DataStorePreferenceRepository @Inject constructor(
     suspend fun savePreference(playlistKeyName:Long? , positionSoundKey:Int){
         try {
             dataStore.edit { prefen ->
-                prefen[ID_PLAYLIST_KEY] = playlistKeyName ?:0L
+                prefen[ID_PLAYLIST_KEY] = playlistKeyName ?:1
                 prefen[POSITION_KEY] = positionSoundKey
             }
         }catch (ioException:IOException){
