@@ -2,8 +2,6 @@ package com.example.soundplayer.presentation.fragment
 
 import android.annotation.SuppressLint
 import android.content.ContentUris
-import android.content.Intent
-import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -16,19 +14,20 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
-import androidx.core.content.ContextCompat.registerReceiver
-import androidx.core.os.bundleOf
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
-import com.example.soundplayer.SoundPlayerReceiver
 import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.databinding.FragmentMainBinding
@@ -75,8 +74,8 @@ class MainFragment : Fragment() {
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        myMenuProvider = MyMenuProvider()
 
-        // createReceiver()
         binding.btnFindSounds.setOnClickListener {
             requestPermission()
         }
@@ -89,7 +88,7 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        setupToolbar()
+
         initAdapter()
         getPermissions()
         observersViewModel()
@@ -101,21 +100,19 @@ class MainFragment : Fragment() {
         CoroutineScope(Dispatchers.Main).launch {
             soundViewModel.readPreferences()
         }
+        setupToolbar(view)
+
     }
+      private fun setupToolbar(view: View) {
 
-
-
-      private fun setupToolbar() {
-
-          //  setSupportActionBar(binding.includeSelectItem.toolbarSelecrionItemsMaterial)
-          myMenuProvider = MyMenuProvider()
+          val activity  = activity as AppCompatActivity
+          activity.setSupportActionBar(binding.includeSelectItem.toolbarSelecrionItemsMaterial)
       }
+
 
       override fun onStart() {
           super.onStart()
-
           Log.i("play_", "on Start")
-
       }
 
       override fun onResume() {
@@ -226,17 +223,18 @@ class MainFragment : Fragment() {
       private fun initAdapter() {
           adapterSound = SoundAdapter(
              soundViewModel =  soundViewModel,
-              isUpdateList = {isUpdate-> updateViewWhenMenuChange(isUpdate) },
+              isUpdateList = {isUpdate->
+                  updateViewWhenMenuChange(isUpdate)
+                             },
               initNewFragment = {
                   findNavController().navigate(R.id.action_mainFragment_to_soundPlayingFragment)
-              }
+               }
               )
 
           binding.rvSound.adapter = adapterSound
           binding.rvSound.layoutManager = LinearLayoutManager( requireActivity(),LinearLayoutManager.VERTICAL,false)
 
           playListAdapter = PlayListAdapter(
-
               onclick = { playListChoseByUser -> adapterSound.getPlayList(playListChoseByUser)},
               onDelete = {playList -> playListViewModel.deletePlayList(playList)},
               onEdit = {playList -> playListViewModel.updateNamePlayList(playList) }
@@ -247,19 +245,15 @@ class MainFragment : Fragment() {
       }
 
       private fun updateViewWhenMenuChange(isUpdate: Boolean) {
+         requireActivity().removeMenuProvider(myMenuProvider)
+          requireActivity().addMenuProvider(myMenuProvider)
           if (isUpdate) {
-             requireActivity().addMenuProvider(myMenuProvider)
-              binding.include.toolbarPrincipal.visibility = View.GONE
-              binding.includeSelectItem.toolbarSelecrionItems.visibility = View.VISIBLE
               binding.fabAddPlayList.isVisible = false
               binding.includeSelectItem.backButton.setOnClickListener {
                   adapterSound.clearSoundListSelected()
               }
           } else {
-              requireActivity().removeMenuProvider(myMenuProvider)
               binding.fabAddPlayList.isVisible = true
-              binding.include.toolbarPrincipal.visibility = View.VISIBLE
-              binding.includeSelectItem.toolbarSelecrionItems.visibility = View.GONE
           }
       }
 
@@ -333,7 +327,6 @@ class MainFragment : Fragment() {
           }
       }
 
-
       override fun onStop() {
           CoroutineScope(Dispatchers.Main).launch{
               soundViewModel.savePreference()
@@ -341,21 +334,26 @@ class MainFragment : Fragment() {
           Log.i("play_", "onStop")
           super.onStop()
       }
-       override fun onDestroy() {
-        //   unregisterReceiver(myReceiver)
-        //  soundViewModel.destroyPlayer()
-           super.onDestroy()
-      }
 
-    inner class  MyMenuProvider() : MenuProvider {
+   inner class  MyMenuProvider() : MenuProvider {
         @SuppressLint("SuspiciousIndentation")
         override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-            menuInflater.inflate(R.menu.sound_menu,menu)
             val pairPlayList = adapterSound.getSoundSelecionados()
+
+            if (pairPlayList.second.isEmpty()){
+                binding.includeSelectItem.toolbarSelecrionItemsMaterial.title = "SoundPlayer"
+                binding.includeSelectItem.backButton.isVisible =false
+                menuInflater.inflate(R.menu.menu_toolbar,menu)
+
+            }else{
+                binding.includeSelectItem.toolbarSelecrionItemsMaterial.title = "Selecionar itens"
+                binding.includeSelectItem.backButton.isVisible =true
+                menuInflater.inflate(R.menu.sound_menu,menu)
+            }
+
             if (pairPlayList.first.toInt() == 1){
                 menu.removeItem(R.id.id_remove)
             }
-
         }
 
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -363,14 +361,17 @@ class MainFragment : Fragment() {
             val pairPlayList  =  adapterSound.getSoundSelecionados()
 
             return  when(menuItem.itemId){
+                R.id.menu_config->{
+                    requireActivity().exibirToast("configuracçoes")
+                    findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
+                    true
+                }
+
 
                 R.id.id_update->{
                     val sound = SoundList(0,pairPlayList.second)
-                    val  bottomSheetFragment =SelectPlayListDialogFragment()
-                    val bundle = bundleOf("listSound" to sound)
-                    bottomSheetFragment.arguments = bundle
-                    findNavController().navigate(R.id.action_mainFragment_to_selectPlayListDialogFragment)
-                    //bottomSheetFragment.show(supportFragmentManager,"tag")
+                   val args  =  MainFragmentDirections.actionMainFragmentToSelectPlayListDialogFragment(sound)
+                    findNavController().navigate(args)
                     true
                 }
                 R.id.id_remove ->{

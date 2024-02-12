@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.example.soundplayer.presentation.fragment.MainFragment"
-        android:label="MainFragment" >
+        android:label="SoundPlayer">
         <action
             android:id="@+id/action_mainFragment_to_bottomSheetFragment"
             app:destination="@id/bottomSheetFragment" />
@@ -17,20 +17,31 @@
             app:destination="@id/soundPlayingFragment" />
         <action
             android:id="@+id/action_mainFragment_to_selectPlayListDialogFragment"
-            app:destination="@id/selectPlayListDialogFragment" />
+            app:destination="@id/id_update" />
+        <action
+            android:id="@+id/action_mainFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <dialog
         android:id="@+id/bottomSheetFragment"
         android:name="com.example.soundplayer.presentation.fragment.BottomSheetFragment"
         android:label="BottomSheetFragment" />
     <dialog
-        android:id="@+id/selectPlayListDialogFragment"
+        android:id="@+id/id_update"
         android:name="com.example.soundplayer.presentation.fragment.SelectPlayListDialogFragment"
         android:label="fragment_select_play_list_dialog_list_dialog"
-        tools:layout="@layout/fragment_select_play_list_dialog_list_dialog" />
+        tools:layout="@layout/fragment_select_play_list_dialog_list_dialog" >
+        <argument
+            android:name="soundsListToAddPlayList"
+            app:argType="com.example.soundplayer.model.SoundList" />
+    </dialog>
     <fragment
         android:id="@+id/soundPlayingFragment"
         android:name="com.example.soundplayer.presentation.fragment.SoundPlayingFragment"
-        android:label="fragment_sound_playing"
         tools:layout="@layout/fragment_sound_playing" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.soundplayer.presentation.fragment.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>
