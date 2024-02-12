@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.NavArgs
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.databinding.FragmentSelectPlayListDialogListDialogBinding
@@ -19,10 +21,10 @@ import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
 class SelectPlayListDialogFragment : DialogFragment() {
 
     private var _binding: FragmentSelectPlayListDialogListDialogBinding? = null
-
     private val playListViewModel by activityViewModels<PlayListViewModel>()
     private lateinit var  adapterPlaylistSelect  :AdapterSelectePlayList
     private lateinit var soudsToUpdate : Set<Sound>
+    private  val arsg : SelectPlayListDialogFragmentArgs by navArgs()
 
     private val binding get() = _binding!!
 
@@ -49,19 +51,7 @@ class SelectPlayListDialogFragment : DialogFragment() {
     }
 
     private fun setUpBundle(){
-        val bundle = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requireArguments().getParcelable("listSound",SoundList::class.java)
-        } else {
-            requireArguments().getParcelable<SoundList>("listSound")
-        }
-
-        if (bundle != null){
-            soudsToUpdate = bundle.listMusic
-        }else{
-            Toast.makeText(this.context, "Lista de musicas não contém sons", Toast.LENGTH_SHORT).show()
-            dismiss()
-        }
-
+           soudsToUpdate = arsg.soundsListToAddPlayList.listMusic
     }
     private fun observer() {
         playListViewModel.playLists.observe(this){listOfPlayList->

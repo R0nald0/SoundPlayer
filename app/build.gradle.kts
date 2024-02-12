@@ -4,6 +4,8 @@ plugins {
     kotlin("kapt")
     id ("kotlin-parcelize")
     id("com.google.dagger.hilt.android")
+
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -46,7 +48,7 @@ dependencies {
     val lottieVersion = "6.1.0"
     val lifecycle_version = "2.6.2"
     val roomVersion = "2.5.0"
-    val nav_version = "2.7.6"
+    val nav_version = "2.5.3"
 
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.recyclerview:recyclerview:1.3.2")

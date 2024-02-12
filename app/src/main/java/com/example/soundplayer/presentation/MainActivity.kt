@@ -23,8 +23,15 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.onNavDestinationSelected
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
 import com.example.soundplayer.SoundPlayerReceiver
@@ -56,6 +63,8 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
+
     private val  soundViewModel by viewModels<SoundViewModel>()
 
     private var isLoading = true
@@ -74,7 +83,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var  navController : NavController
-    private lateinit var  appbar : AppBarConfiguration
+    private  lateinit var  appBarConfiguration  :AppBarConfiguration
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen().apply {
@@ -84,13 +94,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
         setContentView(binding.root)
-
         getNavHost()
     }
 
     private fun getNavHost() {
         val navHost = supportFragmentManager.findFragmentById(R.id.myHostFragment) as NavHostFragment
          navController = navHost.navController
+        appBarConfiguration = AppBarConfiguration(navController.graph)
+
+
     }
 
     override fun onStart() {
@@ -104,5 +116,26 @@ class MainActivity : AppCompatActivity() {
     }
         super.onStop()
     }
+
+
+//    private fun menuToolbar(){
+//        addMenuProvider(object : MenuProvider {
+//            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+//                val menu = menuInflater.inflate(R.menu.menu_toolbar,menu)
+//            }
+//
+//            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+//                return  when(menuItem.itemId){
+//                    R.id.menu_config ->{
+//                        exibirToast("Clicou no config")
+//                        true
+//                    }
+//                    else->true
+//                }
+//            }
+//        })
+//    }
+
+
 
 }
