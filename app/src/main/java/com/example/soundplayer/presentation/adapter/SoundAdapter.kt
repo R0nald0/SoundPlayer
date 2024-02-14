@@ -15,7 +15,7 @@ import com.example.soundplayer.commons.extension.convertMilesSecondToMinSec
 import com.example.soundplayer.databinding.ItemSoundBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
-import com.example.soundplayer.presentation.SoundViewModel
+import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 
 class SoundAdapter(
     private val soundViewModel: SoundViewModel,

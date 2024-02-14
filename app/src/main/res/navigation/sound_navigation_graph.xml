@@ -7,8 +7,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.soundplayer.presentation.fragment.MainFragment"
-        android:label="SoundPlayer">
+        android:name="com.example.soundplayer.presentation.fragment.MainFragment">
         <action
             android:id="@+id/action_mainFragment_to_bottomSheetFragment"
             app:destination="@id/bottomSheetFragment" />
@@ -43,5 +42,6 @@
         android:id="@+id/settingsFragment"
         android:name="com.example.soundplayer.presentation.fragment.SettingsFragment"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+    </fragment>
 </navigation>

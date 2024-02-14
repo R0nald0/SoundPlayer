@@ -15,7 +15,7 @@ import com.example.soundplayer.data.dao.SoundDao
 import com.example.soundplayer.data.database.DatabasePlaylist
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.data.repository.SoundPlayListRepository
-import com.example.soundplayer.presentation.SoundViewModel
+import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,8 +47,6 @@ class ClassModule {
                 produceFile = { context.preferencesDataStoreFile(Constants.PREFERENCE_NAME) }
             )
     }
-
-
 
     @Provides
     fun provideDataStorePreferenceRespository(dataStore: DataStore<Preferences>):DataStorePreferenceRepository{

@@ -2,16 +2,15 @@ package com.example.soundplayer.presentation.service
 
 
 import android.content.Intent
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
-import com.example.soundplayer.presentation.SoundViewModel
+import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SoundService : MediaSessionService() {
-    @Inject  lateinit var soundViewModel:SoundViewModel
+    @Inject  lateinit var soundViewModel: SoundViewModel
     private var mediaSession :MediaSession? = null
 
     override fun onCreate() {

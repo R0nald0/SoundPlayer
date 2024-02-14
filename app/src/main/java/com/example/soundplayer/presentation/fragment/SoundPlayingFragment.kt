@@ -15,7 +15,7 @@ import androidx.media3.session.SessionToken
 import androidx.navigation.fragment.findNavController
 import com.example.soundplayer.R
 import com.example.soundplayer.databinding.FragmentSoundPlayingBinding
-import com.example.soundplayer.presentation.SoundViewModel
+import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import com.example.soundplayer.presentation.service.SoundService
 import com.google.common.util.concurrent.MoreExecutors
 

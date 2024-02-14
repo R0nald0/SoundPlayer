@@ -17,15 +17,10 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
 import com.example.soundplayer.commons.constants.Constants
@@ -34,7 +29,7 @@ import com.example.soundplayer.databinding.FragmentMainBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.SoundList
-import com.example.soundplayer.presentation.SoundViewModel
+import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import com.example.soundplayer.presentation.adapter.PlayListAdapter
 import com.example.soundplayer.presentation.adapter.SoundAdapter
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
@@ -45,12 +40,10 @@ import java.io.File
 
 class MainFragment : Fragment() {
 
-    private  val binding by lazy {
-        FragmentMainBinding.inflate(layoutInflater)
-    }
+    private  lateinit var  binding : FragmentMainBinding
 
     private val listSoundFromContentProvider = mutableSetOf<Sound>()
-    lateinit var myMenuProvider: MenuProvider
+    private lateinit var myMenuProvider: MenuProvider
     var cont = 0
     private lateinit var gerenciarPermissoes : ActivityResultLauncher<Array<String>>
     private lateinit var  adapterSound : SoundAdapter
@@ -76,6 +69,32 @@ class MainFragment : Fragment() {
         super.onCreate(savedInstanceState)
         myMenuProvider = MyMenuProvider()
 
+    }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentMainBinding.inflate(inflater,container,false)
+        return binding.root
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        initAdapter()
+        getPermissions()
+        observersViewModel()
+        initBindigs()
+
+
+       binding.toolbarSelecrionItemsMaterial.title =""
+        CoroutineScope(Dispatchers.Main).launch {
+            soundViewModel.readPreferences()
+        }
+       setupToolbar(view)
+
+    }
+
+    private fun initBindigs() {
         binding.btnFindSounds.setOnClickListener {
             requestPermission()
         }
@@ -84,40 +103,13 @@ class MainFragment : Fragment() {
             findNavController().navigate(R.id.action_mainFragment_to_bottomSheetFragment)
         }
     }
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
 
-        initAdapter()
-        getPermissions()
-        observersViewModel()
-
-        return binding.root
-    }
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        CoroutineScope(Dispatchers.Main).launch {
-            soundViewModel.readPreferences()
-        }
-        setupToolbar(view)
-
-    }
-      private fun setupToolbar(view: View) {
-
+    private fun setupToolbar(view: View) {
           val activity  = activity as AppCompatActivity
-          activity.setSupportActionBar(binding.includeSelectItem.toolbarSelecrionItemsMaterial)
+          activity.setSupportActionBar(binding.toolbarSelecrionItemsMaterial)
+
       }
 
-
-      override fun onStart() {
-          super.onStart()
-          Log.i("play_", "on Start")
-      }
-
-      override fun onResume() {
-          super.onResume()
-      }
 
       private  fun observersViewModel(){
 
@@ -249,7 +241,7 @@ class MainFragment : Fragment() {
           requireActivity().addMenuProvider(myMenuProvider)
           if (isUpdate) {
               binding.fabAddPlayList.isVisible = false
-              binding.includeSelectItem.backButton.setOnClickListener {
+              binding.mainFragmentBackButton.setOnClickListener {
                   adapterSound.clearSoundListSelected()
               }
           } else {
@@ -335,19 +327,21 @@ class MainFragment : Fragment() {
           super.onStop()
       }
 
+
+
    inner class  MyMenuProvider() : MenuProvider {
         @SuppressLint("SuspiciousIndentation")
         override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
             val pairPlayList = adapterSound.getSoundSelecionados()
 
             if (pairPlayList.second.isEmpty()){
-                binding.includeSelectItem.toolbarSelecrionItemsMaterial.title = "SoundPlayer"
-                binding.includeSelectItem.backButton.isVisible =false
+                binding.txvTitleToolbar.text = "SoundPlayer"
+                binding.mainFragmentBackButton.isVisible =false
                 menuInflater.inflate(R.menu.menu_toolbar,menu)
 
             }else{
-                binding.includeSelectItem.toolbarSelecrionItemsMaterial.title = "Selecionar itens"
-                binding.includeSelectItem.backButton.isVisible =true
+                binding.txvTitleToolbar.text= "Selecionar itens"
+                binding.mainFragmentBackButton.isVisible =true
                 menuInflater.inflate(R.menu.sound_menu,menu)
             }
 
@@ -363,7 +357,7 @@ class MainFragment : Fragment() {
             return  when(menuItem.itemId){
                 R.id.menu_config->{
                     requireActivity().exibirToast("configuracçoes")
-                    findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
+                     findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
                     true
                 }
 

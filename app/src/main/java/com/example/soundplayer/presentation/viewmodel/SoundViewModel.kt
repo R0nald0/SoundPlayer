@@ -1,11 +1,10 @@
-package com.example.soundplayer.presentation
+package com.example.soundplayer.presentation.viewmodel
 
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
@@ -15,8 +14,6 @@ import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -180,12 +177,12 @@ class SoundViewModel @Inject constructor(
            readPreferences()
     }
     suspend fun readPreferences(){
-
+        val readAllPreferecenceData = dataStorePreferenceRepository.readAllPreferecenceData()
              runCatching {
 
              }.fold(
                  onSuccess = {
-                     val readAllPreferecenceData = dataStorePreferenceRepository.readAllPreferecenceData()
+
                      if (readAllPreferecenceData != null){
                          _userDataPreferecenceObs.value = readAllPreferecenceData
                      }

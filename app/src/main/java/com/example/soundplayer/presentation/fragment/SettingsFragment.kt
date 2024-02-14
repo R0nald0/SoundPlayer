@@ -5,56 +5,72 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.soundplayer.R
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
+import com.example.soundplayer.commons.extension.exibirToast
+import com.example.soundplayer.databinding.FragmentSettingsBinding
+import com.example.soundplayer.presentation.viewmodel.PreferencesViewModel
+import com.example.soundplayer.presentation.viewmodel.SoundViewModel
+import com.example.soundplayer.presentation.viewmodel.StatePrefre
+import dagger.hilt.android.AndroidEntryPoint
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [SettingsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+@AndroidEntryPoint
 class SettingsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private  lateinit var binding : FragmentSettingsBinding
+    private val preferencesViewModel by activityViewModels<PreferencesViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false)
+
+        binding = FragmentSettingsBinding.inflate(LayoutInflater.from(inflater.context))
+        return  binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment SettingsFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            SettingsFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initBinding()
     }
+
+    override fun onStart() {
+
+        super.onStart()
+        preferencesViewModel.readDarkModePreference()
+        readPreference()
+    }
+    fun initBinding() = binding.apply {
+        settingsBackButton.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        switchDarkMode.setOnCheckedChangeListener { buttonView, isChecked ->
+             configureModeUi(isChecked)
+        }
+    }
+    fun configureModeUi(isDarkMode: Boolean){
+
+          if (isDarkMode) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+          else{AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)}
+          preferencesViewModel.saveDarkModePrefrence(isDarkMode)
+    }
+
+    fun  readPreference(){
+         preferencesViewModel.isDarkMode.observe(viewLifecycleOwner){statePreference->
+              when(statePreference){
+                  is StatePrefre.Sucesse->{
+                     binding.switchDarkMode.isChecked =  statePreference.isDarkMode
+                  }
+                  is StatePrefre.Error ->{
+                      requireActivity().exibirToast(statePreference.mensagem)
+                  }
+              }
+         }
+    }
+
 }
