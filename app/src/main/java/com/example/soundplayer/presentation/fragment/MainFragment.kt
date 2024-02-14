@@ -84,13 +84,12 @@ class MainFragment : Fragment() {
         getPermissions()
         observersViewModel()
         initBindigs()
+        binding.toolbarSelecrionItemsMaterial.title =""
 
-
-       binding.toolbarSelecrionItemsMaterial.title =""
         CoroutineScope(Dispatchers.Main).launch {
             soundViewModel.readPreferences()
         }
-       setupToolbar(view)
+       setupToolbar()
 
     }
 
@@ -104,7 +103,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun setupToolbar(view: View) {
+    private fun setupToolbar() {
           val activity  = activity as AppCompatActivity
           activity.setSupportActionBar(binding.toolbarSelecrionItemsMaterial)
 

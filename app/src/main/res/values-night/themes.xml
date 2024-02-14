@@ -4,6 +4,7 @@
         <!-- Customize your dark theme here. -->
          <item name="colorPrimary">@color/my_primary</item>
 
+        <item name="android:statusBarColor">@color/redStronger</item>
       <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
     </style>
 

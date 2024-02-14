@@ -3,9 +3,10 @@
     <color name="black">#6F000000</color>
     <color name="blackToolbar">#DCE8DEDE</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="red">#E35252</color>
     <color name="white_activity_main">#E3D4D4</color>
     <color name="gray">#E88F8F</color>
+    <color name="red">#E35252</color>
+    <color name="redStronger">#FD3333</color>
 
     <color name="colorPrimaryContainer">#4CAF50</color>
     <color name="colorOnPrimaryContainer">#FFFFFF</color>

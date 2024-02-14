@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
@@ -14,6 +15,9 @@ import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -166,31 +170,42 @@ class SoundViewModel @Inject constructor(
         exoPlayer.release()
     }
 
-  suspend fun savePreference(){
+ suspend  fun savePreference(){
 
-            if(_currentPlayList.value != null){
-                dataStorePreferenceRepository.savePreference(
-                    _currentPlayList.value!!.idPlayList,
-                    positionSoundKey = currentItem
-                )
-            }
-           readPreferences()
+            runCatching {
+                if(_currentPlayList.value != null){
+                    dataStorePreferenceRepository
+                        .savePreference(_currentPlayList.value!!.idPlayList, positionSoundKey = currentItem)
+                }
+            }.fold(
+                onSuccess = {
+                    withContext(Dispatchers.Main){
+                        readPreferences()
+                    }
+                },
+                onFailure = {
+                    Log.i("INFO_", "savePreference: erro ao salvar preferencias ${it.message}")
+                }
+            )
+
     }
-    suspend fun readPreferences(){
-        val readAllPreferecenceData = dataStorePreferenceRepository.readAllPreferecenceData()
+   suspend  fun readPreferences(){
+
              runCatching {
-
+                dataStorePreferenceRepository.readAllPreferecenceData()
              }.fold(
-                 onSuccess = {
-
+                 onSuccess = {readAllPreferecenceData->
                      if (readAllPreferecenceData != null){
-                         _userDataPreferecenceObs.value = readAllPreferecenceData
+                         withContext(Dispatchers.Main){
+                             _userDataPreferecenceObs.value = readAllPreferecenceData
+                         }
                      }
                  },
                  onFailure = {
                      Log.i("Play_", "readPreferences: erro ao ler dados da store : ${it.message}")
                  }
              )
+
     }
 
 }

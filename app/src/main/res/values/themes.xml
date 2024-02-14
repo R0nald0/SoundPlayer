@@ -5,13 +5,14 @@
         <item name="colorPrimary">@color/my_primary</item>
         <item name="actionOverflowButtonStyle">@style/ActionOverFlowButton</item>
 
-        <!-- Floati
+        <!-- Floating actin button
         <item name="colorPrimaryContainer">@color/colorPrimaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/colorOnPrimaryContainer</item>
 
          card
  -->
         <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
+        <item name="android:statusBarColor">@color/redStronger</item>
 
     </style>
 
