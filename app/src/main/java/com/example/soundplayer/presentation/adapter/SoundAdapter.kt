@@ -25,6 +25,7 @@ class SoundAdapter(
    private  var soundsPlayList: PlayList? = null
    private  var actualSound :Sound? = null
     private val soundSelecionados  = mutableSetOf<Sound>()
+    var sizeTitleMusic =16f
 
 
     @SuppressLint("NotifyDataSetChanged")
@@ -47,10 +48,11 @@ class SoundAdapter(
 
     inner class  SoundViewHolder(private val binding : ItemSoundBinding): ViewHolder(binding.root){
      fun bind(soudd :Sound,position: Int){
-         //TODO crirar metoddo para salvar no banco a posicao da musica atual
+
          val duration =  binding.root.context.convertMilesSecondToMinSec(soudd.duration.toLong())
          binding.txvDuration.text = duration
          binding.txvTitle.text =soudd.title
+         binding.txvTitle.textSize = sizeTitleMusic
          binding.imageView.setImageURI(soudd.uriMediaAlbum)
 
          configSelectionedItemApperence(soudd)

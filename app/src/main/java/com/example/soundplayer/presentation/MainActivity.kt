@@ -46,7 +46,6 @@ class MainActivity : AppCompatActivity() {
     }
     private lateinit var  navController : NavController
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen().apply {
@@ -65,17 +64,17 @@ class MainActivity : AppCompatActivity() {
     fun observer(){
         preferencesViewModel.isDarkMode.observe(this){statePreference->
             when(statePreference){
-                is StatePrefre.Sucesse->{
-                     if (statePreference.isDarkMode)AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                is StatePrefre.Sucess<*> ->{
+                     if (statePreference.succssResult as Boolean)AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                      else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                     isLoading =false
                 }
                 is StatePrefre.Error ->{
                    exibirToast(statePreference.mensagem)
                 }
             }
-
+            isLoading =false
         }
+
     }
     private fun getNavHost() {
         val navHost = supportFragmentManager.findFragmentById(R.id.myHostFragment) as NavHostFragment

@@ -4,8 +4,14 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
+import com.example.soundplayer.commons.constants.Constants
+import com.example.soundplayer.commons.constants.Constants.ID_DARKMODE_KEY
+import com.example.soundplayer.commons.constants.Constants.ID_PLAYLIST_KEY
+import com.example.soundplayer.commons.constants.Constants.ID_SIZE_TEXT_TITLE_MUSIC
+import com.example.soundplayer.commons.constants.Constants.POSITION_KEY
 import com.example.soundplayer.data.entities.UserDataPreferecence
 import kotlinx.coroutines.flow.first
 import java.io.IOException
@@ -14,14 +20,12 @@ import javax.inject.Inject
 class DataStorePreferenceRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
-    private val POSITION_KEY = intPreferencesKey("postionKey")
-    private val ID_PLAYLIST_KEY = longPreferencesKey("playlist")
-    private val ID_DARKMODE_KEY = booleanPreferencesKey("isDarkMode")
+
 
     suspend fun savePreference(playlistKeyName:Long? , positionSoundKey:Int){
         try {
             dataStore.edit { prefen ->
-                prefen[ID_PLAYLIST_KEY] = playlistKeyName ?:1
+                prefen[Constants.ID_PLAYLIST_KEY] = playlistKeyName ?:1
                 prefen[POSITION_KEY] = positionSoundKey
             }
         }catch (ioException:IOException){
@@ -43,17 +47,7 @@ class DataStorePreferenceRepository @Inject constructor(
       }
 
     }
-     suspend fun readBooleansPreference():Boolean?{
-        try {
-            val data  = dataStore.data.first()
-            return data[ID_DARKMODE_KEY]
-        }catch (ioException:IOException){
-            throw ioException
-        }catch (exception :Exception){
-            throw exception
-        }
 
-    }
      private suspend fun readPreferencesPos(key: Preferences.Key<Int>):Int? {
          try {
              val data = dataStore.data.first()
@@ -70,11 +64,13 @@ class DataStorePreferenceRepository @Inject constructor(
               val position = readPreferencesPos(POSITION_KEY)
               val idPlay= readPreferences(ID_PLAYLIST_KEY)
               val isDarkMode= readBooleansPreference()
+               val sizeTitleMusic = readSizeTitleMusis(ID_SIZE_TEXT_TITLE_MUSIC)
                if (idPlay!=null){
                    return  UserDataPreferecence(
                        idPreference = idPlay ,
                        postionPreference = position ?: 0,
-                       isDarkMode =isDarkMode ?: false
+                       isDarkMode =isDarkMode ?: false,
+                       sizeTitleMusic = sizeTitleMusic ?: 16f
                    )
                }
                return  null
@@ -83,7 +79,17 @@ class DataStorePreferenceRepository @Inject constructor(
                throw Exception("erro ao ler dados em cache")
            }
     }
+    suspend fun readBooleansPreference():Boolean?{
+        try {
+            val data  = dataStore.data.first()
+            return data[ID_DARKMODE_KEY]
+        }catch (ioException:IOException){
+            throw ioException
+        }catch (exception :Exception){
+            throw exception
+        }
 
+    }
    suspend fun savePreferenceModeUi(darkMode: Boolean) {
          try {
              dataStore.edit {prefen->
@@ -92,5 +98,25 @@ class DataStorePreferenceRepository @Inject constructor(
          }catch (exception :Exception){
              throw Exception(exception.message)
          }
+    }
+    suspend fun saveSizeTitleMusic(sizeText: Float ){
+        try {
+            dataStore.edit {prefen->
+                prefen[ID_SIZE_TEXT_TITLE_MUSIC] = sizeText
+            }
+        }catch (exception :Exception){
+            throw Exception(exception.message)
+        }
+    }
+
+     suspend fun readSizeTitleMusis(key: Preferences.Key<Float>):Float? {
+        try {
+            val data = dataStore.data.first()
+            return data[key]
+        } catch (ioException: IOException) {
+            throw ioException
+        } catch (exception: Exception) {
+            throw exception
+        }
     }
 }

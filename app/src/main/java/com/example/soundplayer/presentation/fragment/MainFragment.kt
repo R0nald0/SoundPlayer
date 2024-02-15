@@ -33,11 +33,13 @@ import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import com.example.soundplayer.presentation.adapter.PlayListAdapter
 import com.example.soundplayer.presentation.adapter.SoundAdapter
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
+import com.example.soundplayer.presentation.viewmodel.PreferencesViewModel
+import com.example.soundplayer.presentation.viewmodel.StatePrefre
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
-
+//TODO bug menu so aparece ao abrir a play list
 class MainFragment : Fragment() {
 
     private  lateinit var  binding : FragmentMainBinding
@@ -50,7 +52,7 @@ class MainFragment : Fragment() {
     private lateinit var  playListAdapter: PlayListAdapter
     private val  soundViewModel by activityViewModels<SoundViewModel>()
     private val playListViewModel by activityViewModels<PlayListViewModel>()
-    private var isLoading = true
+    private val preferencesViewModel by activityViewModels<PreferencesViewModel>()
     private var positonPlayListToScrol = 0
 
     private val listPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -68,7 +70,6 @@ class MainFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         myMenuProvider = MyMenuProvider()
-
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -91,6 +92,11 @@ class MainFragment : Fragment() {
         }
        setupToolbar()
 
+    }
+
+    override fun onStart() {
+        preferencesViewModel.readSizeTextMusicPreference()
+        super.onStart()
     }
 
     private fun initBindigs() {
@@ -124,8 +130,6 @@ class MainFragment : Fragment() {
 
           soundViewModel.isPlayingObserver.observe(viewLifecycleOwner){ isPlaying ->
               if (isPlaying){
-                  requireActivity().exibirToast("Esta tocando")
-
                     soundViewModel.currentPlayList.observe(requireActivity()){currentPlayList->
                         if (currentPlayList != null && isPlaying){
                             playListAdapter.getCurrentPlayListPlayind(
@@ -138,7 +142,7 @@ class MainFragment : Fragment() {
 
                     soundViewModel.actualSound.observe(requireActivity()){ soundLiveData->
                         Log.i("INFO_", "Main:${soundLiveData.title} ${cont++}")
-                        //TODO VERIFICAR CHAMAS MULTIPLAS
+                        //TODO VERIFICAR CHAMAdasS MULTIPLAS
                         adapterSound.getActualSound(soundLiveData)
                         binding.rvSound.scrollToPosition(soundViewModel.currentItem)
                     }
@@ -147,7 +151,6 @@ class MainFragment : Fragment() {
 
           playListViewModel.playLists.observe(requireActivity()){listOfplayListObservable->
               playListAdapter.addPlayList(listOfplayListObservable)
-              isLoading =false
           }
 
           playListViewModel.uniquePlayList.observe(viewLifecycleOwner){uniquePlayListWithSongs->
@@ -167,6 +170,17 @@ class MainFragment : Fragment() {
                     )
                     playListViewModel.savePlayList(playList)
                 }
+          }
+
+          preferencesViewModel.sizeTextMusic.observe(viewLifecycleOwner){statePreference ->
+               when(statePreference){
+                   is StatePrefre.Sucess<*>->{
+                        adapterSound.sizeTitleMusic = statePreference.succssResult as Float
+                   }
+                   is  StatePrefre.Error ->{
+                        requireActivity().exibirToast(statePreference.mensagem)
+                   }
+               }
           }
       }
 
@@ -325,9 +339,6 @@ class MainFragment : Fragment() {
           Log.i("play_", "onStop")
           super.onStop()
       }
-
-
-
    inner class  MyMenuProvider() : MenuProvider {
         @SuppressLint("SuspiciousIndentation")
         override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -355,7 +366,6 @@ class MainFragment : Fragment() {
 
             return  when(menuItem.itemId){
                 R.id.menu_config->{
-                    requireActivity().exibirToast("configuracçoes")
                      findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
                     true
                 }

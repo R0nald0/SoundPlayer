@@ -11,13 +11,15 @@ import androidx.navigation.fragment.findNavController
 import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.databinding.FragmentSettingsBinding
 import com.example.soundplayer.presentation.viewmodel.PreferencesViewModel
-import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import com.example.soundplayer.presentation.viewmodel.StatePrefre
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class SettingsFragment : Fragment() {
     private  lateinit var binding : FragmentSettingsBinding
+    var checkedItem = 0
+    val singleItems = arrayOf("Pequena", "Média", "Grande")
     private val preferencesViewModel by activityViewModels<PreferencesViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +31,7 @@ class SettingsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        binding = FragmentSettingsBinding.inflate(LayoutInflater.from(inflater.context))
+        binding = FragmentSettingsBinding.inflate(inflater,container,false)
         return  binding.root
     }
 
@@ -52,6 +54,12 @@ class SettingsFragment : Fragment() {
         switchDarkMode.setOnCheckedChangeListener { buttonView, isChecked ->
              configureModeUi(isChecked)
         }
+
+       llLayouSizeFont.setOnClickListener {
+            showDialog("Escolha o tamanho da font do titulo da musica")
+       }
+
+
     }
     fun configureModeUi(isDarkMode: Boolean){
 
@@ -63,14 +71,50 @@ class SettingsFragment : Fragment() {
     fun  readPreference(){
          preferencesViewModel.isDarkMode.observe(viewLifecycleOwner){statePreference->
               when(statePreference){
-                  is StatePrefre.Sucesse->{
-                     binding.switchDarkMode.isChecked =  statePreference.isDarkMode
+                  is StatePrefre.Sucess<*> ->{
+                     binding.switchDarkMode.isChecked = statePreference.succssResult as Boolean
                   }
                   is StatePrefre.Error ->{
                       requireActivity().exibirToast(statePreference.mensagem)
                   }
               }
          }
+
+        preferencesViewModel.sizeTextMusic.observe(viewLifecycleOwner){statePreference ->
+            when(statePreference){
+                is StatePrefre.Sucess<*>->{
+                    val result  = statePreference.succssResult as Float
+                   checkedItem = when(result){
+                        16f -> 0
+                        18f -> 1
+                        20f -> 2
+                       else -> 0
+                   }
+                }
+                is  StatePrefre.Error ->{
+                    requireActivity().exibirToast(statePreference.mensagem)
+                }
+
+            }
+            binding.txvOpcaoSize.text = singleItems[checkedItem]
+        }
+    }
+    fun showDialog(title:String){
+
+
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(title)
+            .setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
+                binding.txvOpcaoSize.text = singleItems[which]
+                dialog.cancel()
+                when(which){
+                    0 -> {preferencesViewModel.saveSizeTextMusicPrefrence(15f)}
+                    1 -> {preferencesViewModel.saveSizeTextMusicPrefrence(18f)}
+                    2 -> {preferencesViewModel.saveSizeTextMusicPrefrence(20f)}
+                }
+            }
+            .show()
     }
 
 }
