@@ -37,8 +37,8 @@ class SoundViewModel @Inject constructor(
     val currentPlayList :LiveData<PlayList>
            get() = _currentPlayList
 
-    private val _userDataPreferecenceObs = MutableLiveData<UserDataPreferecence?>()
-    val userDataPreferecence : LiveData<UserDataPreferecence?>
+    private val _userDataPreferecenceObs = MutableLiveData<UserDataPreferecence>()
+    val userDataPreferecence : LiveData<UserDataPreferecence>
         get() = _userDataPreferecenceObs
 
 
@@ -195,11 +195,14 @@ class SoundViewModel @Inject constructor(
                 dataStorePreferenceRepository.readAllPreferecenceData()
              }.fold(
                  onSuccess = {readAllPreferecenceData->
-                     if (readAllPreferecenceData != null){
+
                          withContext(Dispatchers.Main){
                              _userDataPreferecenceObs.value = readAllPreferecenceData
+                                 ?: UserDataPreferecence(idPreference = 1, postionPreference = 1
+                             )
                          }
-                     }
+
+
                  },
                  onFailure = {
                      Log.i("Play_", "readPreferences: erro ao ler dados da store : ${it.message}")

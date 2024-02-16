@@ -119,12 +119,8 @@ class MainFragment : Fragment() {
       private  fun observersViewModel(){
 
           soundViewModel.userDataPreferecence.observe(viewLifecycleOwner){userDataPreference->
-              if (userDataPreference != null){
-                  userDataPreference.idPreference?.let {
-                      playListViewModel.findPlayListById(it)
-                  }
-                 positonPlayListToScrol =  userDataPreference.postionPreference
-              }
+              playListViewModel.findPlayListById(userDataPreference.idPreference ?: 1)
+              positonPlayListToScrol =  userDataPreference.postionPreference
           }
 
 
@@ -154,10 +150,11 @@ class MainFragment : Fragment() {
           }
 
           playListViewModel.uniquePlayList.observe(viewLifecycleOwner){uniquePlayListWithSongs->
-              updateViewWhenPlayListIsEmpty(uniquePlayListWithSongs)
+
               binding.rvSound.scrollToPosition(positonPlayListToScrol)
               soundViewModel.updatePlayList(uniquePlayListWithSongs.listSound)
               playListAdapter.setLastOpenPlayListBorder(uniquePlayListWithSongs.idPlayList ?: 0)
+              updateViewWhenPlayListIsEmpty(uniquePlayListWithSongs)
          }
 
           playListViewModel.soundListBd.observe(viewLifecycleOwner){listSound->
