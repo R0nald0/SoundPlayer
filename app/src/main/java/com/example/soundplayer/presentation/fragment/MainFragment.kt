@@ -241,9 +241,13 @@ class MainFragment : Fragment() {
 
           playListAdapter = PlayListAdapter(
               onclick =  { playListChoseByUser ->
-                  updateViewWhenPlayListIsEmpty(playListChoseByUser)
+                           updateViewWhenPlayListIsEmpty(playListChoseByUser)
                          },
-              onDelete = {playList -> playListViewModel.deletePlayList(playList)},
+              onDelete = {playList ->
+                            playListViewModel.deletePlayList(playList)
+                           binding.txvNoMusicAtPlaylist.isVisible =false
+                           binding.rvSound.isVisible= false
+                         },
               onEdit =   {playList -> playListViewModel.updateNamePlayList(playList) }
           )
           binding.idRvFavoriteList.adapter = playListAdapter
@@ -341,7 +345,7 @@ class MainFragment : Fragment() {
           }else{
               binding.linearMusics.visibility =View.VISIBLE
               binding.txvSoundNotFound.visibility =View.GONE
-              binding.txvQuantidadeMusics.text = "total de  musicas ${listSoundFromContentProvider.size}"
+              binding.txvQuantidadeMusics.text = "Total de músicas ${listSoundFromContentProvider.size}"
           }
       }
 
@@ -395,6 +399,7 @@ class MainFragment : Fragment() {
                         playListId = pairPlayList.first,
                         listRemovedItems =pairPlayList.second.toSet()
                     )
+                    adapterSound.clearSoundListSelected()
                     true
                 }
                 else ->false

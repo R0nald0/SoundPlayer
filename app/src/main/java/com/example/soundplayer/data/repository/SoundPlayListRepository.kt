@@ -66,8 +66,8 @@ class SoundPlayListRepository @Inject constructor (
    suspend fun deletePlaylist(playList: PlayList) : Int{
       try {
           var retorno = playListDAO.deletePlayList(playList = playList.toEntity())
-          if (retorno != 0){
-              retorno=  playlistAndSoundCross.deletePlayListAndSoundCross(playList.toEntity().playListId!!)
+          if (retorno != 0 && playList.listSound.isNotEmpty()){
+              playlistAndSoundCross.deletePlayListAndSoundCross(playList.toEntity().playListId!!)
           }
           return retorno
       }catch (exeption : Exception){
