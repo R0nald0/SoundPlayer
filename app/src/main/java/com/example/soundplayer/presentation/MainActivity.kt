@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.graphics.ColorUtils
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -55,6 +56,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
        getNavHost()
         observer()
+        val color = 0xffFF400404
+        window.navigationBarColor = ColorUtils.setAlphaComponent(color.toInt(),230)
     }
 
     override fun onStart() {

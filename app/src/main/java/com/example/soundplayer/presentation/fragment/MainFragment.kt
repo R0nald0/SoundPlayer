@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -19,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,16 +29,17 @@ import com.example.soundplayer.databinding.FragmentMainBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.SoundList
-import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import com.example.soundplayer.presentation.adapter.PlayListAdapter
 import com.example.soundplayer.presentation.adapter.SoundAdapter
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
 import com.example.soundplayer.presentation.viewmodel.PreferencesViewModel
+import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import com.example.soundplayer.presentation.viewmodel.StatePrefre
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+
 //TODO bug menu so aparece ao abrir a play list
 class MainFragment : Fragment() {
 

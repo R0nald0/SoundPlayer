@@ -2,10 +2,10 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.SoundPlayer" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-         <item name="colorPrimary">@color/my_primary</item>
+         <item name="colorPrimary">@color/colorSurfaceVariant</item>
 
-        <item name="android:statusBarColor">@color/redStronger</item>
-      <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
+        <item name="android:statusBarColor">@color/colorSurfaceStatusBar</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
     </style>
 
     <style name="ActionOverFlowButton" parent="Widget.AppCompat.ActionButton.Overflow">

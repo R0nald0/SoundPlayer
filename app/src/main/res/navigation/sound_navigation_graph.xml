@@ -13,7 +13,8 @@
             app:destination="@id/bottomSheetFragment" />
         <action
             android:id="@+id/action_mainFragment_to_soundPlayingFragment"
-            app:destination="@id/soundPlayingFragment" />
+            app:destination="@id/soundPlayingFragment"
+            app:enterAnim="@android:anim/fade_in" />
         <action
             android:id="@+id/action_mainFragment_to_selectPlayListDialogFragment"
             app:destination="@id/id_update" />
