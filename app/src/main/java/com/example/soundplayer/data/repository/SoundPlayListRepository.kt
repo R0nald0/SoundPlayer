@@ -147,7 +147,7 @@ class SoundPlayListRepository @Inject constructor (
 
     suspend fun  removeSoundItemsFromPlayList(idPlayList: Long, soudsToRemove:Set<Sound>) :List<Int>{
          try {
-             return soudsToRemove.map {sound ->
+            return soudsToRemove.map {sound ->
                   playlistAndSoundCross.deleteItemPlayListAndSoundCroos(idPlayList,sound.idSound!!)
              }
          }catch (exec :Exception){
@@ -166,7 +166,6 @@ class SoundPlayListRepository @Inject constructor (
                  }
              }
           return listToUpdate;
-
     }
 
     suspend fun updateNamePlayList(playList: PlayList) :Int {

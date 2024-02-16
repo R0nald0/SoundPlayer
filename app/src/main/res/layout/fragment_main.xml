@@ -100,7 +100,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:fontFamily="cursive"
+            android:layout_marginEnd="8dp"
             android:gravity="bottom|center_horizontal|end"
             android:letterSpacing="0.1"
             android:lines="1"
@@ -138,9 +138,19 @@
             android:paddingBottom="0dp"
             android:visibility="visible"
             tools:listitem="@layout/item_sound"
-            tools:visibility="visible">
-
+            tools:visibility="gone">
         </androidx.recyclerview.widget.RecyclerView>
+
+        <TextView
+            android:id="@+id/txv_no_music_at_playlist"
+            style="@style/TextAppearance.MaterialComponents.Body1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="40dp"
+            android:text="@string/est_playlist_esta_vazia"
+            android:visibility="visible" />
+
 
     </LinearLayout>
 

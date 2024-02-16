@@ -16,12 +16,13 @@
     <string name="selecionar_items">Selecionar Items</string>
     <string name="escolha_o_playlist">Escolha o PlayList</string>
     <string name="total_de_m_sicas">Total de Músicas %1$s</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="tittle_settings">Settings</string>
     <string name="tamanho_titulo_musica">Tamanho do título da Música</string>
     <string name="darkmode">DarkMode</string>
     <string name="pequena">Pequena</string>
+    <string name="selecionar_itens">Selecionar itens</string>
+    <string name="est_playlist_esta_vazia">Esta playlist está vazia</string>
 
 
 </resources>

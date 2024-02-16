@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tamanho_titulo_musica">Tamanho do título da Música</string>
+    <string name="selecionar_itens">Selecionar itens</string>
+    <string name="est_playlist_esta_vazia">Esta playlist está vazia</string>
 </resources>

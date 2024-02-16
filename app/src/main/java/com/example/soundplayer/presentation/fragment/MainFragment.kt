@@ -154,10 +154,10 @@ class MainFragment : Fragment() {
           }
 
           playListViewModel.uniquePlayList.observe(viewLifecycleOwner){uniquePlayListWithSongs->
-                soundViewModel.updatePlayList(uniquePlayListWithSongs.listSound)
-                adapterSound.getPlayList(uniquePlayListWithSongs)
-               binding.rvSound.scrollToPosition(positonPlayListToScrol)
-                playListAdapter.setLastOpenPlayListBorder(uniquePlayListWithSongs.idPlayList!!)
+              updateViewWhenPlayListIsEmpty(uniquePlayListWithSongs)
+              binding.rvSound.scrollToPosition(positonPlayListToScrol)
+              soundViewModel.updatePlayList(uniquePlayListWithSongs.listSound)
+              playListAdapter.setLastOpenPlayListBorder(uniquePlayListWithSongs.idPlayList ?: 0)
          }
 
           playListViewModel.soundListBd.observe(viewLifecycleOwner){listSound->
@@ -171,7 +171,6 @@ class MainFragment : Fragment() {
                     playListViewModel.savePlayList(playList)
                 }
           }
-
           preferencesViewModel.sizeTextMusic.observe(viewLifecycleOwner){statePreference ->
                when(statePreference){
                    is StatePrefre.Sucess<*>->{
@@ -182,6 +181,7 @@ class MainFragment : Fragment() {
                    }
                }
           }
+
       }
 
       private fun getPermissions(){
@@ -240,16 +240,29 @@ class MainFragment : Fragment() {
           binding.rvSound.layoutManager = LinearLayoutManager( requireActivity(),LinearLayoutManager.VERTICAL,false)
 
           playListAdapter = PlayListAdapter(
-              onclick = { playListChoseByUser -> adapterSound.getPlayList(playListChoseByUser)},
+              onclick =  { playListChoseByUser ->
+                  updateViewWhenPlayListIsEmpty(playListChoseByUser)
+                         },
               onDelete = {playList -> playListViewModel.deletePlayList(playList)},
-              onEdit = {playList -> playListViewModel.updateNamePlayList(playList) }
+              onEdit =   {playList -> playListViewModel.updateNamePlayList(playList) }
           )
           binding.idRvFavoriteList.adapter = playListAdapter
           binding.idRvFavoriteList.layoutManager = LinearLayoutManager( requireActivity(),LinearLayoutManager.HORIZONTAL,false)
 
       }
 
-      private fun updateViewWhenMenuChange(isUpdate: Boolean) {
+    private fun updateViewWhenPlayListIsEmpty(playListChoseByUser: PlayList) {
+        if (playListChoseByUser.listSound.isNotEmpty()) {
+            adapterSound.getPlayList(playListChoseByUser)
+            binding.rvSound.isVisible = true
+            binding.txvNoMusicAtPlaylist.isVisible = false
+        } else {
+            binding.rvSound.isVisible = false
+            binding.txvNoMusicAtPlaylist.isVisible = true
+        }
+    }
+
+    private fun updateViewWhenMenuChange(isUpdate: Boolean) {
          requireActivity().removeMenuProvider(myMenuProvider)
           requireActivity().addMenuProvider(myMenuProvider)
           if (isUpdate) {
@@ -345,12 +358,12 @@ class MainFragment : Fragment() {
             val pairPlayList = adapterSound.getSoundSelecionados()
 
             if (pairPlayList.second.isEmpty()){
-                binding.txvTitleToolbar.text = "SoundPlayer"
+                binding.txvTitleToolbar.text = getString(R.string.app_name)
                 binding.mainFragmentBackButton.isVisible =false
                 menuInflater.inflate(R.menu.menu_toolbar,menu)
 
             }else{
-                binding.txvTitleToolbar.text= "Selecionar itens"
+                binding.txvTitleToolbar.text= getString(R.string.selecionar_itens)
                 binding.mainFragmentBackButton.isVisible =true
                 menuInflater.inflate(R.menu.sound_menu,menu)
             }

@@ -76,6 +76,7 @@ class PlayListAdapter(
         private fun verifyPlayListEmpty(actualPlayList: PlayList) {
             if (actualPlayList.listSound.isEmpty()) {
                 Toast.makeText(binding.root.context, "PlayList vazia", Toast.LENGTH_SHORT).show()
+                onclick(actualPlayList)
             } else {
                 onclick(actualPlayList)
             }

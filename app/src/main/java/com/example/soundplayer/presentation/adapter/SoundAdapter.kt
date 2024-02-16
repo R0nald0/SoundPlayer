@@ -59,8 +59,7 @@ class SoundAdapter(
 
          configApperenceItem(soudd)
 
-
-         clicItemEvent(position, soudd)
+         clickItemEvent(position, soudd)
 
          longPressEvent(soudd)
      }
@@ -115,7 +114,8 @@ class SoundAdapter(
             }
         }
 
-        private fun clicItemEvent(position: Int, soudd: Sound) {
+
+        private fun clickItemEvent(position: Int, soudd: Sound) {
             binding.idContraint.setOnClickListener {
                 if (soundSelecionados.isEmpty()) {
                     if (soundsPlayList != null) {
@@ -138,7 +138,6 @@ class SoundAdapter(
                         soundSelecionados.remove(soudd)
                         if (soundSelecionados.isEmpty()) isUpdateList(false)
                     }
-                    Log.i("INFO_", "bind: ${soundSelecionados.size}")
                 }
 
             }
@@ -150,7 +149,6 @@ class SoundAdapter(
                     isUpdateList(true)
                     soundSelecionados.add(soudd)
                     binding.cardItemSound.setCardBackgroundColor(Color.GRAY)
-                    Log.i("INFO_", "bind: ${soundSelecionados.size}")
                 }
                 true
             }
@@ -179,8 +177,5 @@ class SoundAdapter(
 
    fun clearSoundListSelected(){
        getPlayList(soundsPlayList!!)
-       Log.i("INFO_", "bind: ${soundSelecionados.size}")
   }
-
-    private fun verifyItemContainInTosoundSelecionados(){}
 }

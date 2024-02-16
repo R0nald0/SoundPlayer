@@ -42,10 +42,18 @@ class PlayListViewModel @Inject constructor(
     }
     fun getAllPlayList(){
        viewModelScope.launch {
-          val playListsRetorno =soundPlayListRepository.findAllPlayListWithSong()
-              withContext(Dispatchers.Main){
-                  _playLists.value = playListsRetorno
-              }
+           runCatching {
+               soundPlayListRepository.findAllPlayListWithSong()
+           }.fold(
+               onSuccess = {playListsRetorno->
+                   withContext(Dispatchers.Main){
+                       _playLists.value = playListsRetorno
+                   }
+               },
+               onFailure = {
+                   Log.i("INFO_", "getAllPlayList: erro ao buscar todas ás playlists ${it.message}")
+               }
+           )
        }
     }
 

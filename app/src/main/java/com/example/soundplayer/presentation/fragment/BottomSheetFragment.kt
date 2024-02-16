@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.soundplayer.R
+import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.databinding.FragmentItemListDialogListDialogBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
@@ -39,14 +40,20 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
 
 
         binding.btnCreatePlayList.setOnClickListener {
-              bottomSheetAdapter.getSoundSelected() //<- Todo Verificar se necessario alterar metodo para retornar lista
+              createdSounds  = bottomSheetAdapter.getSoundSelected() ?: emptySet()
+            //<- Todo Verificar se necessario alterar metodo para retornar lista
               val namePlayList  = binding.edtPlayList.text.toString()
-              if (createdSounds.isNotEmpty() && namePlayList.isNotEmpty()){
-                     savePlayList(namePlayList,createdSounds.toMutableSet())
-                     dismiss()
+              if (namePlayList.isNotEmpty()){
+                   if (createdSounds.isNotEmpty()){
+                       savePlayList(namePlayList,createdSounds.toMutableSet())
+                       dismiss()
+                  }else{
+                       requireContext().exibirToast("Você ainda não adicionao musicas a nova playlist")
+                  }
+
               }else{
-                  // Todo Verificar erro quando createdSound é vazio
-                  Toast.makeText(binding.root.context, "Play list vazia ou nome invalido", Toast.LENGTH_SHORT).show()
+
+                   requireContext().exibirToast("Escolha um nome válido para sua e playlist ")
               }
         }
 
@@ -54,15 +61,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        bottomSheetAdapter = BottomPlayListAdapter{returnedChosedSoundList->
-
-            if (returnedChosedSoundList.isNotEmpty() ){
-                 createdSounds = returnedChosedSoundList.toSet()
-            }else{
-                Toast.makeText(binding.root.context, "Play list vazia", Toast.LENGTH_SHORT).show()
-            }
-        };
-
+        bottomSheetAdapter = BottomPlayListAdapter()
         binding.rvMusics.adapter = bottomSheetAdapter
         binding.rvMusics.addItemDecoration(DividerItemDecoration( binding.root.context,RecyclerView.HORIZONTAL))
         binding.rvMusics.layoutManager = LinearLayoutManager(binding.root.context,LinearLayoutManager.VERTICAL,false)

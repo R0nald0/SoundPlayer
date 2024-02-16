@@ -7,14 +7,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.soundplayer.databinding.FragmentItemListDialogListDialogItemBinding
 import com.example.soundplayer.model.Sound
 
-class BottomPlayListAdapter (
-    val getItemns : (Set<Sound>)->Unit
-): RecyclerView.Adapter<BottomPlayListAdapter.ViewHolder>() {
+class BottomPlayListAdapter (): RecyclerView.Adapter<BottomPlayListAdapter.ViewHolder>() {
     private val sounds  = mutableSetOf<Sound>()
     private val soundSelecionados  = mutableSetOf<Sound>()
     private val sparseBooleanArray  = SparseBooleanArray()
-   fun getSoundSelected(){
-         getItemns(soundSelecionados.toSet())
+   fun getSoundSelected() : Set<Sound>{
+        return soundSelecionados.toSet()
    }
     fun getListSound(listMusics : Set<Sound>){
         sounds.addAll(listMusics)
