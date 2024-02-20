@@ -25,8 +25,13 @@ class SoundAdapter(
    private  var actualSound :Sound? = null
     private val soundSelecionados  = mutableSetOf<Sound>()
     var sizeTitleMusic =16f
+    private var isPlay = false;
+    var actualPosition = 0
 
-
+    fun updateAnimationWithPlaying(isPlaying : Boolean){
+        isPlay = isPlaying
+        notifyDataSetChanged()
+    }
     @SuppressLint("NotifyDataSetChanged")
     fun getPlayList(actualPlayList: PlayList){
         soundSelecionados.clear()
@@ -56,12 +61,28 @@ class SoundAdapter(
 
          configSelectionedItemApperence(soudd)
 
-         configApperenceItem(soudd)
+         if (soudd.uriMediaAlbum != null) {
+             binding.imageView.setImageURI(soudd.uriMediaAlbum)
+             if (binding.imageView.drawable == null) {
+                 binding.imageView.setImageResource(R.drawable.transferir)
+             }
+         }
 
          clickItemEvent(position, soudd)
-
+         configApperenceItemImage(soudd)
          longPressEvent(soudd)
+
      }
+         fun configurAnimationWhenPlaying(isPlaying: Boolean) {
+            if (isPlaying){
+                binding.txvTitle.isSelected = true
+                binding.lottieSoundAnimePlaying.isVisible = true
+
+            }else{
+                binding.txvTitle.isSelected = false
+                binding.lottieSoundAnimePlaying.isVisible = false
+            }
+        }
 
         private fun configSelectionedItemApperence(soudd: Sound) {
             if (soundSelecionados.isNotEmpty()) {
@@ -85,13 +106,8 @@ class SoundAdapter(
             }
         }
 
-        private fun configApperenceItem(soudd: Sound) {
-            if (soudd.uriMediaAlbum != null) {
-                binding.imageView.setImageURI(soudd.uriMediaAlbum)
-                if (binding.imageView.drawable == null) {
-                    binding.imageView.setImageResource(R.drawable.transferir)
-                }
-            }
+         fun configApperenceItemImage(soudd: Sound) {
+
             if (actualSound != null && actualSound?.title == soudd.title) {
                 binding.txvTitle.setTextColor(
                     ContextCompat.getColor(
@@ -99,8 +115,7 @@ class SoundAdapter(
                         R.color.red
                     )
                 )
-                binding.txvTitle.isSelected = true
-                binding.lottieSoundAnimePlaying.isVisible = true
+                configurAnimationWhenPlaying(true)
             } else {
                 binding.txvTitle.setTextColor(
                     ContextCompat.getColor(
@@ -108,8 +123,7 @@ class SoundAdapter(
                         R.color.my_primary
                     )
                 )
-                binding.txvTitle.isSelected = false
-                binding.lottieSoundAnimePlaying.isVisible = false
+                configurAnimationWhenPlaying(false)
             }
         }
 
@@ -159,7 +173,6 @@ class SoundAdapter(
             parent.context),
             parent, false
         )
-
         return SoundViewHolder(view)
     }
 
@@ -167,13 +180,15 @@ class SoundAdapter(
        return soundsPlayList?.listSound?.size ?:0
     }
 
-    override fun onBindViewHolder(holder: SoundViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: SoundViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val sound = soundsPlayList?.listSound?.elementAt(position)
         if (sound != null) {
             holder.bind(sound,position)
+          if (actualSound != null && actualSound?.title == sound.title){
+                holder.configurAnimationWhenPlaying(isPlay)
+            }
         }
     }
-
    fun clearSoundListSelected(){
        getPlayList(soundsPlayList!!)
   }

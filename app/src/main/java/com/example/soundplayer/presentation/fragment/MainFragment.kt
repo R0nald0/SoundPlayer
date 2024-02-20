@@ -127,23 +127,23 @@ class MainFragment : Fragment() {
 
           soundViewModel.isPlayingObserver.observe(viewLifecycleOwner){ isPlaying ->
               if (isPlaying){
-                    soundViewModel.currentPlayList.observe(requireActivity()){currentPlayList->
+                    soundViewModel.currentPlayList.observe(viewLifecycleOwner){currentPlayList->
                         if (currentPlayList != null && isPlaying){
                             playListAdapter.getCurrentPlayListPlayind(
-                                playList = currentPlayList,
-                                playIng = isPlaying
+                                playList = currentPlayList
                             )
                         }
-
                     }
 
-                    soundViewModel.actualSound.observe(requireActivity()){ soundLiveData->
-                        Log.i("INFO_", "Main:${soundLiveData.title} ${cont++}")
+                    soundViewModel.actualSound.observe(requireActivity()){ soundLiveDataActual->
+                        Log.i("INFO_", "Main:${soundLiveDataActual.title} ${cont++}")
                         //TODO VERIFICAR CHAMAdasS MULTIPLAS
-                        adapterSound.getActualSound(soundLiveData)
+                        adapterSound.getActualSound(soundLiveDataActual)
                         binding.rvSound.scrollToPosition(soundViewModel.currentItem)
                     }
                 }
+              adapterSound.updateAnimationWithPlaying(isPlaying)
+              playListAdapter.updateAnimationWhenPlayerPause(isPlaying)
           }
 
           playListViewModel.playLists.observe(requireActivity()){listOfplayListObservable->

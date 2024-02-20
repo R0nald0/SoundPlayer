@@ -38,10 +38,14 @@ class PlayListAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun getCurrentPlayListPlayind(playList: PlayList, playIng:Boolean){
-         isPlaying =playIng
+    fun getCurrentPlayListPlayind(playList: PlayList){
          currentPlayListPlaying = playList
          notifyDataSetChanged()
+    }
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateAnimationWhenPlayerPause(playIng:Boolean){
+        isPlaying =playIng
+        notifyDataSetChanged()
     }
 
     @SuppressLint("NotifyDataSetChanged")
