@@ -186,7 +186,6 @@ class SoundAdapter(
             holder.bind(sound,position)
           if (actualSound != null && actualSound?.title == sound.title){
                 holder.configurAnimationWhenPlaying(isPlay)
-                Toast.makeText(holder.itemView.context, "esta tocando ? ${isPlay} $position", Toast.LENGTH_SHORT).show()
             }
         }
     }
