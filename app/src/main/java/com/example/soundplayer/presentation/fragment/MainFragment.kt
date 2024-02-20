@@ -130,8 +130,7 @@ class MainFragment : Fragment() {
                     soundViewModel.currentPlayList.observe(viewLifecycleOwner){currentPlayList->
                         if (currentPlayList != null && isPlaying){
                             playListAdapter.getCurrentPlayListPlayind(
-                                playList = currentPlayList,
-                                playIng = isPlaying
+                                playList = currentPlayList
                             )
                         }
                     }
@@ -144,6 +143,7 @@ class MainFragment : Fragment() {
                     }
                 }
               adapterSound.updateAnimationWithPlaying(isPlaying)
+              playListAdapter.updateAnimationWhenPlayerPause(isPlaying)
           }
 
           playListViewModel.playLists.observe(requireActivity()){listOfplayListObservable->

@@ -184,7 +184,7 @@ class SoundAdapter(
         val sound = soundsPlayList?.listSound?.elementAt(position)
         if (sound != null) {
             holder.bind(sound,position)
-          if (actualSound != null && actualSound?.title == sound.title){
+          if (actualSound != null && actualSound?.idSound == sound.idSound){
                 holder.configurAnimationWhenPlaying(isPlay)
                 Toast.makeText(holder.itemView.context, "esta tocando ? ${isPlay} $position", Toast.LENGTH_SHORT).show()
             }
