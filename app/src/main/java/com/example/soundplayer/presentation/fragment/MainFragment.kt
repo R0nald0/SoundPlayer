@@ -119,11 +119,13 @@ class MainFragment : Fragment() {
 
       private  fun observersViewModel(){
 
-          soundViewModel.userDataPreferecence.observe(viewLifecycleOwner){userDataPreference->
-              playListViewModel.findPlayListById(userDataPreference.idPreference ?: 1)
-              positonPlayListToScrol =  userDataPreference.postionPreference
-          }
 
+          soundViewModel.userDataPreferecence.observe(viewLifecycleOwner){userDataPreference->
+              if (userDataPreference.idPreference != null){
+                   playListViewModel.findPlayListById(userDataPreference.idPreference)
+                  positonPlayListToScrol =  userDataPreference.postionPreference
+              }
+          }
 
           soundViewModel.isPlayingObserver.observe(viewLifecycleOwner){ isPlaying ->
               if (isPlaying){
@@ -154,7 +156,7 @@ class MainFragment : Fragment() {
 
               binding.rvSound.scrollToPosition(positonPlayListToScrol)
               soundViewModel.updatePlayList(uniquePlayListWithSongs.listSound)
-              playListAdapter.setLastOpenPlayListBorder(uniquePlayListWithSongs.idPlayList ?: 0)
+              playListAdapter.setLastOpenPlayListBorder(uniquePlayListWithSongs.idPlayList!!)
               updateViewWhenPlayListIsEmpty(uniquePlayListWithSongs)
          }
 
@@ -177,6 +179,12 @@ class MainFragment : Fragment() {
                    is  StatePrefre.Error ->{
                         requireActivity().exibirToast(statePreference.mensagem)
                    }
+               }
+          }
+
+          playListViewModel.listSoundUpdate.observe(viewLifecycleOwner){
+               if (it.isNotEmpty()){
+                   soundViewModel.removeItemFromListMusic(it)
                }
           }
 
@@ -388,7 +396,7 @@ class MainFragment : Fragment() {
 
                 R.id.id_update->{
                     val sound = SoundList(0,pairPlayList.second)
-                   val args  =  MainFragmentDirections.actionMainFragmentToSelectPlayListDialogFragment(sound)
+                    val args  =  MainFragmentDirections.actionMainFragmentToSelectPlayListDialogFragment(sound)
                     findNavController().navigate(args)
                     true
                 }
@@ -397,7 +405,7 @@ class MainFragment : Fragment() {
                         playListId = pairPlayList.first,
                         listRemovedItems =pairPlayList.second.toSet()
                     )
-                    adapterSound.clearSoundListSelected()
+                   adapterSound.clearSoundListSelected()
                     true
                 }
                 else ->false

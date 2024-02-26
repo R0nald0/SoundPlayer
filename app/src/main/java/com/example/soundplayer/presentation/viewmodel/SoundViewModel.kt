@@ -25,8 +25,8 @@ class SoundViewModel @Inject constructor(
 ) :ViewModel(){
 
      private var playerWhenRead = true
-     var currentItem = 0
-     private var playBackPosition = 0L
+     var currentItem = -1
+     private var playBackPosition = -0L
 
     var actualSound  = MutableLiveData<Sound>()
     var isPlayingObserver  = MutableLiveData<Boolean>()
@@ -48,15 +48,12 @@ class SoundViewModel @Inject constructor(
 
     fun updatePlayList(listSound: MutableSet<Sound>){
         if (currentPlayList.value != null){
-           val retorno  = addItemFromListMusic(listSound);
-             if (retorno.isEmpty()){
-                 removeItemFromListMusic(listSound)
-             }
+            addItemFromListMusic(listSound);
             Log.i("INFO_", "countPlayList: ${exoPlayer.mediaItemCount}")
         }
     }
 
-    fun addItemFromListMusic(listSound:MutableSet<Sound>):MutableSet<Sound>{
+    private fun addItemFromListMusic(listSound:MutableSet<Sound>):MutableSet<Sound>{
         val listToUpdate = mutableSetOf<Sound>()
         if (currentPlayList.value!!.listSound != listSound){
             listSound.forEachIndexed {index , sound->
@@ -75,35 +72,48 @@ class SoundViewModel @Inject constructor(
         }
         return listToUpdate;
     }
-    fun removeItemFromListMusic(listSound:MutableSet<Sound>):MutableSet<Sound>{
-        val modifaildField = mutableSetOf<Sound>()
-        if (currentPlayList.value!!.listSound.isNotEmpty() && listSound.isNotEmpty()){
-            currentPlayList.value!!.listSound.forEachIndexed { index, sound ->
-                if (!listSound.contains(sound)) {
-                    exoPlayer.removeMediaItem(index);
-                    modifaildField.add(sound)
-                }
-                Log.i("INFO_", "getMediaItemAt: ${exoPlayer.getMediaItemAt(index)}")
-            }
-        }
+     fun removeItemFromListMusic(listSound:Set<Sound>){
 
-        return modifaildField
+        if (_currentPlayList.value != null ){
+            if (currentPlayList.value!!.listSound.isNotEmpty() && listSound.isNotEmpty()){
+                currentPlayList.value!!.listSound.forEachIndexed { index, sound ->
+                    if (listSound.contains(sound)) {
+                        exoPlayer.removeMediaItem(index)
+                    }
+                    Log.i("INFO_", "getMediaItemAt: ${exoPlayer.getMediaItemAt(index)}")
+                }
+            }
+
+        }
     }
     fun getAllMusics(playList: PlayList) {
 
-           if (_currentPlayList.value != null &&  _currentPlayList.value!!.name != playList.name){
+           if ( _currentPlayList.value != null &&  _currentPlayList.value!!.name != playList.name){
+               currentItem = -1
                exoPlayer.stop()
                exoPlayer.clearMediaItems()
             }
 
-            if (!exoPlayer.isPlaying || playList.currentMusicPosition !=currentItem ){
+            if (  playList.currentMusicPosition == currentItem){
+                 playBackPosition = exoPlayer.currentPosition
+                 currentItem = playList.currentMusicPosition
+            }
+            else if (!exoPlayer.isPlaying && playList.currentMusicPosition != currentItem){
+                 playBackPosition =0L
                 _currentPlayList.value = playList
                 listMediaItem= createMediaItemList(playList.listSound)
-
                 exoPlayer.seekTo(playList.currentMusicPosition,playBackPosition)
                 currentItem = playList.currentMusicPosition
-
+                playAllMusicFromFist()
             }
+           else{
+                playBackPosition =0L
+                _currentPlayList.value = playList
+                listMediaItem= createMediaItemList(playList.listSound)
+                exoPlayer.seekTo(playList.currentMusicPosition,playBackPosition)
+                currentItem = playList.currentMusicPosition
+           }
+
     }
 
     private fun createMediaItemList(list: MutableSet<Sound>):List<MediaItem>{
@@ -132,6 +142,7 @@ class SoundViewModel @Inject constructor(
                     duration = exoPlayer.duration.toString()
                 )
                 actualSound.postValue( sound)
+
         }
 
         exoPlayer.addListener(object :Player.Listener{
@@ -146,6 +157,8 @@ class SoundViewModel @Inject constructor(
                         uriMediaAlbum = mediaMetadata.artworkUri
                     )
                     actualSound.value= sound
+                 currentItem = exoPlayer.currentMediaItemIndex
+
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -155,12 +168,16 @@ class SoundViewModel @Inject constructor(
         })
     }
 
-    fun playAllMusicFromFist(){
+    private fun playAllMusicFromFist(){
         if (exoPlayer.mediaItemCount == 0){
             exoPlayer.addMediaItems(listMediaItem)
             exoPlayer.playWhenReady = playerWhenRead
             exoPlayer.prepare()
+        }else{
+            exoPlayer.playWhenReady = playerWhenRead
+            exoPlayer.prepare()
         }
+
         configActualSound()
     }
     fun destroyPlayer(){

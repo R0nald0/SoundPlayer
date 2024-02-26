@@ -82,7 +82,7 @@ class SoundPlayingFragment : Fragment() {
     private fun  initPlayer(){
         soundViewModel.getPlayer().let { exoPlayer ->
             binding.myPlayerView.player = exoPlayer
-            soundViewModel.playAllMusicFromFist()
+
         }
     }
 

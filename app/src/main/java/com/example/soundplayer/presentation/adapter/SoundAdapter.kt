@@ -133,6 +133,7 @@ class SoundAdapter(
                 if (soundSelecionados.isEmpty()) {
                     if (soundsPlayList != null) {
                         soundsPlayList!!.currentMusicPosition = position
+                        soundsPlayList!!.listSound.size
                         soundViewModel.getAllMusics(soundsPlayList!!)
                         initNewFragment()
                     } else {
@@ -191,5 +192,6 @@ class SoundAdapter(
     }
    fun clearSoundListSelected(){
        getPlayList(soundsPlayList!!)
+       soundSelecionados.clear()
   }
 }

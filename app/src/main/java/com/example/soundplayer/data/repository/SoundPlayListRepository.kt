@@ -89,30 +89,6 @@ class SoundPlayListRepository @Inject constructor (
          }
     }
 
-    suspend fun updateplaylistAndSoundCrossDaoList(playList: PlayList,newList: MutableSet<Sound>): List<Long> {
-         try {
-             val result = playListDAO.updatePlayList(playList.toEntity())
-             if ( result != 0){
-                  val listUpdate =compareListToUpdate(newList, playList)
-                 return if (listUpdate.isNotEmpty()){
-                     val  playlistAndSoundCrossDaoList = listUpdate.map {soundFromPlayList->
-                         PlayListAndSoundCrossEntity(
-                             playList.idPlayList!!,
-                             soundFromPlayList.idSound!!
-                         )
-                     }
-                     playlistAndSoundCross.insertPlayListAndSoundCroos(playlistAndSoundCrossDaoList)
-                 }else{
-                     deleteItemPlayListSoundAcross(playList, newList)
-                 }
-             }
-             return emptyList()
-
-         }catch (exeption:Exception){
-             exeption.printStackTrace()
-             throw Exception("Erro ao Atualizar play list : ${exeption.message}")
-         }
-    }
     suspend fun addSountToPlayList(idPlayList: Long, listToAdd :Set<Sound>):List<Long>{
         try {
             val listAcrossPlayListSound = listToAdd.map { sound ->
@@ -125,24 +101,6 @@ class SoundPlayListRepository @Inject constructor (
         }catch (exeption:Exception){
             throw exeption;
         }
-    }
-    private suspend fun deleteItemPlayListSoundAcross(
-        playList: PlayList,
-        newList: MutableSet<Sound>
-    ) :List<Long> {
-        val modifaildField = mutableListOf<Long>()
-        if (playList.listSound.isNotEmpty() && newList.isNotEmpty()){
-            playList.listSound.forEach { sound ->
-                if (!newList.contains(sound)) {
-                  val modi = playlistAndSoundCross.deleteItemPlayListAndSoundCroos(
-                        idPlaylist = playList.idPlayList!!,
-                        idSound = sound.idSound!!
-                    )
-                    modifaildField.add(modi.toLong())
-                }
-            }
-        }
-        return modifaildField
     }
 
     suspend fun  removeSoundItemsFromPlayList(idPlayList: Long, soudsToRemove:Set<Sound>) :List<Int>{
@@ -157,7 +115,7 @@ class SoundPlayListRepository @Inject constructor (
 
     suspend fun compareListToUpdate(newList:MutableSet<Sound>, playList: PlayList):MutableSet<Sound> {
           val listToUpdate = mutableSetOf<Sound>()
-           if (playList.listSound == newList) return  listToUpdate
+           if (playList.listSound == newList) return listToUpdate
            if (playList.listSound != newList){
                newList.forEach { sound->
                           if (newList.contains(sound) && !playList.listSound.contains(sound)) {

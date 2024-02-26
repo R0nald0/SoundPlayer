@@ -31,6 +31,10 @@ class PlayListViewModel @Inject constructor(
     val soundListBd : LiveData<List<Sound>>
         get() = _soundListBd
 
+    private val _listSoundUpdate  = MutableLiveData<Set<Sound>>()
+    var listSoundUpdate : LiveData<Set<Sound>> =_listSoundUpdate
+
+
     fun savePlayList(playList: PlayList){
         viewModelScope.launch {
           val retor  = soundPlayListRepository.savePlayList(playList)
@@ -109,17 +113,19 @@ class PlayListViewModel @Inject constructor(
          viewModelScope.launch {
              val itemsRemoved  =soundPlayListRepository.removeSoundItemsFromPlayList(idPlayList = playListId,listRemovedItems)
              if (itemsRemoved.isNotEmpty()){
-                 findPlayListById(idPlayList = playListId)
+                 _listSoundUpdate.value = listRemovedItems
+                findPlayListById(idPlayList = playListId)
                  getAllPlayList()
+                 _listSoundUpdate.value = emptySet()
              }
 
          }
     }
     fun findPlayListById(idPlayList:Long) {
         viewModelScope.launch {
-             val resultPlayList = soundPlayListRepository.findPlayListById(idPlayList)
+            val resultPlayList = soundPlayListRepository.findPlayListById(idPlayList)
               withContext(Dispatchers.Main){
-                 _uniquePlayList.postValue(resultPlayList)
+                 _uniquePlayList.value =resultPlayList
              }
         }
     }
