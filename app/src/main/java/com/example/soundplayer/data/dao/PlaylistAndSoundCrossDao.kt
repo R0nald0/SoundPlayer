@@ -31,7 +31,7 @@ interface PlaylistAndSoundCrossDao {
 
     @Transaction
     @Query(value = "SELECT * FROM playList WHERE playListId = :idPlaylist")
-    suspend fun findPlayListById(idPlaylist: Long) : PlayListWithSong
+    suspend fun findPlayListById(idPlaylist: Long) : PlayListWithSong?
 
     @Transaction
     @Query(value = "SELECT * FROM playlistandsoundcrossentity WHERE playListId = :idPlaylist")

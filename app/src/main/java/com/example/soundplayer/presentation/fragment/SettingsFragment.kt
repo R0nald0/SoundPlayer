@@ -80,7 +80,7 @@ class SettingsFragment : Fragment() {
               }
          }
 
-        preferencesViewModel.sizeTextMusic.observe(viewLifecycleOwner){statePreference ->
+        preferencesViewModel.sizeTextTitleMusic.observe(viewLifecycleOwner){ statePreference ->
             when(statePreference){
                 is StatePrefre.Sucess<*>->{
                     val result  = statePreference.succssResult as Float

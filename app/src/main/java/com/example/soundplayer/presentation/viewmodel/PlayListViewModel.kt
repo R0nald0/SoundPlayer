@@ -118,14 +118,15 @@ class PlayListViewModel @Inject constructor(
                  getAllPlayList()
                  _listSoundUpdate.value = emptySet()
              }
-
          }
     }
     fun findPlayListById(idPlayList:Long) {
         viewModelScope.launch {
             val resultPlayList = soundPlayListRepository.findPlayListById(idPlayList)
-              withContext(Dispatchers.Main){
-                 _uniquePlayList.value =resultPlayList
+             if (resultPlayList != null){
+                 withContext(Dispatchers.Main){
+                     _uniquePlayList.value = resultPlayList!!
+                 }
              }
         }
     }

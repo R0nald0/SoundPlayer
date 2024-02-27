@@ -23,7 +23,7 @@ class PreferencesViewModel @Inject constructor(
      var isDarkMode : LiveData<StatePrefre> = _isDarkMode
 
     private val  _sizeTextMusic =MutableLiveData<StatePrefre>()
-    var sizeTextMusic : LiveData<StatePrefre> = _sizeTextMusic
+    var sizeTextTitleMusic : LiveData<StatePrefre> = _sizeTextMusic
 
     fun saveDarkModePrefrence(isDarkMode :Boolean){
        viewModelScope.launch {

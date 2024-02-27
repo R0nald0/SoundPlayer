@@ -65,7 +65,7 @@ class SoundPlayListRepository @Inject constructor (
 
    suspend fun deletePlaylist(playList: PlayList) : Int{
       try {
-          var retorno = playListDAO.deletePlayList(playList = playList.toEntity())
+          val retorno = playListDAO.deletePlayList(playList = playList.toEntity())
           if (retorno != 0 && playList.listSound.isNotEmpty()){
               playlistAndSoundCross.deletePlayListAndSoundCross(playList.toEntity().playListId!!)
           }
@@ -75,15 +75,18 @@ class SoundPlayListRepository @Inject constructor (
       }
     }
 
-    suspend fun findPlayListById(idPlayList: Long): PlayList {
+    suspend fun findPlayListById(idPlayList: Long): PlayList? {
          try {
              val playList =playlistAndSoundCross.findPlayListById(idPlayList)
-             return  PlayList(
-                 idPlayList = playList.playList.playListId,
-                 listSound = playList.soundPlayList.map { soundEntity -> soundEntity.toSound() }.toMutableSet(),
-                 currentMusicPosition = playList.playList.currentSoundPosition,
-                 name  =  playList.playList.title
-             )
+             if (playList != null){
+                 return  PlayList(
+                     idPlayList = playList.playList.playListId,
+                     listSound = playList.soundPlayList.map { soundEntity -> soundEntity.toSound() }.toMutableSet(),
+                     currentMusicPosition = playList.playList.currentSoundPosition,
+                     name  =  playList.playList.title
+                 )
+             }
+             return null
          }catch (execption :Exception){
              throw execption;
          }
@@ -113,7 +116,7 @@ class SoundPlayListRepository @Inject constructor (
          }
     }
 
-    suspend fun compareListToUpdate(newList:MutableSet<Sound>, playList: PlayList):MutableSet<Sound> {
+     fun compareListToUpdate(newList:MutableSet<Sound>, playList: PlayList):MutableSet<Sound> {
           val listToUpdate = mutableSetOf<Sound>()
            if (playList.listSound == newList) return listToUpdate
            if (playList.listSound != newList){

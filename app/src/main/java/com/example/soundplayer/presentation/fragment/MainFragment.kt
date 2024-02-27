@@ -113,7 +113,6 @@ class MainFragment : Fragment() {
     private fun setupToolbar() {
           val activity  = activity as AppCompatActivity
           activity.setSupportActionBar(binding.toolbarSelecrionItemsMaterial)
-
       }
 
 
@@ -121,8 +120,8 @@ class MainFragment : Fragment() {
 
 
           soundViewModel.userDataPreferecence.observe(viewLifecycleOwner){userDataPreference->
-              if (userDataPreference.idPreference != null){
-                   playListViewModel.findPlayListById(userDataPreference.idPreference)
+              if (userDataPreference.idPreference != null  ){
+                  playListViewModel.findPlayListById(userDataPreference.idPreference)
                   positonPlayListToScrol =  userDataPreference.postionPreference
               }
           }
@@ -171,7 +170,7 @@ class MainFragment : Fragment() {
                     playListViewModel.savePlayList(playList)
                 }
           }
-          preferencesViewModel.sizeTextMusic.observe(viewLifecycleOwner){statePreference ->
+          preferencesViewModel.sizeTextTitleMusic.observe(viewLifecycleOwner){ statePreference ->
                when(statePreference){
                    is StatePrefre.Sucess<*>->{
                         adapterSound.sizeTitleMusic = statePreference.succssResult as Float

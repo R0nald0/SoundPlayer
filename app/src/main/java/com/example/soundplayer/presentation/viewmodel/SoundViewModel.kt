@@ -57,7 +57,7 @@ class SoundViewModel @Inject constructor(
         val listToUpdate = mutableSetOf<Sound>()
         if (currentPlayList.value!!.listSound != listSound){
             listSound.forEachIndexed {index , sound->
-                if (listSound.contains(sound) && !currentPlayList.value!!.listSound.contains(sound)) {
+                if (!currentPlayList.value!!.listSound.contains(sound)) {
                     listToUpdate.add(sound)
                     exoPlayer.addMediaItem(
                         index,
@@ -66,7 +66,6 @@ class SoundViewModel @Inject constructor(
                             .setUri(sound.path)
                             .build()
                     )
-
                 }else if(listSound.contains(sound) && currentPlayList.value!!.listSound.contains(sound)){}
             }
         }
@@ -75,6 +74,7 @@ class SoundViewModel @Inject constructor(
      fun removeItemFromListMusic(listSound:Set<Sound>){
 
         if (_currentPlayList.value != null ){
+
             if (currentPlayList.value!!.listSound.isNotEmpty() && listSound.isNotEmpty()){
                 currentPlayList.value!!.listSound.forEachIndexed { index, sound ->
                     if (listSound.contains(sound)) {
