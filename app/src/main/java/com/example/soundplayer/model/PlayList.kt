@@ -17,7 +17,7 @@ data class PlayList(
         idPlayList =playListEntity.playList.playListId,
         name = playListEntity.playList.title,
         currentMusicPosition= playListEntity.playList.currentSoundPosition,
-        listSound = playListEntity.soundPlayList.map {soundEntity ->
+        listSound = playListEntity.soundOfPlayList.map { soundEntity ->
                soundEntity.toSound()
         }.toMutableSet()
     )

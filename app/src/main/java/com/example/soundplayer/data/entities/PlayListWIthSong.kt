@@ -12,7 +12,8 @@ data class PlayListWithSong(
         parentColumn = "playListId",
         entityColumn = "soundId",
         associateBy = Junction(PlayListAndSoundCrossEntity::class)
+
     )
-    val soundPlayList :List<SoundEntity>
+    val soundOfPlayList :List<SoundEntity>
 ) {
 }

@@ -154,7 +154,7 @@ class MainFragment : Fragment() {
           playListViewModel.uniquePlayList.observe(viewLifecycleOwner){uniquePlayListWithSongs->
 
               binding.rvSound.scrollToPosition(positonPlayListToScrol)
-              soundViewModel.updatePlayList(uniquePlayListWithSongs.listSound)
+
               playListAdapter.setLastOpenPlayListBorder(uniquePlayListWithSongs.idPlayList!!)
               updateViewWhenPlayListIsEmpty(uniquePlayListWithSongs)
          }
@@ -181,10 +181,8 @@ class MainFragment : Fragment() {
                }
           }
 
-          playListViewModel.listSoundUpdate.observe(viewLifecycleOwner){
-               if (it.isNotEmpty()){
-                   soundViewModel.removeItemFromListMusic(it)
-               }
+          playListViewModel.listSoundUpdate.observe(viewLifecycleOwner){pairOFListSound ->
+               if(pairOFListSound.second.isNotEmpty())soundViewModel.updatePlayList(pairOFListSound)
           }
 
       }
@@ -236,7 +234,7 @@ class MainFragment : Fragment() {
               isUpdateList = {isUpdate->
                   updateViewWhenMenuChange(isUpdate)
                              },
-              initNewFragment = {
+              onClickInitNewFragment = {
                   findNavController().navigate(R.id.action_mainFragment_to_soundPlayingFragment)
                }
               )

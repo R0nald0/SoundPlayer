@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.ExoPlayer
 import com.example.soundplayer.data.entities.UserDataPreferecence
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
@@ -46,11 +47,12 @@ class SoundViewModel @Inject constructor(
        return exoPlayer
      }
 
-    fun updatePlayList(listSound: MutableSet<Sound>){
-        if (currentPlayList.value != null){
-            addItemFromListMusic(listSound);
-            Log.i("INFO_", "countPlayList: ${exoPlayer.mediaItemCount}")
+    fun updatePlayList( pairListSounWithDecisionUpdate :Pair<Boolean,Set<Sound>>){
+        if (currentPlayList.value != null && pairListSounWithDecisionUpdate.second.isNotEmpty()){
+            if (pairListSounWithDecisionUpdate.first)addItemFromListMusic(pairListSounWithDecisionUpdate.second.toMutableSet())
+            else removeItemFromListMusic(pairListSounWithDecisionUpdate.second)
         }
+
     }
 
     private fun addItemFromListMusic(listSound:MutableSet<Sound>):MutableSet<Sound>{
@@ -59,8 +61,8 @@ class SoundViewModel @Inject constructor(
             listSound.forEachIndexed {index , sound->
                 if (!currentPlayList.value!!.listSound.contains(sound)) {
                     listToUpdate.add(sound)
+                    _currentPlayList.value?.listSound?.add(sound)
                     exoPlayer.addMediaItem(
-                        index,
                         MediaItem.Builder()
                             .setMediaMetadata(createMetaData(sound))
                             .setUri(sound.path)
@@ -69,29 +71,33 @@ class SoundViewModel @Inject constructor(
                 }else if(listSound.contains(sound) && currentPlayList.value!!.listSound.contains(sound)){}
             }
         }
+
         return listToUpdate;
     }
-     fun removeItemFromListMusic(listSound:Set<Sound>){
+    private fun removeItemFromListMusic(listSound:Set<Sound>){
+            val itemsDeletados = mutableSetOf<Sound>()
 
-        if (_currentPlayList.value != null ){
-
-            if (currentPlayList.value!!.listSound.isNotEmpty() && listSound.isNotEmpty()){
+            if (currentPlayList.value!!.listSound.isNotEmpty() ){
                 currentPlayList.value!!.listSound.forEachIndexed { index, sound ->
                     if (listSound.contains(sound)) {
+                        itemsDeletados.add(sound)
                         exoPlayer.removeMediaItem(index)
                     }
-                    Log.i("INFO_", "getMediaItemAt: ${exoPlayer.getMediaItemAt(index)}")
                 }
-            }
 
-        }
+            }
+         if (itemsDeletados.isNotEmpty()){
+             _currentPlayList.value?.listSound?.removeIf {sound->
+                 itemsDeletados.contains(sound)
+             }
+         }
     }
     fun getAllMusics(playList: PlayList) {
 
            if ( _currentPlayList.value != null &&  _currentPlayList.value!!.name != playList.name){
-               currentItem = -1
                exoPlayer.stop()
                exoPlayer.clearMediaItems()
+               currentItem = -1
             }
 
             if (  playList.currentMusicPosition == currentItem){
@@ -159,11 +165,22 @@ class SoundViewModel @Inject constructor(
                     actualSound.value= sound
                  currentItem = exoPlayer.currentMediaItemIndex
 
+                currentPlayList.value?.listSound?.forEachIndexed { index, sound ->
+
+                 // Log.i("INFO_", "Sound At Playlist: ${exoPlayer.getMediaItemAt(index).mediaMetadata.title}")
+                }
+
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 super.onIsPlayingChanged(isPlaying)
                 isPlayingObserver.value = isPlaying
+            }
+
+            override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+                super.onTimelineChanged(timeline, reason)
+                Log.i("INFO_", "onTimelineChanged: ${reason} : ${timeline}")
+
             }
         })
     }
@@ -185,7 +202,7 @@ class SoundViewModel @Inject constructor(
         exoPlayer.release()
     }
 
- suspend  fun savePreference(){
+   suspend  fun savePreference(){
 
             runCatching {
                 if(_currentPlayList.value != null){

@@ -19,7 +19,7 @@ import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 class SoundAdapter(
     private val soundViewModel: SoundViewModel,
     val isUpdateList :(Boolean)->Unit,
-    val initNewFragment :()->Unit,
+    val onClickInitNewFragment :()->Unit,
 ) :RecyclerView.Adapter<SoundAdapter.SoundViewHolder>() {
    private  var soundsPlayList: PlayList? = null
    private  var actualSound :Sound? = null
@@ -77,7 +77,6 @@ class SoundAdapter(
             if (isPlaying){
                 binding.txvTitle.isSelected = true
                 binding.lottieSoundAnimePlaying.isVisible = true
-
             }else{
                 binding.txvTitle.isSelected = false
                 binding.lottieSoundAnimePlaying.isVisible = false
@@ -135,7 +134,7 @@ class SoundAdapter(
                         soundsPlayList!!.currentMusicPosition = position
                         soundsPlayList!!.listSound.size
                         soundViewModel.getAllMusics(soundsPlayList!!)
-                        initNewFragment()
+                        onClickInitNewFragment()
                     } else {
                         Toast.makeText(it.context, "PlayList null", Toast.LENGTH_SHORT).show()
                     }

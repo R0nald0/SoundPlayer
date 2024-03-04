@@ -1,5 +1,6 @@
 package com.example.soundplayer.presentation.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -11,10 +12,12 @@ import com.example.soundplayer.model.PlayList
  ):RecyclerView.Adapter<AdapterSelectePlayList.ItemSelectViewHolder>(){
 
     private var playLists = mutableSetOf<PlayList>()
+    @SuppressLint("NotifyDataSetChanged")
     fun addPlayList(playList: List<PlayList>){
         playLists = playList.toMutableSet()
         notifyDataSetChanged()
     }
+    @SuppressLint("NotifyDataSetChanged")
     fun updateList(){
         playLists.clear()
         notifyDataSetChanged()

@@ -36,7 +36,7 @@ class SoundPlayListRepository @Inject constructor (
 
        } catch (exception: Exception) {
            exception.printStackTrace()
-           throw Exception("Erro ao salvar play list")
+           throw Exception("Erro ao salvar playlist")
        }
     }
 
@@ -53,7 +53,7 @@ class SoundPlayListRepository @Inject constructor (
     }
 
    suspend fun saveSound(sound: Sound):Long{
-           return  soundDao.createSound(sound = sound.toSoundEntity())
+       return  soundDao.createSound(sound = sound.toSoundEntity())
     }
 
     suspend fun sizeListSound():List<Sound>{
@@ -81,7 +81,7 @@ class SoundPlayListRepository @Inject constructor (
              if (playList != null){
                  return  PlayList(
                      idPlayList = playList.playList.playListId,
-                     listSound = playList.soundPlayList.map { soundEntity -> soundEntity.toSound() }.toMutableSet(),
+                     listSound = playList.soundOfPlayList.map { soundEntity -> soundEntity.toSound() }.toMutableSet(),
                      currentMusicPosition = playList.playList.currentSoundPosition,
                      name  =  playList.playList.title
                  )
