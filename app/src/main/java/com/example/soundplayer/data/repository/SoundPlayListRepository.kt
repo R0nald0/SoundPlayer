@@ -21,9 +21,10 @@ class SoundPlayListRepository @Inject constructor (
    suspend fun savePlayList(playList: PlayList):List<Long>{
        try {
             val list = findAllPlayListWithSong()
-            list.forEach {
-                if (it.name == playList.name) return listOf();
+            list.forEach { playListDb->
+                if (playListDb.name == playList.name) return listOf();
             }
+
 
            val idPlayList =playListDAO.createPlayList(playList.toEntity())
            val  playlistAndSoundCrossDaoList = playList.listSound.map {soundFromPlayList->

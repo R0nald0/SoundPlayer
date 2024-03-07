@@ -3,30 +3,42 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/bg_selected_playlist"
+
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context=".presentation.fragment.SelectPlayListDialogFragment"
-    tools:listitem="@layout/fragment_select_play_list_dialog_list_dialog_item">
+    tools:listitem="@layout/item_select_playlist">
 
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/titulo"
+        android:elevation="10dp"
+        android:shadowColor="@color/black"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
-        android:fontFamily="cursive"
         android:gravity="center"
-        android:text="@string/escolha_o_playlist"
-        android:textSize="22sp"
-        android:textStyle="bold|italic"
+        android:text="@string/escolha_a_playlist"
+        style="@style/TextAppearance.Material3.HeadlineSmall"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:lineHeight="3dp" />
+        />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/divider"
+        android:layout_width="170dp"
+        android:layout_height="2dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:dividerColor="@color/red"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titulo" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_playlists_options"
@@ -36,11 +48,11 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-
+        android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titulo" />
+        app:layout_constraintTop_toBottomOf="@+id/divider" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

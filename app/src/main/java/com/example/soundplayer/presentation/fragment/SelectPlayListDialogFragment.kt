@@ -1,5 +1,7 @@
 package com.example.soundplayer.presentation.fragment
 
+import android.app.Dialog
+import android.content.res.Resources.Theme
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,29 +12,31 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.soundplayer.R
+import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.databinding.FragmentSelectPlayListDialogListDialogBinding
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.presentation.adapter.AdapterSelectePlayList
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SelectPlayListDialogFragment : DialogFragment() {
-
+    private  var view : View?=null
     private var _binding: FragmentSelectPlayListDialogListDialogBinding? = null
     private val playListViewModel by activityViewModels<PlayListViewModel>()
     private lateinit var  adapterPlaylistSelect  :AdapterSelectePlayList
-    private lateinit var soudsToUpdate : Set<Sound>
+    private lateinit var  soudsToUpdate : Set<Sound>
     private  val arsg : SelectPlayListDialogFragmentArgs by navArgs()
 
     private val binding get() = _binding!!
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        _binding = FragmentSelectPlayListDialogListDialogBinding.inflate(inflater, container, false)
+        _binding = FragmentSelectPlayListDialogListDialogBinding.inflate(inflater ,null, false)
         return binding.root
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,8 +48,8 @@ class SelectPlayListDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         inicializerBinding()
-
     }
+
 
     private fun setUpBundle(){
            soudsToUpdate = arsg.soundsListToAddPlayList.listMusic
@@ -55,10 +59,9 @@ class SelectPlayListDialogFragment : DialogFragment() {
             if (listOfPlayList.isNotEmpty()){
                 adapterPlaylistSelect.addPlayList(listOfPlayList)
             }else{
-                Toast.makeText(this.context, "você não possui playLists criada", Toast.LENGTH_SHORT).show()
+               requireContext().exibirToast("Você não possui playList criadas")
                 dismiss()
             }
-
         }
     }
     private fun inicializerBinding() {
@@ -67,7 +70,6 @@ class SelectPlayListDialogFragment : DialogFragment() {
                 idPlayList = selectedPlayList.idPlayList!!,
                 listSound = soudsToUpdate
             )
-            Toast.makeText(this.context, selectedPlayList.name, Toast.LENGTH_SHORT).show()
             dismiss()
         }
         binding.rvPlaylistsOptions.apply {
@@ -77,7 +79,11 @@ class SelectPlayListDialogFragment : DialogFragment() {
         }
     }
 
-
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+     return  MaterialAlertDialogBuilder(requireContext())
+          .setView(_binding?.root)
+          .show()
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

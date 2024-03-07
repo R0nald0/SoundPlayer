@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         preferencesViewModel.readDarkModePreference()
         super.onStart()
     }
-    fun observer(){
+    private fun observer(){
         preferencesViewModel.isDarkMode.observe(this){statePreference->
             when(statePreference){
                 is StatePrefre.Sucess<*> ->{

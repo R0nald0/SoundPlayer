@@ -25,7 +25,7 @@ import com.example.soundplayer.model.PlayList
 
 
     inner class  ItemSelectViewHolder(private val binding : ItemSelectPlaylistBinding): RecyclerView.ViewHolder(binding.root){
-        fun bind(actualPlayList: PlayList, position: Int){
+        fun bind(actualPlayList: PlayList){
               binding.txNamePlayList.text = actualPlayList.name
               binding.idContraint.setOnClickListener {
                  onClick(actualPlayList)
@@ -46,7 +46,7 @@ import com.example.soundplayer.model.PlayList
 
      override fun onBindViewHolder(holder: ItemSelectViewHolder, position: Int) {
          val playList = playLists.elementAt(position)
-         holder.bind(playList,position)
+         holder.bind(playList)
      }
 
      override fun getItemCount() = playLists.size
