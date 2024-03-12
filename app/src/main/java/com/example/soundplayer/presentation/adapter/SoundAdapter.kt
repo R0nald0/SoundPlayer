@@ -26,7 +26,6 @@ class SoundAdapter(
     private val soundSelecionados  = mutableSetOf<Sound>()
     var sizeTitleMusic =16f
     private var isPlay = false;
-    var actualPosition = 0
 
     fun updateAnimationWithPlaying(isPlaying : Boolean){
         isPlay = isPlaying
@@ -46,7 +45,7 @@ class SoundAdapter(
     }
 
     fun getSoundSelecionados(): Pair<Long,MutableSet<Sound>> {
-        return Pair (soundsPlayList?.idPlayList!! , soundSelecionados)
+        return Pair (soundsPlayList?.idPlayList?: 1, soundSelecionados)
     }
 
 
@@ -80,6 +79,12 @@ class SoundAdapter(
             }else{
                 binding.txvTitle.isSelected = false
                 binding.lottieSoundAnimePlaying.isVisible = false
+                binding.txvTitle.setTextColor(
+                    ContextCompat.getColor(
+                        binding.root.context,
+                        R.color.my_primary
+                    )
+                )
             }
         }
 

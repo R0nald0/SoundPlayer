@@ -363,6 +363,7 @@ class MainFragment : Fragment() {
    inner class  MyMenuProvider() : MenuProvider {
         @SuppressLint("SuspiciousIndentation")
         override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+
             val pairPlayList = adapterSound.getSoundSelecionados()
 
             if (pairPlayList.second.isEmpty()){
