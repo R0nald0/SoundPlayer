@@ -126,9 +126,7 @@ class PlayListViewModel @Inject constructor(
         viewModelScope.launch {
             val resultPlayList = soundPlayListRepository.findPlayListById(idPlayList)
              if (resultPlayList != null){
-                 withContext(Dispatchers.Main){
-                     _uniquePlayList.value = resultPlayList!!
-                 }
+                 _uniquePlayList.value = resultPlayList!!
              }
         }
     }

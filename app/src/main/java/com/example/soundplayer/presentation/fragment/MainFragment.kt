@@ -117,8 +117,6 @@ class MainFragment : Fragment() {
 
 
       private  fun observersViewModel(){
-
-
           soundViewModel.userDataPreferecence.observe(viewLifecycleOwner){userDataPreference->
               if (userDataPreference.idPreference != null  ){
                   playListViewModel.findPlayListById(userDataPreference.idPreference)
@@ -147,7 +145,7 @@ class MainFragment : Fragment() {
               playListAdapter.updateAnimationWhenPlayerPause(isPlaying)
           }
 
-          playListViewModel.playLists.observe(requireActivity()){listOfplayListObservable->
+          playListViewModel.playLists.observe(viewLifecycleOwner){listOfplayListObservable->
               playListAdapter.addPlayList(listOfplayListObservable)
           }
 
@@ -170,6 +168,7 @@ class MainFragment : Fragment() {
                     playListViewModel.savePlayList(playList)
                 }
           }
+
           preferencesViewModel.sizeTextTitleMusic.observe(viewLifecycleOwner){ statePreference ->
                when(statePreference){
                    is StatePrefre.Sucess<*>->{
@@ -270,6 +269,7 @@ class MainFragment : Fragment() {
     }
 
     private fun updateViewWhenMenuChange(isUpdate: Boolean) {
+
          requireActivity().removeMenuProvider(myMenuProvider)
           requireActivity().addMenuProvider(myMenuProvider)
           if (isUpdate) {
@@ -280,6 +280,7 @@ class MainFragment : Fragment() {
           } else {
               binding.fabAddPlayList.isVisible = true
           }
+
       }
 
 

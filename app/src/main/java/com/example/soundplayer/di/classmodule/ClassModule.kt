@@ -32,8 +32,12 @@ class ClassModule {
 
     @Singleton
     @Provides
-    fun provideActualSong(exoPlayer: ExoPlayer, dataStorePreferenceRepository: DataStorePreferenceRepository): SoundViewModel {
-        return  SoundViewModel(exoPlayer,dataStorePreferenceRepository)
+    fun provideActualSong(
+        exoPlayer: ExoPlayer,
+        dataStorePreferenceRepository: DataStorePreferenceRepository,
+        soundPlayListRepository: SoundPlayListRepository
+    ): SoundViewModel {
+        return  SoundViewModel(exoPlayer,dataStorePreferenceRepository, soundPlayListRepository =soundPlayListRepository )
     }
 
     @Singleton

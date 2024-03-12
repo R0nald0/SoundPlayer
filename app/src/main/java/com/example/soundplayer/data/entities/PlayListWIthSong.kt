@@ -10,10 +10,14 @@ data class PlayListWithSong(
     val playList : PlayListEntity,
     @Relation(
         parentColumn = "playListId",
+        entity = SoundEntity::class,
         entityColumn = "soundId",
-        associateBy = Junction(PlayListAndSoundCrossEntity::class)
+        associateBy = Junction(
+             value =  PlayListAndSoundCrossEntity::class,
+             parentColumn = "playListId",
+             entityColumn = "soundId",
+        )
 
     )
     val soundOfPlayList :List<SoundEntity>
-) {
-}
+)

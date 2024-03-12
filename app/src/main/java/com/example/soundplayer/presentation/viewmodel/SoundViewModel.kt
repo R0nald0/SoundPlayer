@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
@@ -12,17 +14,20 @@ import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.ExoPlayer
 import com.example.soundplayer.data.entities.UserDataPreferecence
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
+import com.example.soundplayer.data.repository.SoundPlayListRepository
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class SoundViewModel @Inject constructor(
     private val exoPlayer: ExoPlayer,
-    private  val dataStorePreferenceRepository: DataStorePreferenceRepository
+    private  val dataStorePreferenceRepository: DataStorePreferenceRepository,
+    private val soundPlayListRepository: SoundPlayListRepository
 ) :ViewModel(){
 
      private var playerWhenRead = true
@@ -41,7 +46,7 @@ class SoundViewModel @Inject constructor(
         get() = _userDataPreferecenceObs
 
 
-    private lateinit var listMediaItem  : List<MediaItem>
+    private lateinit var listMediaItem  : MutableSet<MediaItem>
 
      fun getPlayer():ExoPlayer{
        return exoPlayer
@@ -55,39 +60,49 @@ class SoundViewModel @Inject constructor(
 
     }
 
-    private fun addItemFromListMusic(listSound:MutableSet<Sound>):MutableSet<Sound>{
-        val listToUpdate = mutableSetOf<Sound>()
-        if (currentPlayList.value!!.listSound != listSound){
-            listSound.forEachIndexed {index , sound->
-                if (!currentPlayList.value!!.listSound.contains(sound)) {
-                    listToUpdate.add(sound)
-                    _currentPlayList.value?.listSound?.add(sound)
-                    exoPlayer.addMediaItem(
-                        MediaItem.Builder()
-                            .setMediaMetadata(createMetaData(sound))
-                            .setUri(sound.path)
-                            .build()
-                    )
-                }else if(listSound.contains(sound) && currentPlayList.value!!.listSound.contains(sound)){}
+    private fun addItemFromListMusic(listSound:MutableSet<Sound>){
+        viewModelScope.launch {
+            runCatching {
+                _currentPlayList.value?.idPlayList?.let { soundPlayListRepository.findPlayListById(it)};
+            }.onSuccess {updatedPlayList->
+                _currentPlayList.value = updatedPlayList ?: currentPlayList.value
+                exoPlayer.clearMediaItems()
+                listMediaItem.clear()
+                listMediaItem  = createMediaItemList(updatedPlayList!!.listSound)
+                playAllMusicFromFist()
+            }.onFailure{
+                Log.i("INFO_", "addItemFromListMusic: erro ao atualizar playlist ${it.message}")
             }
         }
 
-        return listToUpdate;
+/*        if (currentPlayList.value!!.listSound != listSound){
+             for ((index,sound) in listSound.withIndex()){
+                 if (!currentPlayList.value!!.listSound.contains(sound)) {
+                     //TODO tester inserir passando no index o id da musica
+                     exoPlayer.addMediaItem(
+                         MediaItem.Builder()
+                             .setMediaMetadata(createMetaData(sound))
+                             .setUri(sound.path)
+                             .build()
+                     )
+                     _currentPlayList.value?.listSound?.add(sound)
+                 }else if(listSound.contains(sound) && currentPlayList.value!!.listSound.contains(sound)){}
+             }
+        }*/
     }
     private fun removeItemFromListMusic(listSound:Set<Sound>){
             val itemsDeletados = mutableSetOf<Sound>()
 
             if (currentPlayList.value!!.listSound.isNotEmpty() ){
-                currentPlayList.value!!.listSound.forEachIndexed { index, sound ->
+                for ((index,sound ) in  _currentPlayList.value!!.listSound.withIndex()){
                     if (listSound.contains(sound)) {
                         itemsDeletados.add(sound)
                         exoPlayer.removeMediaItem(index)
                     }
                 }
-
             }
          if (itemsDeletados.isNotEmpty()){
-             _currentPlayList.value?.listSound?.removeIf {sound->
+            _currentPlayList.value?.listSound?.removeIf {sound->
                  itemsDeletados.contains(sound)
              }
          }
@@ -122,13 +137,13 @@ class SoundViewModel @Inject constructor(
 
     }
 
-    private fun createMediaItemList(list: MutableSet<Sound>):List<MediaItem>{
+    private fun createMediaItemList(list: MutableSet<Sound>):MutableSet<MediaItem>{
         return list.map{ sound ->
              MediaItem.Builder()
                  .setMediaMetadata(createMetaData(sound))
                  .setUri(sound.path)
                  .build()
-         }
+         }.toMutableSet()
     }
     private fun createMetaData(sound :Sound):MediaMetadata{
 
@@ -147,7 +162,7 @@ class SoundViewModel @Inject constructor(
                     title = mediaItem.mediaMetadata.title.toString(),
                     duration = exoPlayer.duration.toString()
                 )
-                actualSound.postValue( sound)
+                actualSound.value =  sound
 
         }
 
@@ -163,11 +178,12 @@ class SoundViewModel @Inject constructor(
                         uriMediaAlbum = mediaMetadata.artworkUri
                     )
                     actualSound.value= sound
-                 currentItem = exoPlayer.currentMediaItemIndex
-
+                    currentItem = exoPlayer.currentMediaItemIndex
+                Log.i("INFO_", "Sound index: ${exoPlayer.currentMediaItemIndex}")
                 currentPlayList.value?.listSound?.forEachIndexed { index, sound ->
-
-                 // Log.i("INFO_", "Sound At Playlist: ${exoPlayer.getMediaItemAt(index).mediaMetadata.title}")
+// //            Log.i("INFO_", "Sound At Playlist:${index} ${exoPlayer.getMediaItemAt(index).mediaMetadata.title}")
+//
+//
                 }
 
             }
@@ -178,8 +194,9 @@ class SoundViewModel @Inject constructor(
             }
 
             override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+
                 super.onTimelineChanged(timeline, reason)
-                Log.i("INFO_", "onTimelineChanged: ${reason} : ${timeline}")
+                Log.i("INFO_", "onTimelineChanged: $reason : $timeline")
 
             }
         })
@@ -187,7 +204,7 @@ class SoundViewModel @Inject constructor(
 
     private fun playAllMusicFromFist(){
         if (exoPlayer.mediaItemCount == 0){
-            exoPlayer.addMediaItems(listMediaItem)
+            exoPlayer.addMediaItems(listMediaItem.toList())
             exoPlayer.playWhenReady = playerWhenRead
             exoPlayer.prepare()
         }else{
@@ -202,7 +219,7 @@ class SoundViewModel @Inject constructor(
         exoPlayer.release()
     }
 
-   suspend  fun savePreference(){
+   suspend fun savePreference(){
 
             runCatching {
                 if(_currentPlayList.value != null){

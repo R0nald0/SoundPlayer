@@ -80,6 +80,7 @@ class SelectPlayListDialogFragment : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+
      return  MaterialAlertDialogBuilder(requireContext())
           .setView(_binding?.root)
           .show()

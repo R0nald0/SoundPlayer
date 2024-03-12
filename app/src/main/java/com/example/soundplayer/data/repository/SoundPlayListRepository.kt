@@ -78,13 +78,13 @@ class SoundPlayListRepository @Inject constructor (
 
     suspend fun findPlayListById(idPlayList: Long): PlayList? {
          try {
-             val playList =playlistAndSoundCross.findPlayListById(idPlayList)
-             if (playList != null){
+             val playListWithSong =playlistAndSoundCross.findPlayListById(idPlayList)
+             if (playListWithSong != null){
                  return  PlayList(
-                     idPlayList = playList.playList.playListId,
-                     listSound = playList.soundOfPlayList.map { soundEntity -> soundEntity.toSound() }.toMutableSet(),
-                     currentMusicPosition = playList.playList.currentSoundPosition,
-                     name  =  playList.playList.title
+                     idPlayList = playListWithSong.playList.playListId,
+                     listSound = playListWithSong.soundOfPlayList.map { soundEntity -> soundEntity.toSound() }.toMutableSet(),
+                     currentMusicPosition = playListWithSong.playList.currentSoundPosition,
+                     name  =  playListWithSong.playList.title
                  )
              }
              return null

@@ -100,9 +100,6 @@ class SettingsFragment : Fragment() {
         }
     }
     fun showDialog(title:String){
-
-
-
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(title)
             .setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
