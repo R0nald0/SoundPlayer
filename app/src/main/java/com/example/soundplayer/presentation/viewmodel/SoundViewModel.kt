@@ -180,10 +180,7 @@ class SoundViewModel @Inject constructor(
                     actualSound.value= sound
                     currentItem = exoPlayer.currentMediaItemIndex
                 Log.i("INFO_", "Sound index: ${exoPlayer.currentMediaItemIndex}")
-                   if (!exoPlayer.hasNextMediaItem()){
-                       exoPlayer.stop()
-                       exoPlayer.release()
-                   }
+
                 currentPlayList.value?.listSound?.forEachIndexed { index, sound ->
 // //            Log.i("INFO_", "Sound At Playlist:${index} ${exoPlayer.getMediaItemAt(index).mediaMetadata.title}")
 //

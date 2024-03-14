@@ -110,7 +110,7 @@ class SoundAdapter(
             }
         }
 
-         fun configApperenceItemImage(soudd: Sound) {
+         private fun configApperenceItemImage(soudd: Sound) {
 
             if (actualSound != null && actualSound?.title == soudd.title) {
                 binding.txvTitle.setTextColor(
