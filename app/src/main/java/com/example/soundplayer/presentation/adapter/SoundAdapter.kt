@@ -3,6 +3,7 @@ package com.example.soundplayer.presentation.adapter
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -20,10 +21,11 @@ class SoundAdapter(
     private val soundViewModel: SoundViewModel,
     val isUpdateList :(Boolean)->Unit,
     val onClickInitNewFragment :()->Unit,
+    val onDelete : (Long,Pair<Int,Sound>)-> Unit
 ) :RecyclerView.Adapter<SoundAdapter.SoundViewHolder>() {
    private  var soundsPlayList: PlayList? = null
    private  var actualSound :Sound? = null
-    private val soundSelecionados  = mutableSetOf<Sound>()
+    private val soundSelecionados  = mutableSetOf<Pair<Int,Sound>>()
     var sizeTitleMusic =16f
     private var isPlay = false;
 
@@ -44,7 +46,7 @@ class SoundAdapter(
         notifyDataSetChanged()
     }
 
-    fun getSoundSelecionados(): Pair<Long,MutableSet<Sound>> {
+    fun getSoundSelecionados(): Pair<Long,MutableSet<Pair<Int,Sound>>> {
         return Pair (soundsPlayList?.idPlayList?: 1, soundSelecionados)
     }
 
@@ -57,8 +59,11 @@ class SoundAdapter(
          binding.txvTitle.text =soudd.title
          binding.txvTitle.textSize = sizeTitleMusic
          binding.imageView.setImageURI(soudd.uriMediaAlbum)
+         binding.txvRemove.setOnClickListener {
+             onDelete(soundsPlayList?.idPlayList!!,Pair(position,soudd))
+         }
 
-         configSelectionedItemApperence(soudd)
+         configSelectionedItemApperence(position,soudd)
 
          if (soudd.uriMediaAlbum != null) {
              binding.imageView.setImageURI(soudd.uriMediaAlbum)
@@ -69,7 +74,7 @@ class SoundAdapter(
 
          clickItemEvent(position, soudd)
          configApperenceItemImage(soudd)
-         longPressEvent(soudd)
+         longPressEvent(position,soudd)
 
      }
          fun configurAnimationWhenPlaying(isPlaying: Boolean) {
@@ -88,10 +93,10 @@ class SoundAdapter(
             }
         }
 
-        private fun configSelectionedItemApperence(soudd: Sound) {
+        private fun configSelectionedItemApperence(position: Int,soudd: Sound) {
             if (soundSelecionados.isNotEmpty()) {
 
-                if (soundSelecionados.contains(soudd)) {
+                if (soundSelecionados.contains(Pair(position,soudd))) {
                     binding.cardItemSound.setCardBackgroundColor(Color.GRAY)
                 } else {
                     binding.cardItemSound.setCardBackgroundColor(
@@ -101,6 +106,7 @@ class SoundAdapter(
                     )
                 }
             } else {
+
                 isUpdateList(false)
                 binding.cardItemSound.setCardBackgroundColor(
                     ContextCompat.getColor(
@@ -110,7 +116,7 @@ class SoundAdapter(
             }
         }
 
-         private fun configApperenceItemImage(soudd: Sound) {
+        private fun configApperenceItemImage(soudd: Sound) {
 
             if (actualSound != null && actualSound?.title == soudd.title) {
                 binding.txvTitle.setTextColor(
@@ -131,7 +137,6 @@ class SoundAdapter(
             }
         }
 
-
         private fun clickItemEvent(position: Int, soudd: Sound) {
             binding.idContraint.setOnClickListener {
                 if (soundSelecionados.isEmpty()) {
@@ -144,16 +149,16 @@ class SoundAdapter(
                         Toast.makeText(it.context, "PlayList null", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    if (!soundSelecionados.contains(soudd)) {
+                    if (!soundSelecionados.contains(Pair(position,soudd))) {
                         binding.cardItemSound.setCardBackgroundColor(Color.GRAY)
-                        soundSelecionados.add(soudd)
+                        soundSelecionados.add(Pair(position,soudd))
                     } else {
                         binding.cardItemSound.setCardBackgroundColor(
                             ContextCompat.getColor(
                                 binding.root.context, R.color.colorSurfaceVariant
                             )
                         )
-                        soundSelecionados.remove(soudd)
+                        soundSelecionados.remove(Pair(position,soudd))
                         if (soundSelecionados.isEmpty()) isUpdateList(false)
                     }
                 }
@@ -161,16 +166,19 @@ class SoundAdapter(
             }
         }
 
-        private fun longPressEvent(soudd: Sound) {
+        private fun longPressEvent(position: Int,soudd: Sound) {
             binding.idContraint.setOnLongClickListener { view ->
                 if (soundSelecionados.size == 0) {
                     isUpdateList(true)
-                    soundSelecionados.add(soudd)
+                    soundSelecionados.add(Pair(position,soudd))
                     binding.cardItemSound.setCardBackgroundColor(Color.GRAY)
                 }
+
                 true
             }
         }
+
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SoundViewHolder {
@@ -185,10 +193,13 @@ class SoundAdapter(
        return soundsPlayList?.listSound?.size ?:0
     }
 
+
     override fun onBindViewHolder(holder: SoundViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val sound = soundsPlayList?.listSound?.elementAt(position)
+
         if (sound != null) {
             holder.bind(sound,position)
+
           if (actualSound != null && actualSound?.title == sound.title){
                 holder.configurAnimationWhenPlaying(isPlay)
             }

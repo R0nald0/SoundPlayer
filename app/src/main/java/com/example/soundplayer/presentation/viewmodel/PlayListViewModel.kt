@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.soundplayer.data.repository.SoundPlayListRepository
+import com.example.soundplayer.model.DataSoundPlayListToUpdate
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,8 +32,8 @@ class PlayListViewModel @Inject constructor(
     val soundListBd : LiveData<List<Sound>>
         get() = _soundListBd
 
-    private val _listSoundUpdate  = MutableLiveData<Pair<Boolean,Set<Sound>>>()
-    var listSoundUpdate : LiveData<Pair<Boolean,Set<Sound>>> =_listSoundUpdate
+    private val _listSoundUpdate  = MutableLiveData<Pair<Boolean,DataSoundPlayListToUpdate>>()
+    var listSoundUpdate : LiveData<Pair<Boolean,DataSoundPlayListToUpdate>> = _listSoundUpdate
 
 
     fun savePlayList(playList: PlayList){
@@ -100,28 +101,36 @@ class PlayListViewModel @Inject constructor(
          }
     }
 
-    fun addSountToPlayList(idPlayList: Long,listSound:Set<Sound>){
+    fun updatSoundAtPlaylist(dataSoundToUpdate: DataSoundPlayListToUpdate){
          viewModelScope.launch{
-            val result = soundPlayListRepository.addSountToPlayList(idPlayList,listSound)
+            val result = soundPlayListRepository.addSountToPlayList(dataSoundToUpdate.idPlayList,dataSoundToUpdate.sounds)
              if (result.isNotEmpty()) {
-                 _listSoundUpdate.value = Pair(true , listSound)
-                 findPlayListById(idPlayList = idPlayList)
+                  _listSoundUpdate.value = Pair(true,dataSoundToUpdate)
+                 findPlayListById(idPlayList = dataSoundToUpdate.idPlayList)
                  getAllPlayList()
-                 _listSoundUpdate.value = Pair(true , emptySet())
+                 _listSoundUpdate.value = Pair(false , dataSoundToUpdate.copy(idPlayList = -1))
              }
          }
     }
-    fun removePlaySoundFromPlayList(playListId: Long,listRemovedItems: Set<Sound>){
-         viewModelScope.launch {
-             val itemsRemoved  =soundPlayListRepository.removeSoundItemsFromPlayList(idPlayList = playListId,listRemovedItems)
+
+    fun removePlaySoundFromPlayList(dataSoundToUpdate : DataSoundPlayListToUpdate){
+
+        viewModelScope.launch {
+             val itemsRemoved  =soundPlayListRepository.removeSoundItemsFromPlayList(idPlayList = dataSoundToUpdate.idPlayList,
+                 setOf(dataSoundToUpdate.sounds.first())
+             )
+
              if (itemsRemoved.isNotEmpty()){
-                 _listSoundUpdate.value = Pair(false , listRemovedItems)
-                 findPlayListById(idPlayList = playListId)
+                 _listSoundUpdate.value = Pair(false , dataSoundToUpdate)
+                 findPlayListById(idPlayList = dataSoundToUpdate.idPlayList)
                  getAllPlayList()
-                 _listSoundUpdate.value = Pair(false , emptySet())
+                 _listSoundUpdate.value = Pair(false , dataSoundToUpdate.copy(idPlayList = -1))
+                 //TODO refatorar
              }
+
          }
     }
+
     fun findPlayListById(idPlayList:Long) {
         viewModelScope.launch {
             val resultPlayList = soundPlayListRepository.findPlayListById(idPlayList)

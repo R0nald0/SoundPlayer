@@ -9,11 +9,4 @@
         android:icon="@android:drawable/ic_menu_add"
         android:title="@string/adicionar_a_playlist"
         app:showAsAction="always" />
-    <item
-        android:id="@+id/id_remove"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:icon="@android:drawable/ic_menu_delete"
-        android:title="@string/remover_da_playlist"
-        app:showAsAction="always" />
 </menu>

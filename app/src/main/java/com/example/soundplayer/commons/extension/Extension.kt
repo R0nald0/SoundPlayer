@@ -4,6 +4,9 @@ import android.app.AlertDialog
 import android.content.Context
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import java.util.concurrent.TimeUnit
 
 fun Context.convertMilesSecondToMinSec(duration: Long): String {
@@ -33,4 +36,13 @@ fun Context.showAlerDialog(messenger :String, positiveButton:String, negativeBut
 
 fun Context.exibirToast(messenger: String){
     Toast.makeText(this, messenger, Toast.LENGTH_SHORT).show()
+}
+
+fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+    observe(lifecycleOwner, object : Observer<T> {
+        override fun onChanged(value: T) {
+            observer.onChanged(value)
+            removeObserver(this)
+        }
+    })
 }

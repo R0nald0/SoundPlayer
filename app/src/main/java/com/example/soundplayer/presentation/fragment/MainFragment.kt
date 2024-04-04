@@ -20,12 +20,15 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
 import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.commons.extension.exibirToast
+import com.example.soundplayer.commons.extension.observeOnce
 import com.example.soundplayer.databinding.FragmentMainBinding
+import com.example.soundplayer.model.DataSoundPlayListToUpdate
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.SoundList
@@ -55,8 +58,9 @@ class MainFragment : Fragment() {
     private val playListViewModel by activityViewModels<PlayListViewModel>()
     private val preferencesViewModel by activityViewModels<PreferencesViewModel>()
     private var positonPlayListToScrol = 0
+     lateinit var  obs : Observer<Pair<Boolean,DataSoundPlayListToUpdate>>
 
-    private val listPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        private val listPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
         listOf(
             android.Manifest.permission.READ_MEDIA_AUDIO,
             android.Manifest.permission.FOREGROUND_SERVICE,
@@ -117,6 +121,15 @@ class MainFragment : Fragment() {
 
 
       private  fun observersViewModel(){
+//           obs = Observer { pairOFListSound->
+//              soundViewModel.updatePlayList(pairOFListSound)
+//          }
+//          playListViewModel.listSoundUpdate.observeForever(obs)
+
+          playListViewModel.listSoundUpdate.observe(viewLifecycleOwner){ pairOFListSound->
+              soundViewModel.updatePlayList(pairOFListSound)
+          }
+
           soundViewModel.userDataPreferecence.observe(viewLifecycleOwner){userDataPreference->
               if (userDataPreference.idPreference != null  ){
                   playListViewModel.findPlayListById(userDataPreference.idPreference)
@@ -180,9 +193,7 @@ class MainFragment : Fragment() {
                }
           }
 
-          playListViewModel.listSoundUpdate.observe(viewLifecycleOwner){pairOFListSound ->
-               if(pairOFListSound.second.isNotEmpty())soundViewModel.updatePlayList(pairOFListSound)
-          }
+
 
       }
 
@@ -229,6 +240,27 @@ class MainFragment : Fragment() {
 
       private fun initAdapter() {
           adapterSound = SoundAdapter(
+              onDelete = {idPlayList,intSoundPair ->
+                 if (idPlayList == 1L){
+                     requireContext().exibirToast("Audio não pode ser deletado da play list All musics")
+                 }
+                else {
+                     val dataSoundToUpdate = DataSoundPlayListToUpdate(
+                         idPlayList, listOf(intSoundPair.first), setOf(intSoundPair.second)
+                     )
+                     playListViewModel.removePlaySoundFromPlayList(dataSoundToUpdate)
+
+//                     playListViewModel.listSoundUpdate?.observe(viewLifecycleOwner){ pairOFListSound->
+//                         if (pairOFListSound != null) {
+//                             soundViewModel.updatePlayList(pairOFListSound)
+//                         }
+//
+//                     }
+               //      playListViewModel.listSoundUpdate.removeObserver(obs)
+
+
+                 }
+              },
              soundViewModel =  soundViewModel,
               isUpdateList = {isUpdate->
                   updateViewWhenMenuChange(isUpdate)
@@ -358,8 +390,16 @@ class MainFragment : Fragment() {
               soundViewModel.savePreference()
           }
           Log.i("play_", "onStop")
+
           super.onStop()
       }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        playListViewModel.listSoundUpdate.removeObservers(this)
+    }
+
+
    inner class  MyMenuProvider() : MenuProvider {
         @SuppressLint("SuspiciousIndentation")
         override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -377,9 +417,6 @@ class MainFragment : Fragment() {
                 menuInflater.inflate(R.menu.sound_menu,menu)
             }
 
-            if (pairPlayList.first.toInt() == 1){
-                menu.removeItem(R.id.id_remove)
-            }
         }
 
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -399,14 +436,7 @@ class MainFragment : Fragment() {
                     findNavController().navigate(args)
                     true
                 }
-                R.id.id_remove ->{
-                    playListViewModel.removePlaySoundFromPlayList(
-                        playListId = pairPlayList.first,
-                        listRemovedItems =pairPlayList.second.toSet()
-                    )
-                   adapterSound.clearSoundListSelected()
-                    true
-                }
+
                 else ->false
             }
 

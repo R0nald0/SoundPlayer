@@ -6,5 +6,5 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class SoundList(
     var currentMusic : Int,
-    val listMusic :Set<Sound>
+    val listMusic :MutableSet<Pair<Int, Sound>>
 ):Parcelable

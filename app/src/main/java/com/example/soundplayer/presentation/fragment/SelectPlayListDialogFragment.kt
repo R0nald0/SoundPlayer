@@ -1,26 +1,25 @@
 package com.example.soundplayer.presentation.fragment
 
 import android.app.Dialog
-import android.content.res.Resources.Theme
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.soundplayer.R
 import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.databinding.FragmentSelectPlayListDialogListDialogBinding
+import com.example.soundplayer.model.DataSoundPlayListToUpdate
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.presentation.adapter.AdapterSelectePlayList
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SelectPlayListDialogFragment : DialogFragment() {
+    private lateinit var posToUpdate: List<Int>
     private  var view : View?=null
     private var _binding: FragmentSelectPlayListDialogListDialogBinding? = null
     private val playListViewModel by activityViewModels<PlayListViewModel>()
@@ -52,7 +51,12 @@ class SelectPlayListDialogFragment : DialogFragment() {
 
 
     private fun setUpBundle(){
-           soudsToUpdate = arsg.soundsListToAddPlayList.listMusic
+           soudsToUpdate = arsg.soundsListToAddPlayList.listMusic.map {
+                it.second
+           }.toSet()
+        posToUpdate = arsg.soundsListToAddPlayList.listMusic.map {
+            it.first
+        }
     }
     private fun observer() {
         playListViewModel.playLists.observe(this){listOfPlayList->
@@ -66,9 +70,12 @@ class SelectPlayListDialogFragment : DialogFragment() {
     }
     private fun inicializerBinding() {
         adapterPlaylistSelect = AdapterSelectePlayList(){selectedPlayList->
-            playListViewModel.addSountToPlayList(
-                idPlayList = selectedPlayList.idPlayList!!,
-                listSound = soudsToUpdate
+            playListViewModel.updatSoundAtPlaylist(
+                DataSoundPlayListToUpdate(
+                    idPlayList =  selectedPlayList.idPlayList ?: 0,
+                    positionSound = posToUpdate,
+                    sounds = soudsToUpdate
+                )
             )
             dismiss()
         }
