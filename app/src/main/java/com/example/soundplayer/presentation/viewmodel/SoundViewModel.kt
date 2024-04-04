@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
@@ -18,6 +19,7 @@ import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -28,6 +30,7 @@ class SoundViewModel @Inject constructor(
     private val soundPlayListRepository: SoundPlayListRepository
 ) :ViewModel(){
 
+
      private var playerWhenRead = true
      var currentItem = -1
      private var playBackPosition = -0L
@@ -35,13 +38,14 @@ class SoundViewModel @Inject constructor(
     var actualSound  = MutableLiveData<Sound>()
     var isPlayingObserver  = MutableLiveData<Boolean>()
 
-    private var _currentPlayList = MutableLiveData<PlayList>()
+    private var _currentPlayingPlayList = MutableLiveData<PlayList>()
     val currentPlayList :LiveData<PlayList>
-           get() = _currentPlayList
+           get() = _currentPlayingPlayList
 
     private val _userDataPreferecenceObs = MutableLiveData<UserDataPreferecence>()
     val userDataPreferecence : LiveData<UserDataPreferecence>
         get() = _userDataPreferecenceObs
+
 
 
     private lateinit var listMediaItem  : MutableList<MediaItem>
@@ -50,7 +54,7 @@ class SoundViewModel @Inject constructor(
        return exoPlayer
      }
 
-    fun updatePlayList( pairListSounWithDecisionUpdate :Pair<Boolean, DataSoundPlayListToUpdate>){
+     fun updatePlayList( pairListSounWithDecisionUpdate :Pair<Boolean, DataSoundPlayListToUpdate>){
         if (currentPlayList.value != null){
             if (pairListSounWithDecisionUpdate.first)
                 addItemFromListMusic(pairListSounWithDecisionUpdate.second!!)
@@ -60,56 +64,60 @@ class SoundViewModel @Inject constructor(
     }
 
     private fun addItemFromListMusic(dataSoundPlayListToUpdate: DataSoundPlayListToUpdate){
-        if (_currentPlayList.value?.idPlayList == dataSoundPlayListToUpdate.idPlayList){
+        if (_currentPlayingPlayList.value?.idPlayList == dataSoundPlayListToUpdate.idPlayList){
              listMediaItem.clear()
              listMediaItem.addAll(createMediaItemList(dataSoundPlayListToUpdate.sounds.toMutableSet()))
-             dataSoundPlayListToUpdate.sounds.forEachIndexed() {index,sound->
-
+             listMediaItem.forEachIndexed { index,sound ->
+                 exoPlayer.addMediaItem(
+                     dataSoundPlayListToUpdate.positionSound[index],
+                     sound
+                     )
              }
-            _currentPlayList.value?.listSound?.addAll(dataSoundPlayListToUpdate.sounds)
-            Log.i("INFO_", "size list: ${listMediaItem.size}")
         }
     }
 
      private fun removeItemFromListMusic(soundPlay: DataSoundPlayListToUpdate){
 
-          if (_currentPlayList.value?.idPlayList == soundPlay.idPlayList){
+          if (_currentPlayingPlayList.value?.idPlayList == soundPlay.idPlayList){
 
               exoPlayer.removeMediaItem(soundPlay.positionSound.first())
-              _currentPlayList.value?.listSound?.remove(soundPlay.sounds.first())
+              _currentPlayingPlayList.value?.listSound?.remove(soundPlay.sounds.first())
               Log.i("INFO_", "size list: ${listMediaItem.size}")
           }
     }
 
     fun getAllMusics(playList: PlayList) {
 
-           if ( _currentPlayList.value != null &&  _currentPlayList.value!!.name != playList.name){
+           if ( _currentPlayingPlayList.value != null &&  _currentPlayingPlayList.value!!.name != playList.name){
                exoPlayer.stop()
                exoPlayer.clearMediaItems()
                currentItem = -1
             }
 
-            if (  playList.currentMusicPosition == currentItem){
+            if ( playList.currentMusicPosition == currentItem){
                  playBackPosition = exoPlayer.currentPosition
                  currentItem = playList.currentMusicPosition
             }
             else if (!exoPlayer.isPlaying && playList.currentMusicPosition != currentItem){
                  playBackPosition =0L
-                _currentPlayList.value = playList
+                _currentPlayingPlayList.value = playList
                 listMediaItem= createMediaItemList(playList.listSound).toMutableList()
                 exoPlayer.seekTo(playList.currentMusicPosition,playBackPosition)
                 currentItem = playList.currentMusicPosition
                 playAllMusicFromFist()
+
             }
            else{
                 playBackPosition =0L
-                _currentPlayList.value = playList
+                _currentPlayingPlayList.value = playList
                 listMediaItem= createMediaItemList(playList.listSound).toMutableList()
                 exoPlayer.seekTo(playList.currentMusicPosition,playBackPosition)
                 currentItem = playList.currentMusicPosition
            }
 
     }
+
+
 
     private fun createMediaItemList(list: MutableSet<Sound>):MutableSet<MediaItem>{
         return list.map{ sound ->
@@ -168,6 +176,7 @@ class SoundViewModel @Inject constructor(
                 isPlayingObserver.value = isPlaying
             }
 
+
             override fun onTimelineChanged(timeline: Timeline, reason: Int) {
 
                 super.onTimelineChanged(timeline, reason)
@@ -197,9 +206,9 @@ class SoundViewModel @Inject constructor(
    suspend fun savePreference(){
 
             runCatching {
-                if(_currentPlayList.value != null){
+                if(_currentPlayingPlayList.value != null){
                     dataStorePreferenceRepository
-                        .savePreference(_currentPlayList.value!!.idPlayList, positionSoundKey = currentItem)
+                        .savePreference(_currentPlayingPlayList.value!!.idPlayList, positionSoundKey = currentItem)
                 }
             }.fold(
                 onSuccess = {

@@ -162,7 +162,7 @@ class MainFragment : Fragment() {
               playListAdapter.addPlayList(listOfplayListObservable)
           }
 
-          playListViewModel.uniquePlayList.observe(viewLifecycleOwner){uniquePlayListWithSongs->
+          playListViewModel.clickedPlayList.observe(viewLifecycleOwner){uniquePlayListWithSongs->
 
               binding.rvSound.scrollToPosition(positonPlayListToScrol)
 
@@ -192,9 +192,6 @@ class MainFragment : Fragment() {
                    }
                }
           }
-
-
-
       }
 
       private fun getPermissions(){
@@ -261,7 +258,7 @@ class MainFragment : Fragment() {
 
                  }
               },
-             soundViewModel =  soundViewModel,
+              soundViewModel =  soundViewModel,
               isUpdateList = {isUpdate->
                   updateViewWhenMenuChange(isUpdate)
                              },

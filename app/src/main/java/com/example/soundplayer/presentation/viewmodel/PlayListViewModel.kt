@@ -20,9 +20,9 @@ import javax.inject.Inject
 class PlayListViewModel @Inject constructor(
     private val soundPlayListRepository: SoundPlayListRepository,
 ):ViewModel() {
-    private val _uniquePlayList = MutableLiveData<PlayList>()
-    val uniquePlayList : LiveData<PlayList>
-        get() = _uniquePlayList
+    private val TAG = "INFO_"
+    private val _clickedPlayList = MutableLiveData<PlayList>()
+    val clickedPlayList : LiveData<PlayList> = _clickedPlayList
 
     private val _playLists = MutableLiveData<List<PlayList>>()
      val playLists : LiveData<List<PlayList>>
@@ -133,10 +133,17 @@ class PlayListViewModel @Inject constructor(
 
     fun findPlayListById(idPlayList:Long) {
         viewModelScope.launch {
-            val resultPlayList = soundPlayListRepository.findPlayListById(idPlayList)
-             if (resultPlayList != null){
-                 _uniquePlayList.value = resultPlayList!!
-             }
+            runCatching {
+                soundPlayListRepository.findPlayListById(idPlayList)
+            }.fold(
+                onSuccess = { resultPlayList ->
+                    if (resultPlayList != null){
+                        _clickedPlayList.value = resultPlayList!!
+                    }
+                }, onFailure = {
+                    Log.i(TAG, "erro ao buscar encontrar play list com o id: $idPlayList : ${it.message} ")
+                }
+            )
         }
     }
 }
