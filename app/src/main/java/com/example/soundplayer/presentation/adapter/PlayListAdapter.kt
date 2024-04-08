@@ -153,7 +153,7 @@ class PlayListAdapter(
         popupMenu.setOnMenuItemClickListener {
             when(it.itemId){
                 R.id.idEdit->{
-                    val upadateNameBinding =UpadateNamePlaylistLayoutBinding.inflate(LayoutInflater.from(view.context),null, false)
+                   val upadateNameBinding =UpadateNamePlaylistLayoutBinding.inflate(LayoutInflater.from(view.context),null, false)
 
                     view.context.showAlerDialog(
                         messenger = String.format(ContextCompat.getString(view.context,R.string.atualizar_nome_playlist),playList.name),

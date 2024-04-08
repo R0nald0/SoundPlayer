@@ -141,7 +141,7 @@ class PlayListViewModel @Inject constructor(
                         _clickedPlayList.value = resultPlayList!!
                     }
                 }, onFailure = {
-                    Log.i(TAG, "erro ao buscar encontrar play list com o id: $idPlayList : ${it.message} ")
+                    Log.i(TAG, "erro ao buscar  playlist com o id: $idPlayList : ${it.message} ")
                 }
             )
         }

@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
 import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.commons.extension.exibirToast
-import com.example.soundplayer.commons.extension.observeOnce
 import com.example.soundplayer.databinding.FragmentMainBinding
 import com.example.soundplayer.model.DataSoundPlayListToUpdate
 import com.example.soundplayer.model.PlayList
@@ -121,11 +120,6 @@ class MainFragment : Fragment() {
 
 
       private  fun observersViewModel(){
-//           obs = Observer { pairOFListSound->
-//              soundViewModel.updatePlayList(pairOFListSound)
-//          }
-//          playListViewModel.listSoundUpdate.observeForever(obs)
-
           playListViewModel.listSoundUpdate.observe(viewLifecycleOwner){ pairOFListSound->
               soundViewModel.updatePlayList(pairOFListSound)
           }
@@ -246,16 +240,6 @@ class MainFragment : Fragment() {
                          idPlayList, listOf(intSoundPair.first), setOf(intSoundPair.second)
                      )
                      playListViewModel.removePlaySoundFromPlayList(dataSoundToUpdate)
-
-//                     playListViewModel.listSoundUpdate?.observe(viewLifecycleOwner){ pairOFListSound->
-//                         if (pairOFListSound != null) {
-//                             soundViewModel.updatePlayList(pairOFListSound)
-//                         }
-//
-//                     }
-               //      playListViewModel.listSoundUpdate.removeObserver(obs)
-
-
                  }
               },
               soundViewModel =  soundViewModel,
@@ -320,6 +304,7 @@ class MainFragment : Fragment() {
               MediaStore.Audio.Media.DURATION,
               MediaStore.Audio.Media._ID,
               MediaStore.Audio.Media.ALBUM_ID,
+              MediaStore.Audio.Media.VOLUME_NAME,
           )
           val cursor =requireActivity().contentResolver.query(
               MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -336,6 +321,7 @@ class MainFragment : Fragment() {
                   val duarution = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
                   val path  = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
                   val title = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+                  val volumeName = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.VOLUME_NAME)
 
                   while (cursor.moveToNext()){
 
@@ -347,14 +333,19 @@ class MainFragment : Fragment() {
                       val mediaUri  = ContentUris.withAppendedId(
                           MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,idMedia)
 
+
+                      val itemPathAlbumMedia = mediaUriAlbum.pathSegments[3].toInt()
+                      val newMediaAlbum =if(itemPathAlbumMedia == 1 || itemPathAlbumMedia ==3)  null else  mediaUriAlbum
                       val sound = Sound(
                           idSound = null,
                           path = cursor.getString(path),
                           duration =cursor.getInt(duarution).toString(),
                           title= cursor.getString(title),
                           uriMedia = mediaUri,
-                          uriMediaAlbum = mediaUriAlbum
+                          uriMediaAlbum = newMediaAlbum
                       )
+
+                      Log.i("INFO_", "playlist : ${mediaUriAlbum.pathSegments[3]} ${sound.title}")
 
                       if (File(sound.path).exists()){
                           if (!listSoundFromContentProvider.contains(sound)){
@@ -411,7 +402,7 @@ class MainFragment : Fragment() {
             }else{
                 binding.txvTitleToolbar.text= getString(R.string.selecionar_itens)
                 binding.mainFragmentBackButton.isVisible =true
-                menuInflater.inflate(R.menu.sound_menu,menu)
+                menuInflater.inflate(R.menu.update_toolbar_menu,menu)
             }
 
         }

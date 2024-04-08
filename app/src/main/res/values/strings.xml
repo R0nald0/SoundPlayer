@@ -22,6 +22,7 @@
     <string name="pequena">Pequena</string>
     <string name="selecionar_itens">Selecionar itens</string>
     <string name="est_playlist_esta_vazia">Esta playlist está vazia</string>
+    <string name="deletar">Deletar</string>
 
 
 </resources>

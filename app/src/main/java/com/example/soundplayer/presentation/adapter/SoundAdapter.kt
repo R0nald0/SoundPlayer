@@ -2,9 +2,11 @@ package com.example.soundplayer.presentation.adapter
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -16,6 +18,7 @@ import com.example.soundplayer.databinding.ItemSoundBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.presentation.viewmodel.SoundViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SoundAdapter(
     private val soundViewModel: SoundViewModel,
@@ -58,9 +61,12 @@ class SoundAdapter(
          binding.txvDuration.text = duration
          binding.txvTitle.text =soudd.title
          binding.txvTitle.textSize = sizeTitleMusic
-         binding.imageView.setImageURI(soudd.uriMediaAlbum)
-         binding.txvRemove.setOnClickListener {
-             onDelete(soundsPlayList?.idPlayList!!,Pair(position,soudd))
+
+
+         showHideOptionsMenu(soudd, position)
+
+         binding.idBtnOptionSound.setOnClickListener {
+             createOptionsMenu(it,soudd,position)
          }
 
          configSelectionedItemApperence(position,soudd)
@@ -70,6 +76,8 @@ class SoundAdapter(
              if (binding.imageView.drawable == null) {
                  binding.imageView.setImageResource(R.drawable.transferir)
              }
+         }else{
+             binding.imageView.setImageResource(R.drawable.transferir)
          }
 
          clickItemEvent(position, soudd)
@@ -77,7 +85,21 @@ class SoundAdapter(
          longPressEvent(position,soudd)
 
      }
-         fun configurAnimationWhenPlaying(isPlaying: Boolean) {
+
+        private fun showHideOptionsMenu(soudd: Sound, position: Int) {
+            val playListId = soundsPlayList?.idPlayList!!
+
+            if (playListId != 1L) {
+                binding.idBtnOptionSound.visibility = View.VISIBLE
+                binding.idBtnOptionSound.setOnClickListener {
+                    createOptionsMenu(it, soudd, position)
+                }
+            } else {
+                binding.idBtnOptionSound.visibility = View.GONE
+            }
+        }
+
+        fun configurAnimationWhenPlaying(isPlaying: Boolean) {
             if (isPlaying){
                 binding.txvTitle.isSelected = true
                 binding.lottieSoundAnimePlaying.isVisible = true
@@ -106,7 +128,6 @@ class SoundAdapter(
                     )
                 }
             } else {
-
                 isUpdateList(false)
                 binding.cardItemSound.setCardBackgroundColor(
                     ContextCompat.getColor(
@@ -173,7 +194,6 @@ class SoundAdapter(
                     soundSelecionados.add(Pair(position,soudd))
                     binding.cardItemSound.setCardBackgroundColor(Color.GRAY)
                 }
-
                 true
             }
         }
@@ -209,4 +229,32 @@ class SoundAdapter(
        getPlayList(soundsPlayList!!)
        soundSelecionados.clear()
   }
+
+    private fun createOptionsMenu(view : View,sound: Sound,position : Int){
+
+        val popupMenu  = PopupMenu(view.context,view)
+        popupMenu.inflate(R.menu.unique_sound_menu)
+        popupMenu.show()
+        popupMenu.setOnMenuItemClickListener {
+            when(it.itemId){
+                R.id.id_delete->{
+                     MaterialAlertDialogBuilder(view.context)
+                         .setTitle("Deseja deletar ${sound.title} ?")
+                         .setPositiveButton("Sim"){dialog,q->
+                             onDelete(soundsPlayList?.idPlayList!!,Pair(position,sound))
+                             dialog.dismiss()
+                         }
+                         .setNegativeButton("Cancelar"){dialog,q->
+                             dialog.dismiss()
+                         }
+                         .show()
+                    true
+                }
+
+                else -> false
+            }
+        }
+    }
+
+
 }
