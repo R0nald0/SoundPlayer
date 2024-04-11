@@ -17,6 +17,7 @@ class SoundPlayListRepository @Inject constructor (
     private val playlistAndSoundCross :PlaylistAndSoundCrossDao,
     private val soundDao: SoundDao,
 ){
+   private var _listOfPlayList = mutableListOf<PlayListDAO>()
 
    suspend fun savePlayList(playList: PlayList):List<Long>{
        try {

@@ -50,7 +50,7 @@ class SoundAdapter(
     }
 
     fun getSoundSelecionados(): Pair<Long,MutableSet<Pair<Int,Sound>>> {
-        return Pair (soundsPlayList?.idPlayList?: 1, soundSelecionados)
+        return Pair (soundsPlayList?.idPlayList?: 0, soundSelecionados)
     }
 
 
@@ -87,9 +87,9 @@ class SoundAdapter(
      }
 
         private fun showHideOptionsMenu(soudd: Sound, position: Int) {
-            val playListId = soundsPlayList?.idPlayList!!
+            val playListId = soundsPlayList?.idPlayList ?: 0L
 
-            if (playListId != 1L) {
+            if (playListId != 0L) {
                 binding.idBtnOptionSound.visibility = View.VISIBLE
                 binding.idBtnOptionSound.setOnClickListener {
                     createOptionsMenu(it, soudd, position)

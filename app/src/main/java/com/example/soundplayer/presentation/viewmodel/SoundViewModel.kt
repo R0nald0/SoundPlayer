@@ -231,7 +231,7 @@ class SoundViewModel @Inject constructor(
 
                          withContext(Dispatchers.Main){
                              _userDataPreferecenceObs.value = readAllPreferecenceData
-                                 ?: UserDataPreferecence(idPreference = 1, postionPreference = 1
+                                 ?: UserDataPreferecence(idPreference = 0, postionPreference = 1
                              )
                          }
 

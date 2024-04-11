@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.data.repository.SoundPlayListRepository
 import com.example.soundplayer.model.DataSoundPlayListToUpdate
 import com.example.soundplayer.model.PlayList
@@ -21,11 +22,14 @@ class PlayListViewModel @Inject constructor(
     private val soundPlayListRepository: SoundPlayListRepository,
 ):ViewModel() {
     private val TAG = "INFO_"
+
+
+
     private val _clickedPlayList = MutableLiveData<PlayList>()
     val clickedPlayList : LiveData<PlayList> = _clickedPlayList
 
-    private val _playLists = MutableLiveData<List<PlayList>>()
-     val playLists : LiveData<List<PlayList>>
+    private val _playLists = MutableLiveData<MutableList<PlayList>>()
+     val playLists : LiveData<MutableList<PlayList>>
          get() = _playLists
 
     private val _soundListBd = MutableLiveData<List<Sound>>()
@@ -52,7 +56,7 @@ class PlayListViewModel @Inject constructor(
            }.fold(
                onSuccess = {playListsRetorno->
                    withContext(Dispatchers.Main){
-                       _playLists.value = playListsRetorno
+                       _playLists.value = playListsRetorno.toMutableList()
                    }
                },
                onFailure = {
@@ -68,7 +72,7 @@ class PlayListViewModel @Inject constructor(
             Log.i("INFO_", "saveSound id :id music $id ")
         }
     }
-    fun saveAllSoundsByContentProvider(sizeListAllMusic: MutableSet<Sound>){
+    fun saveAllSoundsByContentProvider(sizeListAllMusic: Set<Sound>){
         viewModelScope.launch {
            var listBd = soundPlayListRepository.sizeListSound()
             if(sizeListAllMusic.size != listBd.size){
@@ -140,6 +144,7 @@ class PlayListViewModel @Inject constructor(
                     if (resultPlayList != null){
                         _clickedPlayList.value = resultPlayList!!
                     }
+
                 }, onFailure = {
                     Log.i(TAG, "erro ao buscar  playlist com o id: $idPlayList : ${it.message} ")
                 }

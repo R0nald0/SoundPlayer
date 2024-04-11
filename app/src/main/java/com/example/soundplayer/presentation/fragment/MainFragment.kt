@@ -1,11 +1,8 @@
 package com.example.soundplayer.presentation.fragment
 
 import android.annotation.SuppressLint
-import android.content.ContentUris
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -20,7 +17,6 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
@@ -31,6 +27,7 @@ import com.example.soundplayer.model.DataSoundPlayListToUpdate
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.SoundList
+import com.example.soundplayer.presentation.MyContetntProvider
 import com.example.soundplayer.presentation.adapter.PlayListAdapter
 import com.example.soundplayer.presentation.adapter.SoundAdapter
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
@@ -40,14 +37,13 @@ import com.example.soundplayer.presentation.viewmodel.StatePrefre
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 
 //TODO bug menu so aparece ao abrir a play list
 class MainFragment : Fragment() {
 
     private  lateinit var  binding : FragmentMainBinding
 
-    private val listSoundFromContentProvider = mutableSetOf<Sound>()
+    private var listSoundFromContentProvider = setOf<Sound>()
     private lateinit var myMenuProvider: MenuProvider
     var cont = 0
     private lateinit var gerenciarPermissoes : ActivityResultLauncher<Array<String>>
@@ -57,7 +53,6 @@ class MainFragment : Fragment() {
     private val playListViewModel by activityViewModels<PlayListViewModel>()
     private val preferencesViewModel by activityViewModels<PreferencesViewModel>()
     private var positonPlayListToScrol = 0
-     lateinit var  obs : Observer<Pair<Boolean,DataSoundPlayListToUpdate>>
 
         private val listPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
         listOf(
@@ -152,27 +147,32 @@ class MainFragment : Fragment() {
               playListAdapter.updateAnimationWhenPlayerPause(isPlaying)
           }
 
-          playListViewModel.playLists.observe(viewLifecycleOwner){listOfplayListObservable->
-              playListAdapter.addPlayList(listOfplayListObservable)
-          }
+
 
           playListViewModel.clickedPlayList.observe(viewLifecycleOwner){uniquePlayListWithSongs->
 
               binding.rvSound.scrollToPosition(positonPlayListToScrol)
 
-              playListAdapter.setLastOpenPlayListBorder(uniquePlayListWithSongs.idPlayList!!)
+              playListAdapter.setLastOpenPlayListBorder(uniquePlayListWithSongs.idPlayList ?: 0)
               updateViewWhenPlayListIsEmpty(uniquePlayListWithSongs)
          }
 
           playListViewModel.soundListBd.observe(viewLifecycleOwner){listSound->
                 if (listSound.isNotEmpty()){
-                    val playList =  PlayList(
-                        idPlayList = null,
-                        name= Constants.ALL_MUSIC_NAME,
-                        listSound =  listSound.toMutableSet(),
-                        currentMusicPosition = 0
-                    )
-                    playListViewModel.savePlayList(playList)
+
+                    playListViewModel.playLists.observe(viewLifecycleOwner){listOfplayListObservable->
+                        val playList =  PlayList(
+                            idPlayList = 0,
+                            name= Constants.ALL_MUSIC_NAME,
+                            listSound =  listSoundFromContentProvider.toMutableSet(),
+                            currentMusicPosition = 0
+                        )
+                        listOfplayListObservable.add(0,playList)
+
+                        playListAdapter.addPlayList(listOfplayListObservable)
+                    }
+
+                   // playListViewModel.savePlayList(playList)
                 }
           }
 
@@ -230,9 +230,10 @@ class MainFragment : Fragment() {
       }
 
       private fun initAdapter() {
+
           adapterSound = SoundAdapter(
               onDelete = {idPlayList,intSoundPair ->
-                 if (idPlayList == 1L){
+                 if (idPlayList == 0L){
                      requireContext().exibirToast("Audio não pode ser deletado da play list All musics")
                  }
                 else {
@@ -298,67 +299,9 @@ class MainFragment : Fragment() {
 
 
       private fun getMusicFromContentProvider(){
-          val projection = arrayOf(
-              MediaStore.Audio.Media.TITLE,
-              MediaStore.Audio.Media.DATA,
-              MediaStore.Audio.Media.DURATION,
-              MediaStore.Audio.Media._ID,
-              MediaStore.Audio.Media.ALBUM_ID,
-              MediaStore.Audio.Media.VOLUME_NAME,
-          )
-          val cursor =requireActivity().contentResolver.query(
-              MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-              projection,
-              null,
-              null,
-              null
-          )
-
-          if (cursor != null) {
-              try {
-                  val id =cursor.getColumnIndexOrThrow( MediaStore.Audio.Media._ID)
-                  val albumid =cursor.getColumnIndexOrThrow( MediaStore.Audio.Media.ALBUM_ID)
-                  val duarution = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
-                  val path  = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
-                  val title = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
-                  val volumeName = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.VOLUME_NAME)
-
-                  while (cursor.moveToNext()){
-
-                      val idMedia = cursor.getLong(id)
-                      val albumidMedia = cursor.getLong(albumid)
-                      val mediaUriAlbum  = ContentUris.withAppendedId(
-                          Uri.parse("content://media/external/audio/albumart"),albumidMedia)
-
-                      val mediaUri  = ContentUris.withAppendedId(
-                          MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,idMedia)
-
-
-                      val itemPathAlbumMedia = mediaUriAlbum.pathSegments[3].toInt()
-                      val newMediaAlbum =if(itemPathAlbumMedia == 1 || itemPathAlbumMedia ==3)  null else  mediaUriAlbum
-                      val sound = Sound(
-                          idSound = null,
-                          path = cursor.getString(path),
-                          duration =cursor.getInt(duarution).toString(),
-                          title= cursor.getString(title),
-                          uriMedia = mediaUri,
-                          uriMediaAlbum = newMediaAlbum
-                      )
-
-                      Log.i("INFO_", "playlist : ${mediaUriAlbum.pathSegments[3]} ${sound.title}")
-
-                      if (File(sound.path).exists()){
-                          if (!listSoundFromContentProvider.contains(sound)){
-                              listSoundFromContentProvider.add(sound)
-                          }
-                      }
-                  }
-                  cursor.close()
-              }catch (nullPointer : NullPointerException){
-                  nullPointer.printStackTrace()
-                  requireActivity().exibirToast( "Null ${nullPointer.printStackTrace()}")
-              }
-          }
+        listSoundFromContentProvider  = MyContetntProvider.createData(requireContext())
+              .getListOfSound(requireContext())
+              .listSoundFromContentProvider
           verifyListIsEmpty()
       }
 
