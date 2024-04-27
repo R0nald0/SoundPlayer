@@ -14,6 +14,11 @@ interface SoundDao {
     suspend  fun createSound(sound : SoundEntity):Long
     @Query(value = "SELECT * FROM sound")
     suspend  fun findAllSound():List<SoundEntity>
+
+    @Query(value = "SELECT * FROM sound WHERE soundId = :idSound")
+    suspend  fun findAllSound(idSound:Long?):List<SoundEntity>
+
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend   fun updateSound(sound: SoundEntity){}
     @Delete

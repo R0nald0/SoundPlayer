@@ -4,8 +4,12 @@ import com.example.soundplayer.data.dao.PlayListDAO
 import com.example.soundplayer.data.dao.PlaylistAndSoundCrossDao
 import com.example.soundplayer.data.dao.SoundDao
 import com.example.soundplayer.data.entities.PlayListAndSoundCrossEntity
+import com.example.soundplayer.data.entities.PlayListWithSong
+import com.example.soundplayer.data.entities.SoundEntity
+import com.example.soundplayer.data.entities.toPlaylistWithSoundDomain
 import com.example.soundplayer.data.entities.toSound
 import com.example.soundplayer.model.PlayList
+import com.example.soundplayer.model.PlaylistWithSoundDomain
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.toEntity
 import com.example.soundplayer.model.toSoundEntity
@@ -17,15 +21,13 @@ class SoundPlayListRepository @Inject constructor (
     private val playlistAndSoundCross :PlaylistAndSoundCrossDao,
     private val soundDao: SoundDao,
 ){
-   private var _listOfPlayList = mutableListOf<PlayListDAO>()
 
    suspend fun savePlayList(playList: PlayList):List<Long>{
        try {
             val list = findAllPlayListWithSong()
             list.forEach { playListDb->
-                if (playListDb.name == playList.name) return listOf();
+                if (playListDb.playList.name == playList.name) return listOf();
             }
-
 
            val idPlayList =playListDAO.createPlayList(playList.toEntity())
            val  playlistAndSoundCrossDaoList = playList.listSound.map {soundFromPlayList->
@@ -42,16 +44,25 @@ class SoundPlayListRepository @Inject constructor (
        }
     }
 
-   suspend fun findAllPlayListWithSong():List<PlayList>{
+   suspend fun findAllPlayListWithSong():List<PlaylistWithSoundDomain>{
         try {
-            val listPlayListWithSong  =  playlistAndSoundCross.findAllPlayListWithSong()
-            val listPlayList = listPlayListWithSong.map { playListWithSound->
-                  PlayList(playListWithSound)
+            val list =   playlistAndSoundCross.findAllPlayListWithSong()
+
+            val  newList = list.map {playListWithSong ->
+                playListWithSong.toPlaylistWithSoundDomain()
             }
-            return  listPlayList
+
+
+
+            return newList
+
         }catch (exeption :Exception){
             throw exeption
         }
+    }
+
+    suspend fun findSoundById(idSound :Long?):List<SoundEntity>{
+    return  soundDao.findAllSound(idSound)
     }
 
    suspend fun saveSound(sound: Sound):Long{
@@ -103,7 +114,11 @@ class SoundPlayListRepository @Inject constructor (
                 )
             }
             return playlistAndSoundCross.insertPlayListAndSoundCroos(listAcrossPlayListSound)
-        }catch (exeption:Exception){
+        }catch (nullPointer :NullPointerException){
+            nullPointer.printStackTrace()
+            throw NullPointerException("erro ao adiconar musica na playlist,id da playlist não encontrado")
+        }
+        catch (exeption:Exception){
             throw exeption;
         }
     }

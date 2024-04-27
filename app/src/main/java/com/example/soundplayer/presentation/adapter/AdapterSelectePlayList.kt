@@ -6,14 +6,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.soundplayer.databinding.ItemSelectPlaylistBinding
 import com.example.soundplayer.model.PlayList
+import com.example.soundplayer.model.PlaylistWithSoundDomain
 
- class AdapterSelectePlayList (
+class AdapterSelectePlayList (
      val onClick:(PlayList)->Unit
  ):RecyclerView.Adapter<AdapterSelectePlayList.ItemSelectViewHolder>(){
 
-    private var playLists = mutableSetOf<PlayList>()
+    private var playLists = mutableSetOf<PlaylistWithSoundDomain>()
     @SuppressLint("NotifyDataSetChanged")
-    fun addPlayList(playList: List<PlayList>){
+    fun addPlayList(playList: List<PlaylistWithSoundDomain>){
         playLists = playList.toMutableSet()
         notifyDataSetChanged()
     }
@@ -46,7 +47,7 @@ import com.example.soundplayer.model.PlayList
 
      override fun onBindViewHolder(holder: ItemSelectViewHolder, position: Int) {
          val playList = playLists.elementAt(position)
-         holder.bind(playList)
+         holder.bind(playList.playList)
      }
 
      override fun getItemCount() = playLists.size

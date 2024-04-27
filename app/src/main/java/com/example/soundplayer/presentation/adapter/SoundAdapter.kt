@@ -1,3 +1,4 @@
+
 package com.example.soundplayer.presentation.adapter
 
 import android.annotation.SuppressLint
@@ -26,8 +27,8 @@ class SoundAdapter(
     val onClickInitNewFragment :()->Unit,
     val onDelete : (Long,Pair<Int,Sound>)-> Unit
 ) :RecyclerView.Adapter<SoundAdapter.SoundViewHolder>() {
-   private  var soundsPlayList: PlayList? = null
-   private  var actualSound :Sound? = null
+    private  var soundsPlayList: PlayList? = null
+    private  var actualSound :Sound? = null
     private val soundSelecionados  = mutableSetOf<Pair<Int,Sound>>()
     var sizeTitleMusic =16f
     private var isPlay = false;
@@ -50,46 +51,46 @@ class SoundAdapter(
     }
 
     fun getSoundSelecionados(): Pair<Long,MutableSet<Pair<Int,Sound>>> {
-        return Pair (soundsPlayList?.idPlayList?: 0, soundSelecionados)
+        return Pair (soundsPlayList?.idPlayList?: 1, soundSelecionados)
     }
 
 
     inner class  SoundViewHolder(private val binding : ItemSoundBinding): ViewHolder(binding.root){
-     fun bind(soudd :Sound,position: Int){
+        fun bind(soudd :Sound,position: Int){
 
-         val duration =  binding.root.context.convertMilesSecondToMinSec(soudd.duration.toLong())
-         binding.txvDuration.text = duration
-         binding.txvTitle.text =soudd.title
-         binding.txvTitle.textSize = sizeTitleMusic
+            val duration =  binding.root.context.convertMilesSecondToMinSec(soudd.duration.toLong())
+            binding.txvDuration.text = duration
+            binding.txvTitle.text =soudd.title
+            binding.txvTitle.textSize = sizeTitleMusic
 
 
-         showHideOptionsMenu(soudd, position)
+            showHideOptionsMenu(soudd, position)
 
-         binding.idBtnOptionSound.setOnClickListener {
-             createOptionsMenu(it,soudd,position)
-         }
+            binding.idBtnOptionSound.setOnClickListener {
+                createOptionsMenu(it,soudd,position)
+            }
 
-         configSelectionedItemApperence(position,soudd)
+            configSelectionedItemApperence(position,soudd)
 
-         if (soudd.uriMediaAlbum != null) {
-             binding.imageView.setImageURI(soudd.uriMediaAlbum)
-             if (binding.imageView.drawable == null) {
-                 binding.imageView.setImageResource(R.drawable.transferir)
-             }
-         }else{
-             binding.imageView.setImageResource(R.drawable.transferir)
-         }
+            if (soudd.uriMediaAlbum != null) {
+                binding.imageView.setImageURI(soudd.uriMediaAlbum)
+                if (binding.imageView.drawable == null) {
+                    binding.imageView.setImageResource(R.drawable.transferir)
+                }
+            }else{
+                binding.imageView.setImageResource(R.drawable.transferir)
+            }
 
-         clickItemEvent(position, soudd)
-         configApperenceItemImage(soudd)
-         longPressEvent(position,soudd)
+            clickItemEvent(position, soudd)
+            configApperenceItemImage(soudd)
+            longPressEvent(position,soudd)
 
-     }
+        }
 
         private fun showHideOptionsMenu(soudd: Sound, position: Int) {
-            val playListId = soundsPlayList?.idPlayList ?: 0L
+            val playListId = soundsPlayList?.idPlayList!!
 
-            if (playListId != 0L) {
+            if (playListId != 1L) {
                 binding.idBtnOptionSound.visibility = View.VISIBLE
                 binding.idBtnOptionSound.setOnClickListener {
                     createOptionsMenu(it, soudd, position)
@@ -210,7 +211,7 @@ class SoundAdapter(
     }
 
     override fun getItemCount(): Int {
-       return soundsPlayList?.listSound?.size ?:0
+        return soundsPlayList?.listSound?.size ?:0
     }
 
 
@@ -220,15 +221,15 @@ class SoundAdapter(
         if (sound != null) {
             holder.bind(sound,position)
 
-          if (actualSound != null && actualSound?.title == sound.title){
+            if (actualSound != null && actualSound?.title == sound.title){
                 holder.configurAnimationWhenPlaying(isPlay)
             }
         }
     }
-   fun clearSoundListSelected(){
-       getPlayList(soundsPlayList!!)
-       soundSelecionados.clear()
-  }
+    fun clearSoundListSelected(){
+        getPlayList(soundsPlayList!!)
+        soundSelecionados.clear()
+    }
 
     private fun createOptionsMenu(view : View,sound: Sound,position : Int){
 
@@ -238,16 +239,16 @@ class SoundAdapter(
         popupMenu.setOnMenuItemClickListener {
             when(it.itemId){
                 R.id.id_delete->{
-                     MaterialAlertDialogBuilder(view.context)
-                         .setTitle("Deseja deletar ${sound.title} ?")
-                         .setPositiveButton("Sim"){dialog,q->
-                             onDelete(soundsPlayList?.idPlayList!!,Pair(position,sound))
-                             dialog.dismiss()
-                         }
-                         .setNegativeButton("Cancelar"){dialog,q->
-                             dialog.dismiss()
-                         }
-                         .show()
+                    MaterialAlertDialogBuilder(view.context)
+                        .setTitle("Deseja deletar ${sound.title} ?")
+                        .setPositiveButton("Sim"){dialog,q->
+                            onDelete(soundsPlayList?.idPlayList!!,Pair(position,sound))
+                            dialog.dismiss()
+                        }
+                        .setNegativeButton("Cancelar"){dialog,q->
+                            dialog.dismiss()
+                        }
+                        .show()
                     true
                 }
 

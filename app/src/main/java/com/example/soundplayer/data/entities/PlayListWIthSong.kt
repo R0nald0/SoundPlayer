@@ -4,6 +4,9 @@ import androidx.room.Embedded
 
 import androidx.room.Junction
 import androidx.room.Relation
+import com.example.soundplayer.model.PlaylistWithSoundDomain
+import com.example.soundplayer.model.toEntity
+import com.example.soundplayer.model.toSoundEntity
 
 data class PlayListWithSong(
     @Embedded
@@ -17,7 +20,12 @@ data class PlayListWithSong(
              parentColumn = "playListId",
              entityColumn = "soundId",
         )
-
     )
     val soundOfPlayList :List<SoundEntity>
+)
+
+
+fun PlayListWithSong.toPlaylistWithSoundDomain()= PlaylistWithSoundDomain(
+    playList = this.playList.toPlayList(),
+    soundOfPlayList = this.soundOfPlayList.map { soundEntity -> soundEntity.toSound() }.toMutableSet()
 )

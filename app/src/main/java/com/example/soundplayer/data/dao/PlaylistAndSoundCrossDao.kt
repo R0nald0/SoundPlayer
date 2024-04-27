@@ -11,6 +11,7 @@ import com.example.soundplayer.data.entities.PlayListWithSong
 
 @Dao
 interface PlaylistAndSoundCrossDao {
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend  fun insertPlayListAndSoundCroos(playListAndSoundCrossEntity: List<PlayListAndSoundCrossEntity>):List<Long>
 
@@ -36,4 +37,5 @@ interface PlaylistAndSoundCrossDao {
     @Transaction
     @Query(value = "SELECT * FROM playlistandsoundcrossentity WHERE playListId = :idPlaylist")
     suspend fun findPlayListAcrossSoundById(idPlaylist: Long) : PlayListAndSoundCrossEntity
+
 }

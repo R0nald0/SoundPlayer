@@ -1,3 +1,4 @@
+
 package com.example.soundplayer.presentation.adapter
 
 import android.annotation.SuppressLint
@@ -17,13 +18,14 @@ import com.example.soundplayer.commons.extension.showAlerDialog
 import com.example.soundplayer.databinding.PlayListItemBinding
 import com.example.soundplayer.databinding.UpadateNamePlaylistLayoutBinding
 import com.example.soundplayer.model.PlayList
+import com.example.soundplayer.model.PlaylistWithSoundDomain
 
 class PlayListAdapter(
     val onclick :(PlayList)->Unit,
     val onDelete :(PlayList)->Unit,
     val onEdit :(PlayList)->Unit
 ) :RecyclerView.Adapter<PlayListAdapter.PlayLisViewHolder>(){
-    private var playLists = mutableSetOf<PlayList>()
+    private var playlistWithSoundDomainMutableSet = mutableSetOf<PlaylistWithSoundDomain>()
     private var userPositionPreferePlayListId = -1L
     private var isPlaying = false
     private var currentPlayListPlaying : PlayList? = null
@@ -31,16 +33,16 @@ class PlayListAdapter(
     @SuppressLint("UseSparseArrays")
     var positionPlayListClicked = SparseArray<Int>()
     @SuppressLint("NotifyDataSetChanged")
-    fun addPlayList(playList: List<PlayList>){
+    fun addPlayList(playlistWithSoundDomains: List<PlaylistWithSoundDomain>){
         positionPlayListClicked.clear()
-        playLists = playList.toMutableSet()
+        playlistWithSoundDomainMutableSet = playlistWithSoundDomains.toMutableSet()
         notifyDataSetChanged()
     }
 
     @SuppressLint("NotifyDataSetChanged")
     fun getCurrentPlayListPlayind(playList: PlayList){
-         currentPlayListPlaying = playList
-         notifyDataSetChanged()
+        currentPlayListPlaying = playList
+        notifyDataSetChanged()
     }
     @SuppressLint("NotifyDataSetChanged")
     fun updateAnimationWhenPlayerPause(playIng:Boolean){
@@ -57,13 +59,13 @@ class PlayListAdapter(
 
     inner class  PlayLisViewHolder( val binding : PlayListItemBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(actualPlayList: PlayList, position: Int){
-
             if(!positionPlayListClicked.containsValue(position)){
-                 binding.idContraintPlayList.background = ContextCompat.getDrawable(binding.root.context,R.drawable.border_playlist_item_selected)
-              }
+                binding.idContraintPlayList.background = ContextCompat.getDrawable(binding.root.context,R.drawable.border_playlist_item_selected)
+            }
             initBindings(actualPlayList, position)
         }
         private fun  initBindings(actualPlayList :PlayList, position: Int){
+
             binding.txvTitle.text = actualPlayList.name
             binding.idContraintPlayList.setOnClickListener {
                 setUpBorderPlayList(position)
@@ -86,7 +88,7 @@ class PlayListAdapter(
             }
         }
         @SuppressLint("NotifyDataSetChanged")
-       private  fun setUpBorderPlayList(position: Int) {
+        private  fun setUpBorderPlayList(position: Int) {
             positionPlayListClicked.clear()
             positionPlayListClicked.put(position, position)
             if (positionPlayListClicked.containsValue(position)) {
@@ -118,7 +120,7 @@ class PlayListAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlayLisViewHolder {
         val view = PlayListItemBinding.inflate(
             LayoutInflater.from(
-            parent.context),
+                parent.context),
             parent,
             false
         )
@@ -126,12 +128,12 @@ class PlayListAdapter(
         return PlayLisViewHolder(view)
     }
 
-    override fun getItemCount() = playLists.size
+    override fun getItemCount() = playlistWithSoundDomainMutableSet.size
     override fun onBindViewHolder(holder: PlayLisViewHolder, position: Int) {
 
-        val playList = playLists.elementAt(position)
+        val playListWithMusic = playlistWithSoundDomainMutableSet.elementAt(position)
 
-        if (userPositionPreferePlayListId == playList.idPlayList){
+        if (userPositionPreferePlayListId == playListWithMusic.playList.idPlayList){
             holder.setUpBorderPlayListFirst(position)
             userPositionPreferePlayListId =-1
         }
@@ -140,10 +142,17 @@ class PlayListAdapter(
             holder.setUpImageActualPlayListPlaying(
                 currentPlayList = actualPlayListPlaying,
                 playIng = isPlaying,
-                actualPlayList =  playList
+                actualPlayList =  playListWithMusic.playList
             )
         }
-        holder.bind(playList,position)
+//        val playList = PlayList(
+//            idPlayList = playListWithMusic.playList.idPlayList,
+//            listSound = playListWithMusic.soundOfPlayList,
+//            name = playListWithMusic.playList.name,
+//            currentMusicPosition = playListWithMusic.playList.currentMusicPosition
+//        )
+        playListWithMusic.playList.listSound.addAll(playListWithMusic.soundOfPlayList)
+        holder.bind(playListWithMusic.playList,position)
     }
     private fun createOptionsMenu(view : View,playList: PlayList){
 
@@ -153,10 +162,10 @@ class PlayListAdapter(
         popupMenu.setOnMenuItemClickListener {
             when(it.itemId){
                 R.id.idEdit->{
-                   val upadateNameBinding =UpadateNamePlaylistLayoutBinding.inflate(LayoutInflater.from(view.context),null, false)
+                    val upadateNameBinding =UpadateNamePlaylistLayoutBinding.inflate(LayoutInflater.from(view.context),null, false)
 
                     view.context.showAlerDialog(
-                        messenger = String.format(ContextCompat.getString(view.context,R.string.atualizar_nome_playlist),playList.name),
+                        messenger = String.format(ContextCompat.getString(view.context,R.string.text_atualizar_playlist),playList.name),
                         negativeButton = view.context.getString(R.string.cancelar),
                         positiveButton = view.context.getString(R.string.editar),
                         layoutResid = upadateNameBinding.root,

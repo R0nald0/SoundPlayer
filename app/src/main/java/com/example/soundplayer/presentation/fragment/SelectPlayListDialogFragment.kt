@@ -59,7 +59,7 @@ class SelectPlayListDialogFragment : DialogFragment() {
         }
     }
     private fun observer() {
-        playListViewModel.playLists.observe(this){listOfPlayList->
+        playListViewModel.playListsWithSounds.observe(this){ listOfPlayList->
             if (listOfPlayList.isNotEmpty()){
                 adapterPlaylistSelect.addPlayList(listOfPlayList)
             }else{

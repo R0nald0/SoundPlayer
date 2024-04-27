@@ -1,3 +1,4 @@
+
 package com.example.soundplayer.presentation.viewmodel
 
 import android.util.Log
@@ -5,10 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.data.repository.SoundPlayListRepository
 import com.example.soundplayer.model.DataSoundPlayListToUpdate
 import com.example.soundplayer.model.PlayList
+import com.example.soundplayer.model.PlaylistWithSoundDomain
 import com.example.soundplayer.model.Sound
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,15 +23,12 @@ class PlayListViewModel @Inject constructor(
     private val soundPlayListRepository: SoundPlayListRepository,
 ):ViewModel() {
     private val TAG = "INFO_"
-
-
-
     private val _clickedPlayList = MutableLiveData<PlayList>()
     val clickedPlayList : LiveData<PlayList> = _clickedPlayList
 
-    private val _playLists = MutableLiveData<MutableList<PlayList>>()
-     val playLists : LiveData<MutableList<PlayList>>
-         get() = _playLists
+    private val _playListsWithSounds = MutableLiveData<List<PlaylistWithSoundDomain>>()
+    val playListsWithSounds : LiveData<List<PlaylistWithSoundDomain>>
+        get() = _playListsWithSounds
 
     private val _soundListBd = MutableLiveData<List<Sound>>()
     val soundListBd : LiveData<List<Sound>>
@@ -42,7 +40,7 @@ class PlayListViewModel @Inject constructor(
 
     fun savePlayList(playList: PlayList){
         viewModelScope.launch {
-          val retor  = soundPlayListRepository.savePlayList(playList)
+            val retor  = soundPlayListRepository.savePlayList(playList)
             if (retor.isNotEmpty()){
                 getAllPlayList()
             }
@@ -50,31 +48,29 @@ class PlayListViewModel @Inject constructor(
 
     }
     fun getAllPlayList(){
-       viewModelScope.launch {
-           runCatching {
-               soundPlayListRepository.findAllPlayListWithSong()
-           }.fold(
-               onSuccess = {playListsRetorno->
-                   withContext(Dispatchers.Main){
-                       _playLists.value = playListsRetorno.toMutableList()
-                   }
-               },
-               onFailure = {
-                   Log.i("INFO_", "getAllPlayList: erro ao buscar todas ás playlists ${it.message}")
-               }
-           )
-       }
+        viewModelScope.launch {
+            runCatching {
+                soundPlayListRepository.findAllPlayListWithSong()
+            }.fold(
+                onSuccess = {playlistWithSoundDomainsRetorno->
+                    _playListsWithSounds.value = playlistWithSoundDomainsRetorno
+                },
+                onFailure = {
+                    Log.i("INFO_", "getAllPlayList: erro ao buscar todas ás playlists ${it.message}")
+                }
+            )
+        }
     }
 
     fun saveSound(sound: Sound ){
         viewModelScope.launch {
-           val id  =soundPlayListRepository.saveSound(sound)
+            val id  =soundPlayListRepository.saveSound(sound)
             Log.i("INFO_", "saveSound id :id music $id ")
         }
     }
-    fun saveAllSoundsByContentProvider(sizeListAllMusic: Set<Sound>){
+    fun saveAllSoundsByContentProvider(sizeListAllMusic: MutableSet<Sound>){
         viewModelScope.launch {
-           var listBd = soundPlayListRepository.sizeListSound()
+            var listBd = soundPlayListRepository.sizeListSound()
             if(sizeListAllMusic.size != listBd.size){
                 sizeListAllMusic.forEach {sound->
                     if (!listBd.contains(sound)){
@@ -90,49 +86,49 @@ class PlayListViewModel @Inject constructor(
     }
     fun deletePlayList(playList: PlayList) {
         viewModelScope.launch {
-          val reterno   = soundPlayListRepository.deletePlaylist(playList)
-          if (reterno != 0){
-              getAllPlayList()
-          }
+            val reterno   = soundPlayListRepository.deletePlaylist(playList)
+            if (reterno != 0){
+                getAllPlayList()
+            }
         }
     }
     fun updateNamePlayList(playList: PlayList){
-         viewModelScope.launch {
+        viewModelScope.launch {
             val numberModifiedField  =soundPlayListRepository.updateNamePlayList(playList)
-             if (numberModifiedField !=0 ){
-                 getAllPlayList()
-             }
-         }
+            if (numberModifiedField !=0 ){
+                getAllPlayList()
+            }
+        }
     }
 
     fun updatSoundAtPlaylist(dataSoundToUpdate: DataSoundPlayListToUpdate){
-         viewModelScope.launch{
+        viewModelScope.launch{
             val result = soundPlayListRepository.addSountToPlayList(dataSoundToUpdate.idPlayList,dataSoundToUpdate.sounds)
-             if (result.isNotEmpty()) {
-                  _listSoundUpdate.value = Pair(true,dataSoundToUpdate)
-                 findPlayListById(idPlayList = dataSoundToUpdate.idPlayList)
-                 getAllPlayList()
-                 _listSoundUpdate.value = Pair(false , dataSoundToUpdate.copy(idPlayList = -1))
-             }
-         }
+            if (result.isNotEmpty()) {
+                _listSoundUpdate.value = Pair(true,dataSoundToUpdate)
+                findPlayListById(idPlayList = dataSoundToUpdate.idPlayList)
+                getAllPlayList()
+                _listSoundUpdate.value = Pair(false , dataSoundToUpdate.copy(idPlayList = -1))
+            }
+        }
     }
 
     fun removePlaySoundFromPlayList(dataSoundToUpdate : DataSoundPlayListToUpdate){
 
         viewModelScope.launch {
-             val itemsRemoved  =soundPlayListRepository.removeSoundItemsFromPlayList(idPlayList = dataSoundToUpdate.idPlayList,
-                 setOf(dataSoundToUpdate.sounds.first())
-             )
+            val itemsRemoved  =soundPlayListRepository.removeSoundItemsFromPlayList(idPlayList = dataSoundToUpdate.idPlayList,
+                setOf(dataSoundToUpdate.sounds.first())
+            )
 
-             if (itemsRemoved.isNotEmpty()){
-                 _listSoundUpdate.value = Pair(false , dataSoundToUpdate)
-                 findPlayListById(idPlayList = dataSoundToUpdate.idPlayList)
-                 getAllPlayList()
-                 _listSoundUpdate.value = Pair(false , dataSoundToUpdate.copy(idPlayList = -1))
-                 //TODO refatorar
-             }
+            if (itemsRemoved.isNotEmpty()){
+                _listSoundUpdate.value = Pair(false , dataSoundToUpdate)
+                findPlayListById(idPlayList = dataSoundToUpdate.idPlayList)
+                getAllPlayList()
+                _listSoundUpdate.value = Pair(false , dataSoundToUpdate.copy(idPlayList = -1))
+                //TODO refatorar
+            }
 
-         }
+        }
     }
 
     fun findPlayListById(idPlayList:Long) {
@@ -144,7 +140,6 @@ class PlayListViewModel @Inject constructor(
                     if (resultPlayList != null){
                         _clickedPlayList.value = resultPlayList!!
                     }
-
                 }, onFailure = {
                     Log.i(TAG, "erro ao buscar  playlist com o id: $idPlayList : ${it.message} ")
                 }
