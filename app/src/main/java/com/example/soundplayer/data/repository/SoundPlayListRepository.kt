@@ -1,5 +1,6 @@
 package com.example.soundplayer.data.repository
 
+import android.util.Log
 import com.example.soundplayer.data.dao.PlayListDAO
 import com.example.soundplayer.data.dao.PlaylistAndSoundCrossDao
 import com.example.soundplayer.data.dao.SoundDao
@@ -57,6 +58,7 @@ class SoundPlayListRepository @Inject constructor (
             return newList
 
         }catch (exeption :Exception){
+             exeption.printStackTrace()
             throw exeption
         }
     }
@@ -70,7 +72,6 @@ class SoundPlayListRepository @Inject constructor (
     }
 
     suspend fun sizeListSound():List<Sound>{
-
         return soundDao.findAllSound().map {soundEntity ->
             Sound(soundEntity)
         }

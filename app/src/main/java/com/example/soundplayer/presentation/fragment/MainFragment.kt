@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
 import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.commons.extension.exibirToast
+import com.example.soundplayer.commons.permission.Permission
 import com.example.soundplayer.databinding.FragmentMainBinding
 import com.example.soundplayer.model.DataSoundPlayListToUpdate
 import com.example.soundplayer.model.PlayList
@@ -59,13 +60,13 @@ class MainFragment : Fragment() {
 
 
     private val listPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        listOf(
+        setOf(
             android.Manifest.permission.READ_MEDIA_AUDIO,
             android.Manifest.permission.FOREGROUND_SERVICE,
             android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK,
         )
     } else {
-        listOf(
+        setOf(
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
         )
@@ -78,15 +79,17 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        getPermissions()
+
         binding = FragmentMainBinding.inflate(inflater,container,false)
         return binding.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initAdapter()
-        getPermissions()
+
         observersViewModel()
+        initAdapter()
         initBindigs()
         binding.toolbarSelecrionItemsMaterial.title =""
 
@@ -94,7 +97,6 @@ class MainFragment : Fragment() {
             soundViewModel.readPreferences()
         }
         setupToolbar()
-
     }
 
     override fun onStart() {
@@ -104,7 +106,8 @@ class MainFragment : Fragment() {
 
     private fun initBindigs() {
         binding.btnFindSounds.setOnClickListener {
-            requestPermission()
+
+            Permission.requestPermission(gerenciarPermissoes,listPermission)
         }
 
         binding.fabAddPlayList.setOnClickListener {
@@ -195,28 +198,23 @@ class MainFragment : Fragment() {
             ActivityResultContracts
                 .RequestMultiplePermissions()){permission: Map<String, Boolean> ->
 
-            if (!permission.values.contains(false)){
-                verifyPermissions(true)
-            }else{
-                verifyPermissions(false)
-            }
+            val isPepermited  =Permission.getPermissions(permission)
+            verifyPermissions(isPepermited)
         }
 
-        requestPermission()
+       Permission.requestPermission(gerenciarPermissoes,listPermission)
 
     }
 
     private fun verifyPermissions(isPermitted : Boolean) {
         if (!isPermitted) {
-            binding.btnFindSounds.visibility = View.VISIBLE
-            binding.txvSoundNotFound.visibility = View.VISIBLE
+            binding.LineartLayoutEmptySound.isVisible= true
             binding.linearMusics.visibility = View.GONE
             binding.fabAddPlayList.visibility = View.GONE
             requireActivity().exibirToast("Permissão necessaria para carragar as músicas")
 
         } else {
-            binding.btnFindSounds.visibility = View.GONE
-            binding.txvSoundNotFound.visibility = View.GONE
+            binding.LineartLayoutEmptySound.isVisible= false
             binding.linearMusics.visibility = View.VISIBLE
             binding.fabAddPlayList.visibility = View.VISIBLE
             getMusicFromContentProvider()
@@ -227,9 +225,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun requestPermission(){
-        gerenciarPermissoes.launch(listPermission.toTypedArray())
-    }
+
 
     private fun initAdapter() {
         adapterSound = SoundAdapter(
@@ -258,7 +254,7 @@ class MainFragment : Fragment() {
 
         playListAdapter = PlayListAdapter(
             onclick =  { playListChoseByUser ->
-               val exibithionPlayList = actulPlayListPLayingMain.comparePlayList(playListChoseByUser)
+                val exibithionPlayList = actulPlayListPLayingMain.comparePlayList(playListChoseByUser)
                 updateViewWhenPlayListIsEmpty(exibithionPlayList)
             },
             onDelete = {playList ->
@@ -301,10 +297,10 @@ class MainFragment : Fragment() {
 
 
     private fun getMusicFromContentProvider(){
-         listSoundFromContentProvider = MyContetntProvider
-             .createData(requireContext())
-             .getListOfSound(requireContext())
-             .listSoundFromContentProvider.toMutableSet()
+        listSoundFromContentProvider = MyContetntProvider
+            .createData(requireContext())
+            .getListOfSound(requireContext())
+            .listSoundFromContentProvider.toMutableSet()
         verifyListIsEmpty()
     }
 
@@ -324,8 +320,6 @@ class MainFragment : Fragment() {
         CoroutineScope(Dispatchers.Main).launch{
             soundViewModel.savePreference()
         }
-        Log.i("play_", "onStop")
-
         super.onStop()
     }
 

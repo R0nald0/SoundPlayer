@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/contstaintLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarSelecrionItemsMaterial"
+        style="@style/Widget.MaterialComponents.Toolbar.Primary"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
 
+        android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
@@ -19,30 +19,28 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
         app:menu="@menu/menu_toolbar"
-        style="@style/Widget.MaterialComponents.Toolbar.Primary"
 
         >
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
             <ImageButton
                 android:id="@+id/mainFragment_back_button"
-                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
-                />
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/txv_title_toolbar"
+                style="@style/TextAppearance.Material3.ActionBar.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:textColor="@color/white"
                 android:text="@string/app_name"
-                style="@style/TextAppearance.Material3.ActionBar.Title"
-                />
+                android:textColor="@color/white" />
         </LinearLayout>
     </com.google.android.material.appbar.MaterialToolbar>
 
@@ -58,48 +56,62 @@
         app:layout_constraintStart_toStartOf="parent" />
 
 
-    <TextView
-        android:id="@+id/txv_sound_not_found"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="cursive"
-        android:text="Nenhuma Mùsica"
-        android:textColor="@color/black"
-        android:textSize="28sp"
+    <LinearLayout
+        android:id="@+id/Lineart_layout_empty_sound"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+        app:layout_constraintVertical_bias="0.5">
 
-    <Button
-        android:id="@+id/btn_find_sounds"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Buscar músicas"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/txv_sound_not_found"
-        app:layout_constraintHorizontal_bias="0.493"
-        app:layout_constraintStart_toStartOf="@+id/txv_sound_not_found"
-        app:layout_constraintTop_toTopOf="@+id/txv_sound_not_found"
-        app:layout_constraintVertical_bias="0.344"
-        tools:visibility="gone" />
+        <TextView
+            android:id="@+id/txv_sound_not_found"
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="cursive"
+            android:text="Nenhuma Mùsica"
+            android:textSize="28sp"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center"
+            android:visibility="visible"
+            tools:visibility="visible" />
+
+        <Button
+            android:layout_marginTop="18dp"
+            android:id="@+id/btn_find_sounds"
+            style="@style/ThemeOverlay.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Buscar músicas"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/white"
+            android:visibility="visible"
+            tools:visibility="visible" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linear_musics"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="vertical"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline2">
+        app:layout_constraintTop_toTopOf="@+id/guideline2"
+        tools:visibility="gone">
 
         <TextView
             android:id="@+id/txv_quantidade_musics"
+            style="@style/TextAppearance.Material3.HeadlineMedium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -109,7 +121,6 @@
             android:lines="1"
             android:padding="4dp"
             android:text="Musicas : 20"
-            style="@style/TextAppearance.Material3.HeadlineMedium"
             android:textSize="12sp"
             android:textStyle="bold" />
 
@@ -141,16 +152,15 @@
             android:paddingBottom="0dp"
             android:visibility="visible"
             tools:listitem="@layout/item_sound"
-            tools:visibility="gone">
-        </androidx.recyclerview.widget.RecyclerView>
+            tools:visibility="visible"></androidx.recyclerview.widget.RecyclerView>
 
         <TextView
             android:id="@+id/txv_no_music_at_playlist"
             style="@style/TextAppearance.MaterialComponents.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
             android:layout_marginTop="40dp"
+            android:gravity="center_horizontal"
             android:text="@string/est_playlist_esta_vazia"
             android:visibility="gone" />
 
@@ -159,18 +169,17 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_play_list"
+        style="@style/ThemeOverlay.Material3.FloatingActionButton.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/border_playlist_item"
         android:clickable="true"
+        android:contentDescription="TODO"
         android:src="@drawable/baseline_playlist_add_24"
-        style="@style/ThemeOverlay.Material3.FloatingActionButton.Secondary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="TODO" />
-
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

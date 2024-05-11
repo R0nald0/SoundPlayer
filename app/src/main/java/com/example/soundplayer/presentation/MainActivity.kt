@@ -32,19 +32,6 @@ class MainActivity : AppCompatActivity() {
     private val preferencesViewModel by viewModels<PreferencesViewModel>()
 
     private var isLoading = true
-
-    private val listPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        listOf(
-            android.Manifest.permission.READ_MEDIA_AUDIO,
-            android.Manifest.permission.FOREGROUND_SERVICE,
-            android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK,
-        )
-    } else {
-       listOf(
-           android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-           android.Manifest.permission.READ_EXTERNAL_STORAGE,
-       )
-    }
     private lateinit var  navController : NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,7 +41,7 @@ class MainActivity : AppCompatActivity() {
                 isLoading}
         }
         setContentView(binding.root)
-       getNavHost()
+        getNavHost()
         observer()
         val color = 0xffFF400404
         window.navigationBarColor = ColorUtils.setAlphaComponent(color.toInt(),230)
@@ -68,11 +55,11 @@ class MainActivity : AppCompatActivity() {
         preferencesViewModel.isDarkMode.observe(this){statePreference->
             when(statePreference){
                 is StatePrefre.Sucess<*> ->{
-                     if (statePreference.succssResult as Boolean)AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                     else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    if (statePreference.succssResult as Boolean)AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 }
                 is StatePrefre.Error ->{
-                   exibirToast(statePreference.mensagem)
+                    exibirToast(statePreference.mensagem)
                 }
             }
             isLoading =false
@@ -81,13 +68,13 @@ class MainActivity : AppCompatActivity() {
     }
     private fun getNavHost() {
         val navHost = supportFragmentManager.findFragmentById(R.id.myHostFragment) as NavHostFragment
-         navController = navHost.navController
+        navController = navHost.navController
 
     }
     override fun onStop() {
-    CoroutineScope(Dispatchers.Main).launch {
-        soundViewModel.savePreference()
-    }
+        CoroutineScope(Dispatchers.Main).launch {
+            soundViewModel.savePreference()
+        }
         super.onStop()
     }
 
