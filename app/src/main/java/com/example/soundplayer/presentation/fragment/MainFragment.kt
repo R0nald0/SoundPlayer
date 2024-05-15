@@ -230,15 +230,17 @@ class MainFragment : Fragment() {
     private fun initAdapter() {
         adapterSound = SoundAdapter(
             onDelete = {idPlayList,intSoundPair ->
-                if (idPlayList == 1L){
-                    requireContext().exibirToast("Audio não pode ser deletado da play list All musics")
-                }
-                else {
-                    val dataSoundToUpdate = DataSoundPlayListToUpdate(
-                        idPlayList, listOf(intSoundPair.first), setOf(intSoundPair.second)
-                    )
-                    playListViewModel.removePlaySoundFromPlayList(dataSoundToUpdate)
-                }
+//                if (idPlayList == 1L){
+//                    requireContext().exibirToast("Audio não pode ser deletado da play list All musics")
+//                }
+//                else {
+//
+//                }
+                val dataSoundToUpdate = DataSoundPlayListToUpdate(
+                    idPlayList, listOf(intSoundPair.first), setOf(intSoundPair.second)
+                )
+                playListViewModel.removePlaySoundFromPlayList(dataSoundToUpdate)
+                getMusicFromContentProvider()
             },
             soundViewModel =  soundViewModel,
             isUpdateList = {isUpdate->

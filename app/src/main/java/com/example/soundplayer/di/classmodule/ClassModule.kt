@@ -15,6 +15,7 @@ import com.example.soundplayer.data.dao.SoundDao
 import com.example.soundplayer.data.database.DatabasePlaylist
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.data.repository.SoundPlayListRepository
+import com.example.soundplayer.data.repository.SoundRepository
 import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import dagger.Module
 import dagger.Provides
@@ -79,8 +80,10 @@ class ClassModule {
     }
     @Provides
     fun provideSoundPlayListRepository(playListDAO: PlayListDAO ,playlistAndSoundCross: PlaylistAndSoundCrossDao,soundDao: SoundDao):SoundPlayListRepository{
-         return  SoundPlayListRepository(playListDAO, playlistAndSoundCross,soundDao)
+         return  SoundPlayListRepository(playListDAO, playlistAndSoundCross)
     }
+    @Provides
+    fun provideSoundRepository(sounDao: SoundDao):SoundRepository {return  SoundRepository(soundDao = sounDao)}
 
     @Singleton
     @Provides

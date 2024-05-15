@@ -20,7 +20,6 @@ import javax.inject.Inject
 class SoundPlayListRepository @Inject constructor (
     private val playListDAO: PlayListDAO,
     private val playlistAndSoundCross :PlaylistAndSoundCrossDao,
-    private val soundDao: SoundDao,
 ){
 
    suspend fun savePlayList(playList: PlayList):List<Long>{
@@ -52,9 +51,6 @@ class SoundPlayListRepository @Inject constructor (
             val  newList = list.map {playListWithSong ->
                 playListWithSong.toPlaylistWithSoundDomain()
             }
-
-
-
             return newList
 
         }catch (exeption :Exception){
@@ -63,19 +59,7 @@ class SoundPlayListRepository @Inject constructor (
         }
     }
 
-    suspend fun findSoundById(idSound :Long?):List<SoundEntity>{
-    return  soundDao.findAllSound(idSound)
-    }
 
-   suspend fun saveSound(sound: Sound):Long{
-       return  soundDao.createSound(sound = sound.toSoundEntity())
-    }
-
-    suspend fun sizeListSound():List<Sound>{
-        return soundDao.findAllSound().map {soundEntity ->
-            Sound(soundEntity)
-        }
-    }
 
    suspend fun deletePlaylist(playList: PlayList) : Int{
       try {
@@ -117,7 +101,7 @@ class SoundPlayListRepository @Inject constructor (
             return playlistAndSoundCross.insertPlayListAndSoundCroos(listAcrossPlayListSound)
         }catch (nullPointer :NullPointerException){
             nullPointer.printStackTrace()
-            throw NullPointerException("erro ao adiconar musica na playlist,id da playlist não encontrado")
+            throw NullPointerException("erro ao adicionar música na playlist,id da playlist não encontrado")
         }
         catch (exeption:Exception){
             throw exeption;
@@ -130,6 +114,7 @@ class SoundPlayListRepository @Inject constructor (
                   playlistAndSoundCross.deleteItemPlayListAndSoundCroos(idPlayList,sound.idSound!!)
              }
          }catch (exec :Exception){
+             exec.printStackTrace()
              throw exec;
          }
     }
@@ -150,8 +135,9 @@ class SoundPlayListRepository @Inject constructor (
     suspend fun updateNamePlayList(playList: PlayList) :Int {
           try {
             return playListDAO.updatePlayList(playList.toEntity())
-          } catch(exeption:Exception){
-               throw  exeption;
+          } catch(exception:Exception){
+              exception.printStackTrace()
+               throw  exception;
           }
     }
 }

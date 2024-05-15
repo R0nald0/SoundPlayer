@@ -90,14 +90,14 @@ class SoundAdapter(
         private fun showHideOptionsMenu(soudd: Sound, position: Int) {
             val playListId = soundsPlayList?.idPlayList!!
 
-            if (playListId != 1L) {
-                binding.idBtnOptionSound.visibility = View.VISIBLE
-                binding.idBtnOptionSound.setOnClickListener {
-                    createOptionsMenu(it, soudd, position)
-                }
-            } else {
-                binding.idBtnOptionSound.visibility = View.GONE
-            }
+//            if (playListId != 1L) {
+//                binding.idBtnOptionSound.visibility = View.VISIBLE
+//                binding.idBtnOptionSound.setOnClickListener {
+//                    createOptionsMenu(it, soudd, position)
+//                }
+//            } else {
+//                binding.idBtnOptionSound.visibility = View.GONE
+//            }
         }
 
         fun configurAnimationWhenPlaying(isPlaying: Boolean) {
@@ -227,8 +227,11 @@ class SoundAdapter(
         }
     }
     fun clearSoundListSelected(){
-        getPlayList(soundsPlayList!!)
-        soundSelecionados.clear()
+        if (soundsPlayList != null){
+            getPlayList(soundsPlayList!!)
+            soundSelecionados.clear()
+        }
+
     }
 
     private fun createOptionsMenu(view : View,sound: Sound,position : Int){
@@ -245,7 +248,7 @@ class SoundAdapter(
                             onDelete(soundsPlayList?.idPlayList!!,Pair(position,sound))
                             dialog.dismiss()
                         }
-                        .setNegativeButton("Cancelar"){dialog,q->
+                        .setNegativeButton("Cancelar"){dialog,_->
                             dialog.dismiss()
                         }
                         .show()

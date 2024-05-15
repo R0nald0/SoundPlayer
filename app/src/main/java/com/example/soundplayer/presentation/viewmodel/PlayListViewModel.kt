@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.soundplayer.data.repository.SoundPlayListRepository
+import com.example.soundplayer.data.repository.SoundRepository
 import com.example.soundplayer.model.DataSoundPlayListToUpdate
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.PlaylistWithSoundDomain
@@ -21,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PlayListViewModel @Inject constructor(
     private val soundPlayListRepository: SoundPlayListRepository,
+    private val soundRepository: SoundRepository
 ):ViewModel() {
     private val TAG = "INFO_"
     private val _clickedPlayList = MutableLiveData<PlayList>()
@@ -64,20 +66,20 @@ class PlayListViewModel @Inject constructor(
 
     fun saveSound(sound: Sound ){
         viewModelScope.launch {
-            val id  =soundPlayListRepository.saveSound(sound)
+            val id  =soundRepository.saveSound(sound)
             Log.i("INFO_", "saveSound id :id music $id ")
         }
     }
     fun saveAllSoundsByContentProvider(sizeListAllMusic: MutableSet<Sound>){
         viewModelScope.launch {
-            var listBd = soundPlayListRepository.sizeListSound()
+            var listBd = soundRepository.sizeListSound()
             if(sizeListAllMusic.size != listBd.size){
                 sizeListAllMusic.forEach {sound->
                     if (!listBd.contains(sound)){
-                        soundPlayListRepository.saveSound(sound)
+                        soundRepository.saveSound(sound)
                     }
                 }
-                listBd = soundPlayListRepository.sizeListSound()
+                listBd = soundRepository.sizeListSound()
             }
             withContext(Dispatchers.Main){
                 _soundListBd.value = listBd
