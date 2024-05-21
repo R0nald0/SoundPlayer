@@ -72,6 +72,7 @@ class PlayListViewModel @Inject constructor(
     }
     fun saveAllSoundsByContentProvider(sizeListAllMusic: MutableSet<Sound>){
         viewModelScope.launch {
+
             var listBd = soundRepository.sizeListSound()
             if(sizeListAllMusic.size != listBd.size){
                 sizeListAllMusic.forEach {sound->
@@ -118,15 +119,20 @@ class PlayListViewModel @Inject constructor(
     fun removePlaySoundFromPlayList(dataSoundToUpdate : DataSoundPlayListToUpdate){
 
         viewModelScope.launch {
-            val itemsRemoved  =soundPlayListRepository.removeSoundItemsFromPlayList(idPlayList = dataSoundToUpdate.idPlayList,
-                setOf(dataSoundToUpdate.sounds.first())
+            val itemsRemoved  =soundPlayListRepository.removeSoundItemsFromPlayList(
+                idPlayList = dataSoundToUpdate.idPlayList,
+                soudsToRemove = setOf(dataSoundToUpdate.sounds.first())
             )
 
             if (itemsRemoved.isNotEmpty()){
+                if (dataSoundToUpdate.idPlayList == 1L){
+                    val deletedCount = soundRepository.delete(dataSoundToUpdate.sounds.first())
+                }
                 _listSoundUpdate.value = Pair(false , dataSoundToUpdate)
                 findPlayListById(idPlayList = dataSoundToUpdate.idPlayList)
                 getAllPlayList()
                 _listSoundUpdate.value = Pair(false , dataSoundToUpdate.copy(idPlayList = -1))
+
                 //TODO refatorar
             }
 
