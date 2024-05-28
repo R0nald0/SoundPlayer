@@ -63,19 +63,10 @@ class SoundPlayListRepository @Inject constructor (
         }
     }
 
-    suspend fun findSoundById(idSound :Long?):List<SoundEntity>{
-    return  soundDao.findAllSound(idSound)
-    }
 
-   suspend fun saveSound(sound: Sound):Long{
-       return  soundDao.createSound(sound = sound.toSoundEntity())
-    }
 
-    suspend fun sizeListSound():List<Sound>{
-        return soundDao.findAllSound().map {soundEntity ->
-            Sound(soundEntity)
-        }
-    }
+
+
 
    suspend fun deletePlaylist(playList: PlayList) : Int{
       try {

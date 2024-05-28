@@ -46,8 +46,6 @@ class SoundViewModel @Inject constructor(
     val userDataPreferecence : LiveData<UserDataPreferecence>
         get() = _userDataPreferecenceObs
 
-
-
     private lateinit var listMediaItem  : MutableList<MediaItem>
 
     fun getPlayer():ExoPlayer{
@@ -57,8 +55,8 @@ class SoundViewModel @Inject constructor(
     fun updatePlayList( pairListSounWithDecisionUpdate :Pair<Boolean, DataSoundPlayListToUpdate>){
         if (currentPlayList.value != null){
             if (pairListSounWithDecisionUpdate.first)
-                addItemFromListMusic(pairListSounWithDecisionUpdate.second!!)
-            else removeItemFromListMusic(pairListSounWithDecisionUpdate.second!!)
+                addItemFromListMusic(pairListSounWithDecisionUpdate.second)
+            else removeItemFromListMusic(pairListSounWithDecisionUpdate.second)
         }
     }
 
