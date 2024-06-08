@@ -1,26 +1,20 @@
 package com.example.soundplayer.data.repository
 
-import android.util.Log
 import com.example.soundplayer.data.dao.PlayListDAO
 import com.example.soundplayer.data.dao.PlaylistAndSoundCrossDao
-import com.example.soundplayer.data.dao.SoundDao
 import com.example.soundplayer.data.entities.PlayListAndSoundCrossEntity
-import com.example.soundplayer.data.entities.PlayListWithSong
-import com.example.soundplayer.data.entities.SoundEntity
 import com.example.soundplayer.data.entities.toPlaylistWithSoundDomain
 import com.example.soundplayer.data.entities.toSound
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.PlaylistWithSoundDomain
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.toEntity
-import com.example.soundplayer.model.toSoundEntity
 import javax.inject.Inject
 
 
 class SoundPlayListRepository @Inject constructor (
     private val playListDAO: PlayListDAO,
     private val playlistAndSoundCross :PlaylistAndSoundCrossDao,
-    private val soundDao: SoundDao,
 ){
 
    suspend fun savePlayList(playList: PlayList):List<Long>{
@@ -62,11 +56,6 @@ class SoundPlayListRepository @Inject constructor (
             throw exeption
         }
     }
-
-
-
-
-
 
    suspend fun deletePlaylist(playList: PlayList) : Int{
       try {
@@ -115,11 +104,9 @@ class SoundPlayListRepository @Inject constructor (
         }
     }
 
-    suspend fun  removeSoundItemsFromPlayList(idPlayList: Long, soudsToRemove:Set<Sound>) :List<Int>{
+    suspend fun  removeSoundItemFromPlayList(idPlayList: Long, idSound:Long) :Int{
          try {
-            return soudsToRemove.map {sound ->
-                  playlistAndSoundCross.deleteItemPlayListAndSoundCroos(idPlayList,sound.idSound!!)
-             }
+           return  playlistAndSoundCross.deleteItemPlayListAndSoundCroos(idPlayList,idSound)
          }catch (exec :Exception){
              throw exec;
          }
@@ -138,9 +125,9 @@ class SoundPlayListRepository @Inject constructor (
           return listToUpdate;
     }
 
-    suspend fun updateNamePlayList(playList: PlayList) :Int {
+    suspend fun updateNamePlayList(idPlayList: Long,newName:String) :Int {
           try {
-            return playListDAO.updatePlayList(playList.toEntity())
+            return playListDAO.updateNamePlayList(idPlayList, name = newName)
           } catch(exeption:Exception){
                throw  exeption;
           }

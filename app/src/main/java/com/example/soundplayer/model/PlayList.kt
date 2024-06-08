@@ -29,10 +29,3 @@ fun PlayList.toEntity() = PlayListEntity(
     title = this.name,
 )
 
-fun PlayList?.comparePlayList(playListToComaper :PlayList):PlayList{
-    if (this != null && this.idPlayList == playListToComaper.idPlayList){
-        return this
-    }else{
-        return  playListToComaper
-    }
-}

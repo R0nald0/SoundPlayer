@@ -14,9 +14,10 @@ import com.example.soundplayer.data.dao.PlaylistAndSoundCrossDao
 import com.example.soundplayer.data.dao.SoundDao
 import com.example.soundplayer.data.database.DatabasePlaylist
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
+import com.example.soundplayer.data.repository.PlayerRepository
 import com.example.soundplayer.data.repository.SoundPlayListRepository
 import com.example.soundplayer.data.repository.SoundRepository
-import com.example.soundplayer.presentation.viewmodel.SoundViewModel
+import com.example.soundplayer.service.ServicePlayer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,17 +31,18 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class ClassModule {
-
     @Singleton
     @Provides
-    fun provideActualSong(
-        exoPlayer: ExoPlayer,
-        dataStorePreferenceRepository: DataStorePreferenceRepository,
+    fun provideServicePlayer(
+        playerRepository: PlayerRepository,
+        soundRepository: SoundRepository,
         soundPlayListRepository: SoundPlayListRepository
-    ): SoundViewModel {
-        return  SoundViewModel(exoPlayer,dataStorePreferenceRepository,
-            soundPlayListRepository =soundPlayListRepository )
+    ) :ServicePlayer{
+        return  ServicePlayer(playerRepository,soundPlayListRepository,soundRepository)
     }
+    @Singleton
+    @Provides
+    fun providePlayerRepository(exoPlayer: ExoPlayer):PlayerRepository = PlayerRepository(exoPlayer)
 
     @Singleton
     @Provides
@@ -82,20 +84,18 @@ class ClassModule {
 
     @Singleton
     @Provides
-    fun provideSoundPlayListRepository(playListDAO: PlayListDAO ,playlistAndSoundCross: PlaylistAndSoundCrossDao,soundDao: SoundDao):SoundPlayListRepository{
-         return  SoundPlayListRepository(playListDAO, playlistAndSoundCross,soundDao)
+    fun provideSoundPlayListRepository(
+        playListDAO: PlayListDAO ,
+        playlistAndSoundCross : PlaylistAndSoundCrossDao
+    ):SoundPlayListRepository{
+         return  SoundPlayListRepository(playListDAO, playlistAndSoundCross)
     }
 
     @Singleton
     @Provides
-    fun provideSoundRepository(soundDao: SoundDao):SoundRepository{
-        return  SoundRepository(soundDao)
-    }
-
+    fun provideSoundRepository(soundDao: SoundDao):SoundRepository = SoundRepository(soundDao)
 
     @Singleton
     @Provides
-    fun provideRoomDatabase(@ApplicationContext context: Context):DatabasePlaylist{
-            return  DatabasePlaylist.getInstance(context)
-    }
+    fun provideRoomDatabase(@ApplicationContext context: Context):DatabasePlaylist = DatabasePlaylist.getInstance(context)
 }

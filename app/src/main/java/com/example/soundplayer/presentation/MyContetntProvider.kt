@@ -58,16 +58,15 @@ object MyContetntProvider {
                    val mediaUri  = ContentUris.withAppendedId(
                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,idMedia)
 
-
-                   val itemPathAlbumMedia = mediaUriAlbum.pathSegments[3].toInt()
-                   val newMediaAlbum =if(itemPathAlbumMedia == 1 || itemPathAlbumMedia ==3)  null else  mediaUriAlbum
+             //      val itemPathAlbumMedia = mediaUriAlbum.pathSegments[3].toInt()
+              //     val newMediaAlbum =if(itemPathAlbumMedia == 1 || itemPathAlbumMedia ==3)  null else  mediaUriAlbum
                    val sound = Sound(
                        idSound = null,
                        path = cursor.getString(path),
                        duration =cursor.getInt(duarution).toString(),
                        title= cursor.getString(title),
                        uriMedia = mediaUri,
-                       uriMediaAlbum = newMediaAlbum
+                       uriMediaAlbum = mediaUriAlbum
                    )
 
                    Log.i("INFO_", "playlist : ${mediaUriAlbum.pathSegments[3]} ${sound.title}")

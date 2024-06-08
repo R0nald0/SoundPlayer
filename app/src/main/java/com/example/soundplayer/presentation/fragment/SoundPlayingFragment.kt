@@ -2,6 +2,7 @@ package com.example.soundplayer.presentation.fragment
 
 import android.content.ComponentName
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -66,9 +67,10 @@ class SoundPlayingFragment : Fragment() {
     }
 
     private fun observer() {
-        soundViewModel.actualSound.observe(requireActivity()) { sound ->
+        soundViewModel.actualSound?.observe(viewLifecycleOwner) { sound ->
             binding.txvNameMusic.isSelected = true
             binding.txvNameMusic.text = sound.title
+            Log.i("INFO_", "Sound title vm: ${sound!!.title}")
 
             if (sound.uriMediaAlbum != null){
                 binding.imvSong.setImageURI(sound.uriMediaAlbum)
@@ -80,10 +82,10 @@ class SoundPlayingFragment : Fragment() {
     }
     @OptIn(UnstableApi::class)
     private fun  initPlayer(){
-        soundViewModel.getPlayer().let { exoPlayer ->
-            binding.myPlayerView.player = exoPlayer
-
-        }
+        binding.myPlayerView.player = soundViewModel.myPlayer
+//        soundViewModel.getPlayer().let { exoPlayer ->
+//             = exoPlayer
+//        }
     }
 
 }

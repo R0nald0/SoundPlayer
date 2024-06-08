@@ -3,7 +3,6 @@ package com.example.soundplayer.presentation.fragment
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -17,7 +16,6 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
@@ -29,7 +27,6 @@ import com.example.soundplayer.model.DataSoundPlayListToUpdate
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.SoundList
-import com.example.soundplayer.model.comparePlayList
 import com.example.soundplayer.presentation.MyContetntProvider
 import com.example.soundplayer.presentation.adapter.PlayListAdapter
 import com.example.soundplayer.presentation.adapter.SoundAdapter
@@ -106,7 +103,6 @@ class MainFragment : Fragment() {
 
     private fun initBindigs() {
         binding.btnFindSounds.setOnClickListener {
-
             Permission.requestPermission(gerenciarPermissoes,listPermission)
         }
 
@@ -120,10 +116,6 @@ class MainFragment : Fragment() {
         activity.setSupportActionBar(binding.toolbarSelecrionItemsMaterial)
     }
     private  fun observersViewModel(){
-        playListViewModel.listSoundUpdate.observe(viewLifecycleOwner){ pairOFListSound->
-            soundViewModel.updatePlayList(pairOFListSound)
-        }
-
         soundViewModel.userDataPreferecence.observe(viewLifecycleOwner){userDataPreference->
             if (userDataPreference.idPreference != null  ){
                 playListViewModel.findPlayListById(userDataPreference.idPreference)
@@ -139,15 +131,14 @@ class MainFragment : Fragment() {
                             playList = actualPLayiingPlayList
                         )
                         actulPlayListPLayingMain = actualPLayiingPlayList
-
                     }
                 }
 
-                soundViewModel.actualSound.observe(requireActivity()){ soundLiveDataActual->
-                    Log.i("INFO_", "Main:${soundLiveDataActual.title} ${cont++}")
+                soundViewModel.actualSound?.observe(viewLifecycleOwner){ soundLiveDataActual->
+                   // Log.i("INFO_", "Main:${soundLiveDataActual.title} ${cont++}")
                     //TODO VERIFICAR CHAMAdasS MULTIPLAS
                     adapterSound.getActualSound(soundLiveDataActual)
-                    binding.rvSound.scrollToPosition(soundViewModel.currentItem)
+                    binding.rvSound.scrollToPosition(soundViewModel.getCurrentPositionSound())
                 }
             }
             adapterSound.updateAnimationWithPlaying(isPlaying)
@@ -161,11 +152,8 @@ class MainFragment : Fragment() {
         playListViewModel.clickedPlayList.observe(viewLifecycleOwner){uniquePlayListWithSongs->
 
             binding.rvSound.scrollToPosition(positonPlayListToScrol)
-
             playListAdapter.setLastOpenPlayListBorder(uniquePlayListWithSongs.idPlayList!!)
-            val exibithionPlayList =actulPlayListPLayingMain.comparePlayList(uniquePlayListWithSongs)
-            updateViewWhenPlayListIsEmpty(exibithionPlayList)
-
+            updateViewWhenPlayListIsEmpty(uniquePlayListWithSongs)
         }
 
         playListViewModel.soundListBd.observe(viewLifecycleOwner){listSound->
@@ -176,6 +164,8 @@ class MainFragment : Fragment() {
                     listSound =  listSound.toMutableSet(),
                     currentMusicPosition = 0
                 )
+                binding.txvQuantidadeMusics.text =
+                    getString(R.string.total_de_musicas, listSound.size)
                 playListViewModel.savePlayList(playList)
             }
         }
@@ -191,7 +181,6 @@ class MainFragment : Fragment() {
             }
         }
     }
-
 
     private fun getPermissions(){
         gerenciarPermissoes =  registerForActivityResult(
@@ -211,7 +200,7 @@ class MainFragment : Fragment() {
             binding.LineartLayoutEmptySound.isVisible= true
             binding.linearMusics.visibility = View.GONE
             binding.fabAddPlayList.visibility = View.GONE
-            requireActivity().exibirToast("Permissão necessaria para carragar as músicas")
+            requireActivity().exibirToast(getString(R.string.permiss_o_necessaria_para_carragar_as_m_sicas))
 
         } else {
             binding.LineartLayoutEmptySound.isVisible= false
@@ -225,20 +214,19 @@ class MainFragment : Fragment() {
         }
     }
 
-
-
     private fun initAdapter() {
         adapterSound = SoundAdapter(
             onDelete = {idPlayList,intSoundPair ->
-                if (idPlayList == 1L){
-                    requireContext().exibirToast("Audio não pode ser deletado da play list All musics")
-                }
-                else {
-                    val dataSoundToUpdate = DataSoundPlayListToUpdate(
-                        idPlayList, listOf(intSoundPair.first), setOf(intSoundPair.second)
-                    )
-                    playListViewModel.removePlaySoundFromPlayList(dataSoundToUpdate)
-                }
+//                if (idPlayList == 1L){
+//                    requireContext().exibirToast("Audio não pode ser deletado da play list All musics")
+//                }
+//                else {
+//
+//                }
+                val dataSoundToUpdate = DataSoundPlayListToUpdate(
+                    idPlayList, listOf(intSoundPair.first), setOf(intSoundPair.second)
+                )
+                playListViewModel.removePlaySoundFromPlayList(dataSoundToUpdate)
             },
             soundViewModel =  soundViewModel,
             isUpdateList = {isUpdate->
@@ -254,8 +242,7 @@ class MainFragment : Fragment() {
 
         playListAdapter = PlayListAdapter(
             onclick =  { playListChoseByUser ->
-                val exibithionPlayList = actulPlayListPLayingMain.comparePlayList(playListChoseByUser)
-                updateViewWhenPlayListIsEmpty(exibithionPlayList)
+                playListViewModel.findPlayListById(playListChoseByUser.idPlayList?:1)
             },
             onDelete = {playList ->
                 playListViewModel.deletePlayList(playList)
@@ -301,18 +288,16 @@ class MainFragment : Fragment() {
             .createData(requireContext())
             .getListOfSound(requireContext())
             .listSoundFromContentProvider.toMutableSet()
-        verifyListIsEmpty()
+        verifyListIsEmpty(listSoundFromContentProvider)
     }
 
-    private fun verifyListIsEmpty(){
-        if (listSoundFromContentProvider.isEmpty()){
+    private fun verifyListIsEmpty(listSound :MutableSet<Sound>){
+        if (listSound.isEmpty()){
             binding.linearMusics.visibility =View.GONE
             binding.txvSoundNotFound.visibility =View.VISIBLE
         }else{
-
             binding.linearMusics.visibility =View.VISIBLE
             binding.txvSoundNotFound.visibility =View.GONE
-            binding.txvQuantidadeMusics.text = "Total de músicas ${listSoundFromContentProvider.size}"
         }
     }
 
@@ -325,9 +310,7 @@ class MainFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        playListViewModel.listSoundUpdate.removeObservers(this)
     }
-
 
     inner class  MyMenuProvider() : MenuProvider {
         @SuppressLint("SuspiciousIndentation")
@@ -357,7 +340,6 @@ class MainFragment : Fragment() {
                     findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
                     true
                 }
-
 
                 R.id.id_update->{
                     val sound = SoundList(0,pairPlayList.second)

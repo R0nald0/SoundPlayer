@@ -77,6 +77,9 @@ class SelectPlayListDialogFragment : DialogFragment() {
                     sounds = soudsToUpdate
                 )
             )
+//             selectedPlayList.idPlayList.let {idPlayList ->
+//                 playListViewModel.testUpdate(idPlayList!!,soudsToUpdate)
+//             }
             dismiss()
         }
         binding.rvPlaylistsOptions.apply {

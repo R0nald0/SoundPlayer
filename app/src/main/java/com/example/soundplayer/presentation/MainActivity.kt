@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onStop() {
         CoroutineScope(Dispatchers.Main).launch {
+
             soundViewModel.savePreference()
         }
         super.onStop()

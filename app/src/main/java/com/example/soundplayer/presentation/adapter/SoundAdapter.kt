@@ -64,7 +64,7 @@ class SoundAdapter(
             binding.txvTitle.textSize = sizeTitleMusic
 
 
-            showHideOptionsMenu(soudd, position)
+            //showHideOptionsMenu(soudd, position)
 
             binding.idBtnOptionSound.setOnClickListener {
                 createOptionsMenu(it,soudd,position)
@@ -84,20 +84,6 @@ class SoundAdapter(
             clickItemEvent(position, soudd)
             configApperenceItemImage(soudd)
             longPressEvent(position,soudd)
-
-        }
-
-        private fun showHideOptionsMenu(soudd: Sound, position: Int) {
-            val playListId = soundsPlayList?.idPlayList!!
-
-            if (playListId != 1L) {
-                binding.idBtnOptionSound.visibility = View.VISIBLE
-                binding.idBtnOptionSound.setOnClickListener {
-                    createOptionsMenu(it, soudd, position)
-                }
-            } else {
-                binding.idBtnOptionSound.visibility = View.GONE
-            }
         }
 
         fun configurAnimationWhenPlaying(isPlaying: Boolean) {
@@ -162,14 +148,14 @@ class SoundAdapter(
         private fun clickItemEvent(position: Int, soudd: Sound) {
             binding.idContraint.setOnClickListener {
                 if (soundSelecionados.isEmpty()) {
-                    if (soundsPlayList != null) {
-                        soundsPlayList!!.currentMusicPosition = position
-                        soundsPlayList!!.listSound.size
-                        soundViewModel.getAllMusics(soundsPlayList!!)
+                    soundsPlayList?.let {nonNulPlayList->
+                        nonNulPlayList.currentMusicPosition = position
+                        nonNulPlayList.listSound.size
+                        soundViewModel.getAllMusics(nonNulPlayList)
+                        Log.i("INFO_", "clickItemEvent: ${nonNulPlayList.listSound.size}")
                         onClickInitNewFragment()
-                    } else {
-                        Toast.makeText(it.context, "PlayList null", Toast.LENGTH_SHORT).show()
-                    }
+                    }?: Toast.makeText(it.context, "PlayList null", Toast.LENGTH_SHORT).show()
+
                 } else {
                     if (!soundSelecionados.contains(Pair(position,soudd))) {
                         binding.cardItemSound.setCardBackgroundColor(Color.GRAY)

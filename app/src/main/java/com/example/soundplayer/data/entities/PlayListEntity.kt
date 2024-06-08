@@ -14,7 +14,6 @@ data class PlayListEntity(
     val playListId:Long?,
     @ColumnInfo(name = "current_sound_position")
     val currentSoundPosition : Int = 0,
-    @ColumnInfo(name = "title_music")
     val title :String ,
 )
 

@@ -6,17 +6,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
-import androidx.media3.common.Timeline
-import androidx.media3.exoplayer.ExoPlayer
 import com.example.soundplayer.data.entities.UserDataPreferecence
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
-import com.example.soundplayer.data.repository.SoundPlayListRepository
-import com.example.soundplayer.model.DataSoundPlayListToUpdate
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
+import com.example.soundplayer.service.ServicePlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,17 +20,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SoundViewModel @Inject constructor(
-    private val exoPlayer: ExoPlayer,
     private  val dataStorePreferenceRepository: DataStorePreferenceRepository,
-    private val soundPlayListRepository: SoundPlayListRepository
+    private val servicePlayer: ServicePlayer
 ) :ViewModel(){
 
 
-    private var playerWhenRead = true
-    var currentItem = -1
-    private var playBackPosition = -0L
-
-    var actualSound  = MutableLiveData<Sound>()
+    var actualSound  : LiveData<Sound> ? = null
     var isPlayingObserver  = MutableLiveData<Boolean>()
 
     private var _currentPlayingPlayList = MutableLiveData<PlayList>()
@@ -46,158 +36,39 @@ class SoundViewModel @Inject constructor(
     val userDataPreferecence : LiveData<UserDataPreferecence>
         get() = _userDataPreferecenceObs
 
-    private lateinit var listMediaItem  : MutableList<MediaItem>
+    lateinit var myPlayer :Player
 
-    fun getPlayer():ExoPlayer{
-        return exoPlayer
+    init {
+         getPlayer()
+         isPlaying()
+         getActualSound()
     }
 
-    fun updatePlayList( pairListSounWithDecisionUpdate :Pair<Boolean, DataSoundPlayListToUpdate>){
-        if (currentPlayList.value != null){
-            if (pairListSounWithDecisionUpdate.first)
-                addItemFromListMusic(pairListSounWithDecisionUpdate.second)
-            else removeItemFromListMusic(pairListSounWithDecisionUpdate.second)
-        }
+    fun getCurrentPositionSound():Int{
+      return  _currentPlayingPlayList.value?.currentMusicPosition ?: 0
     }
+    fun getActualSound()
+        { viewModelScope.launch { actualSound = servicePlayer.getActualSound() } }
 
-    private fun addItemFromListMusic(dataSoundPlayListToUpdate: DataSoundPlayListToUpdate){
-        //TODO quando inserido fora da ordem sound e ficam fora de posição do exoplay com adapter
-
-        if (_currentPlayingPlayList.value?.idPlayList == dataSoundPlayListToUpdate.idPlayList){
-            listMediaItem.clear()
-            listMediaItem.addAll(createMediaItemList(dataSoundPlayListToUpdate.sounds.toMutableSet()))
-            exoPlayer.addMediaItems(listMediaItem)
-            _currentPlayingPlayList.value!!.listSound += dataSoundPlayListToUpdate.sounds
-        }
-    }
-
-    private fun removeItemFromListMusic(soundPlay: DataSoundPlayListToUpdate){
-
-        if (_currentPlayingPlayList.value?.idPlayList == soundPlay.idPlayList){
-
-            exoPlayer.removeMediaItem(soundPlay.positionSound.first())
-            _currentPlayingPlayList.value?.listSound?.remove(soundPlay.sounds.first())
-            Log.i("INFO_", "size list: ${listMediaItem.size}")
-        }
-    }
-
-    fun getAllMusics(playList: PlayList) {
-
-        if ( _currentPlayingPlayList.value != null &&  _currentPlayingPlayList.value!!.name != playList.name){
-            exoPlayer.stop()
-            exoPlayer.clearMediaItems()
-            currentItem = -1
-        }
-
-        if ( playList.currentMusicPosition == currentItem){
-            playBackPosition = exoPlayer.currentPosition
-            currentItem = playList.currentMusicPosition
-        }
-        else if (!exoPlayer.isPlaying && playList.currentMusicPosition != currentItem){
-            playBackPosition =0L
-            _currentPlayingPlayList.value = playList
-            listMediaItem= createMediaItemList(playList.listSound).toMutableList()
-            exoPlayer.seekTo(playList.currentMusicPosition,playBackPosition)
-            currentItem = playList.currentMusicPosition
-            playAllMusicFromFist()
-
-        }
-        else{
-            playBackPosition =0L
-            _currentPlayingPlayList.value = playList
-            listMediaItem= createMediaItemList(playList.listSound).toMutableList()
-            exoPlayer.seekTo(playList.currentMusicPosition,playBackPosition)
-            currentItem = playList.currentMusicPosition
-        }
-
-    }
-
-
-
-    private fun createMediaItemList(list: MutableSet<Sound>):MutableSet<MediaItem>{
-        return list.map{ sound ->
-            MediaItem.Builder()
-                .setMediaMetadata(createMetaData(sound))
-                .setUri(sound.path)
-                .build()
-        }.toMutableSet()
-    }
-    private fun createMetaData(sound :Sound):MediaMetadata{
-
-        return MediaMetadata.Builder()
-            .setTitle(sound.title)
-            .setArtworkUri(sound.uriMediaAlbum)
-            .setDisplayTitle(sound.title)
-            .build()
-    }
-    private fun configActualSound(){
-        val mediaItem   = exoPlayer.currentMediaItem
-        if (mediaItem != null) {
-            val sound =Sound(
-                idSound = null,
-                path = "",
-                title = mediaItem.mediaMetadata.title.toString(),
-                duration = exoPlayer.duration.toString()
-            )
-            actualSound.value =  sound
-
-        }
-
-        exoPlayer.addListener(object :Player.Listener{
-            override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
-                super.onMediaMetadataChanged(mediaMetadata)
-
-                val sound =Sound(
-                    idSound = null,
-                    path = "",
-                    title = mediaMetadata.displayTitle.toString(),
-                    duration = exoPlayer.duration.toString(),
-                    uriMediaAlbum = mediaMetadata.artworkUri
-                )
-                actualSound.value= sound
-                currentItem = exoPlayer.currentMediaItemIndex
-                Log.i("INFO_", "Sound index: ${exoPlayer.currentMediaItemIndex}")
-
-            }
-
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                super.onIsPlayingChanged(isPlaying)
-                isPlayingObserver.value = isPlaying
-            }
-
-
-            override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-
-                super.onTimelineChanged(timeline, reason)
-                Log.i("INFO_", "onTimelineChanged: $reason : $timeline")
-
-            }
-        })
-    }
-
-    private fun playAllMusicFromFist(){
-        if (exoPlayer.mediaItemCount == 0){
-            exoPlayer.addMediaItems(listMediaItem.toList())
-            exoPlayer.playWhenReady = playerWhenRead
-            exoPlayer.prepare()
-        }else{
-            exoPlayer.playWhenReady = playerWhenRead
-            exoPlayer.prepare()
-        }
-
-        configActualSound()
-    }
-    fun destroyPlayer(){
-        exoPlayer.stop()
-        exoPlayer.release()
-    }
+    private fun isPlaying() = viewModelScope.launch { isPlayingObserver =servicePlayer.isiPlaying() }
+    fun getAllMusics(playList: PlayList) = viewModelScope.launch {
+           val currentPlaiList =  servicePlayer.playPlaylist(playList)
+           currentPlaiList?.let {
+               _currentPlayingPlayList.value =it
+               getActualSound()
+               isPlaying()
+           }
+       }
 
     suspend fun savePreference(){
 
         runCatching {
             if(_currentPlayingPlayList.value != null){
                 dataStorePreferenceRepository
-                    .savePreference(_currentPlayingPlayList.value!!.idPlayList, positionSoundKey = currentItem)
+                    .savePreference(
+                         playlistKeyName =  _currentPlayingPlayList.value!!.idPlayList,
+                        positionSoundKey = _currentPlayingPlayList.value!!.currentMusicPosition
+                    )
             }
         }.fold(
             onSuccess = {
@@ -212,7 +83,6 @@ class SoundViewModel @Inject constructor(
 
     }
     suspend  fun readPreferences(){
-
         runCatching {
             dataStorePreferenceRepository.readAllPreferecenceData()
         }.fold(
@@ -223,14 +93,16 @@ class SoundViewModel @Inject constructor(
                         ?: UserDataPreferecence(idPreference = 1, postionPreference = 1
                         )
                 }
-
-
             },
             onFailure = {
                 Log.i("Play_", "readPreferences: erro ao ler dados da store : ${it.message}")
             }
         )
 
+    }
+
+    private fun getPlayer() {
+        myPlayer = servicePlayer.getPlayer()
     }
 
 }
