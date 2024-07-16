@@ -5,7 +5,6 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Log
 import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.model.Sound
 import java.io.File
@@ -58,18 +57,17 @@ object MyContetntProvider {
                    val mediaUri  = ContentUris.withAppendedId(
                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,idMedia)
 
-             //      val itemPathAlbumMedia = mediaUriAlbum.pathSegments[3].toInt()
-              //     val newMediaAlbum =if(itemPathAlbumMedia == 1 || itemPathAlbumMedia ==3)  null else  mediaUriAlbum
+//                  val itemPathAlbumMedia = mediaUriAlbum.pathSegments[3].toInt()
+              //    val newMediaAlbum =if(itemPathAlbumMedia == 1 || itemPathAlbumMedia ==3)  null else  mediaUriAlbum
                    val sound = Sound(
                        idSound = null,
                        path = cursor.getString(path),
                        duration =cursor.getInt(duarution).toString(),
                        title= cursor.getString(title),
                        uriMedia = mediaUri,
-                       uriMediaAlbum = mediaUriAlbum
+                       uriMediaAlbum = mediaUriAlbum,
+                       insertedDate = null
                    )
-
-                   Log.i("INFO_", "playlist : ${mediaUriAlbum.pathSegments[3]} ${sound.title}")
 
                    if (File(sound.path).exists()){
                        if (!_listSoundFromContentProvider.contains(sound)){

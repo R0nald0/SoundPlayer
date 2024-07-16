@@ -1,6 +1,5 @@
 package com.example.soundplayer.commons.permission
 
-import android.content.res.TypedArray
 import androidx.activity.result.ActivityResultLauncher
 
 class Permission {

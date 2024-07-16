@@ -24,7 +24,6 @@ class SoundViewModel @Inject constructor(
     private val servicePlayer: ServicePlayer
 ) :ViewModel(){
 
-
     var actualSound  : LiveData<Sound> ? = null
     var isPlayingObserver  = MutableLiveData<Boolean>()
 
@@ -42,6 +41,7 @@ class SoundViewModel @Inject constructor(
          getPlayer()
          isPlaying()
          getActualSound()
+         getActualPlayList()
     }
 
     fun getCurrentPositionSound():Int{
@@ -50,23 +50,30 @@ class SoundViewModel @Inject constructor(
     fun getActualSound()
         { viewModelScope.launch { actualSound = servicePlayer.getActualSound() } }
 
-    private fun isPlaying() = viewModelScope.launch { isPlayingObserver =servicePlayer.isiPlaying() }
-    fun getAllMusics(playList: PlayList) = viewModelScope.launch {
-           val currentPlaiList =  servicePlayer.playPlaylist(playList)
-           currentPlaiList?.let {
-               _currentPlayingPlayList.value =it
-               getActualSound()
-               isPlaying()
-           }
-       }
+    private fun isPlaying()  {
+        viewModelScope.launch { isPlayingObserver = servicePlayer.isiPlaying() }
+    }
 
+    fun getActualPlayList() {
+        viewModelScope.launch {
+            _currentPlayingPlayList.value =  servicePlayer.getActualPlayList()
+        }
+    }
+    fun getAllMusics(playList: PlayList) = viewModelScope.launch {
+          val currentPlayList =  servicePlayer.playPlaylist(playList)
+          if (currentPlayList != null){
+              _currentPlayingPlayList.value = currentPlayList!!
+              getActualSound()
+              isPlaying()
+          }
+       }
     suspend fun savePreference(){
 
         runCatching {
             if(_currentPlayingPlayList.value != null){
                 dataStorePreferenceRepository
                     .savePreference(
-                         playlistKeyName =  _currentPlayingPlayList.value!!.idPlayList,
+                         playlistKeyId =  _currentPlayingPlayList.value!!.idPlayList,
                         positionSoundKey = _currentPlayingPlayList.value!!.currentMusicPosition
                     )
             }
@@ -87,7 +94,6 @@ class SoundViewModel @Inject constructor(
             dataStorePreferenceRepository.readAllPreferecenceData()
         }.fold(
             onSuccess = {readAllPreferecenceData->
-
                 withContext(Dispatchers.Main){
                     _userDataPreferecenceObs.value = readAllPreferecenceData
                         ?: UserDataPreferecence(idPreference = 1, postionPreference = 1

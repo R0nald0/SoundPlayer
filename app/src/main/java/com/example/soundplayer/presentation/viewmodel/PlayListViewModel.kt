@@ -13,9 +13,7 @@ import com.example.soundplayer.model.PlaylistWithSoundDomain
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.service.ServicePlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -36,11 +34,12 @@ class PlayListViewModel @Inject constructor(
     val soundListBd : LiveData<List<Sound>>
         get() = _soundListBd
 
-    private val _listSoundUpdate  = MutableLiveData<Pair<Boolean,DataSoundPlayListToUpdate>>()
-    var listSoundUpdate : LiveData<Pair<Boolean,DataSoundPlayListToUpdate>> = _listSoundUpdate
+    private val  _listSize = MutableLiveData<Int>()
+    var listSize:LiveData<Int>  = _listSize
 
-    private val _listSoundUpdateTest  = MutableLiveData<PlayList>()
-    var listSoundUpdateTeste : LiveData<PlayList> = _listSoundUpdateTest
+    init {
+      countTotalSound()
+    }
 
     fun savePlayList(playList: PlayList){
         viewModelScope.launch {
@@ -65,22 +64,44 @@ class PlayListViewModel @Inject constructor(
             )
         }
     }
-    
+
+  fun findAllSound(){
+      viewModelScope.launch {
+          runCatching {
+              soundRepository.findAllSound()
+          }.fold(
+              onSuccess = {soundList->
+                  _soundListBd.value = soundList
+              },
+              onFailure = {erro->
+                  Log.i(TAG, "findAllSound: Erro ao buscar sound ${erro.message}")
+              }
+          )
+      }
+  }
+    fun countTotalSound(){
+        viewModelScope.launch {
+            _listSize.value = soundRepository.findAllSound().size
+        }
+    }
     fun saveAllSoundsByContentProvider(sizeListAllMusic: MutableSet<Sound>){
         viewModelScope.launch {
+            runCatching {
+                servicePlayer.saveSoundProvideFromDb(sizeListAllMusic)
+            }.fold(
+                onSuccess = { listSound->
+                       if (listSound?.size != 0){
+                           val sounds =soundRepository.findAllSound()
+                           _soundListBd.value =  sounds
+                           _listSize.value = sounds.size
+                       }
 
-            var listBd = soundRepository.sizeListSound()
-            if(sizeListAllMusic.size != listBd.size){
-                sizeListAllMusic.forEach {sound->
-                    if (!listBd.contains(sound)){
-                        soundRepository.saveSound(sound)
-                    }
+                    Log.i(TAG, "saveAllSoundsByContentProvider: AllMusics salva")
+                },
+                onFailure = {
+                    Log.i(TAG, "saveAllSoundsByContentProvider: erro ao salvar allmucis")
                 }
-                listBd = soundRepository.sizeListSound()
-            }
-            withContext(Dispatchers.Main){
-                _soundListBd.value = listBd
-            }
+            )
         }
     }
     fun deletePlayList(playList: PlayList) {
@@ -100,39 +121,42 @@ class PlayListViewModel @Inject constructor(
         }
     }
 
-    fun updatSoundAtPlaylist(dataSoundToUpdate: DataSoundPlayListToUpdate){
+    fun updateSoundAtPlaylist(dataSoundToUpdate: DataSoundPlayListToUpdate){
         viewModelScope.launch{
             val (idPlaylist,_,soundToUpdate) = dataSoundToUpdate
             val result =  servicePlayer.addItemFromListMusic(
                 idPlayList = idPlaylist,
                 soundsToInsertPlayList = soundToUpdate
-
             )
 
             if (result.isNotEmpty()) {
-                _listSoundUpdate.value = Pair(true,dataSoundToUpdate)
+                verifyAndUpdateSizeListSound(idPlaylist)
                 findPlayListById(idPlayList = idPlaylist)
                 getAllPlayList()
-                _listSoundUpdate.value = Pair(false , dataSoundToUpdate.copy(idPlayList = -1))
             }
         }
     }
+
+    private suspend fun verifyAndUpdateSizeListSound(idPlaylist: Long) {
+        if (idPlaylist == 1L) {
+            _listSize.value = soundRepository.findAllSound().size
+            Log.i(TAG, "verifyAndUpdateSizeListSound: ${listSize.value}")
+        }
+    }
+
     fun removePlaySoundFromPlayList(dataSoundToUpdate : DataSoundPlayListToUpdate){
 
         viewModelScope.launch {
             val itemsRemoved  =servicePlayer.removeItemFromListMusic(
-               idPlayList = dataSoundToUpdate.idPlayList,
+                idPlayList = dataSoundToUpdate.idPlayList,
                 idSound = dataSoundToUpdate.sounds.first().idSound!!,
                 indexSound = dataSoundToUpdate.positionSound.first()
             )
 
             if (itemsRemoved != 0){
-                _listSoundUpdate.value = Pair(false , dataSoundToUpdate)
+                verifyAndUpdateSizeListSound(dataSoundToUpdate.idPlayList)
                 findPlayListById(idPlayList = dataSoundToUpdate.idPlayList)
                 getAllPlayList()
-                _listSoundUpdate.value = Pair(false , dataSoundToUpdate.copy(idPlayList = -1))
-
-                //TODO refatorar
             }
 
         }
@@ -148,7 +172,7 @@ class PlayListViewModel @Inject constructor(
                         _clickedPlayList.value = resultPlayList!!
                     }
                 }, onFailure = {
-                    Log.i(TAG, "erro ao buscar  playlist com o id: $idPlayList : ${it.message} ")
+                    Log.e(TAG, "erro ao buscar  playlist com o id: $idPlayList : ${it.message} ")
                 }
             )
         }

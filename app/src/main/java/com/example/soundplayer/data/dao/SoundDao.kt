@@ -10,13 +10,19 @@ import com.example.soundplayer.data.entities.SoundEntity
 
 @Dao
 interface SoundDao {
-    @Insert
-    suspend  fun createSound(sound : SoundEntity):Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend  fun saveSound(sound : SoundEntity):Long
     @Query(value = "SELECT * FROM sound")
     suspend  fun findAllSound():List<SoundEntity>
 
+    @Query(value = "SELECT title FROM sound")
+    suspend  fun findAllSoundTiitle():List<String>
+
     @Query(value = "SELECT * FROM sound WHERE soundId = :idSound")
-    suspend  fun findAllSound(idSound:Long?):List<SoundEntity>
+    suspend  fun findSoundById(idSound:Long?):SoundEntity
+
+    @Query(value = "SELECT * FROM sound WHERE sound.title = :title")
+    suspend  fun findSoundByName(title:String):SoundEntity?
 
 
     @Update(onConflict = OnConflictStrategy.REPLACE)

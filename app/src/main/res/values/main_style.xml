@@ -10,4 +10,9 @@
         <item>22.0</item>
     </array>
 
+    <style name="ButtonThemeSoundPlayer" parent="Widget.Material3.Button.ElevatedButton">
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/colorPrimaryContainer</item>
+    </style>
+
 </resources>

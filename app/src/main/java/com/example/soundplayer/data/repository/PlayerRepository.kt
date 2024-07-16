@@ -1,11 +1,9 @@
 package com.example.soundplayer.data.repository
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
-import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.ExoPlayer
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
@@ -14,25 +12,26 @@ import javax.inject.Inject
 class PlayerRepository @Inject constructor(
    private  val exoPlayer: ExoPlayer
 ) {
-
-   private lateinit var listMediaItem: Set<MediaItem>
    private var currentItem: Int =-1
    private var playerWhenRead = true
    private var playBackPosition: Long = -0L
-   private var playlistCurrentlyPlaying :PlayList ? = null
+   private var _playlistCurrentlyPlaying :PlayList ? = null
    private var _actualSound  = MutableLiveData<Sound>()
    private  var isPlayingObserver  = MutableLiveData<Boolean>()
 
     fun getPlayer() = exoPlayer
      fun getActaulSound() =_actualSound
    fun getAcutalPlayList() :PlayList?{
-        return  playlistCurrentlyPlaying
+        return  _playlistCurrentlyPlaying
    }
    fun isPlaying()  = isPlayingObserver
 
+   fun replaceMediaItem(list: Set<Sound>){
+
+   }
    fun getAllMusics(playList: PlayList): PlayList? {
 
-      if ( playlistCurrentlyPlaying != null &&  playlistCurrentlyPlaying!!.name != playList.name){
+      if ( _playlistCurrentlyPlaying != null &&  _playlistCurrentlyPlaying!!.name != playList.name){
          exoPlayer.stop()
          exoPlayer.clearMediaItems()
          currentItem = -1
@@ -44,24 +43,22 @@ class PlayerRepository @Inject constructor(
       }
       else if (!exoPlayer.isPlaying && playList.currentMusicPosition != currentItem){
          playBackPosition =0L
-         playlistCurrentlyPlaying = playList
-         listMediaItem= createMediaItemList(playList.listSound)
+         _playlistCurrentlyPlaying = playList
          exoPlayer.seekTo(playList.currentMusicPosition,playBackPosition)
          currentItem = playList.currentMusicPosition
-         playAllMusicFromFist()
+         playAllMusicFromFist(createMediaItemList(playList.listSound))
       }
       else{
          playBackPosition =0L
-         playlistCurrentlyPlaying = playList
-         listMediaItem= createMediaItemList(playList.listSound)
+         _playlistCurrentlyPlaying = playList
          exoPlayer.seekTo(playList.currentMusicPosition,playBackPosition)
          currentItem = playList.currentMusicPosition
       }
 
-      return  playlistCurrentlyPlaying
+      return  _playlistCurrentlyPlaying
    }
 
-   private fun playAllMusicFromFist(){
+   private fun playAllMusicFromFist(listMediaItem : Set<MediaItem>){
       if (exoPlayer.mediaItemCount == 0){
          exoPlayer.addMediaItems(listMediaItem.toList())
          exoPlayer.playWhenReady = playerWhenRead
@@ -75,13 +72,15 @@ class PlayerRepository @Inject constructor(
    }
 
    private fun configActualSound(){
+
       val mediaItem   = exoPlayer.currentMediaItem
       if (mediaItem != null) {
          val sound =Sound(
             idSound = null,
             path = "",
             title = mediaItem.mediaMetadata.title.toString(),
-            duration = exoPlayer.duration.toString()
+            duration = exoPlayer.duration.toString(),
+            insertedDate = null
          )
          _actualSound.value =  sound
 
@@ -96,28 +95,20 @@ class PlayerRepository @Inject constructor(
                path = "",
                title = mediaMetadata.displayTitle.toString(),
                duration = exoPlayer.duration.toString(),
-               uriMediaAlbum = mediaMetadata.artworkUri
+               uriMediaAlbum = mediaMetadata.artworkUri,
+               insertedDate = null
             )
+
             _actualSound.value= sound
             currentItem = exoPlayer.currentMediaItemIndex
-            playlistCurrentlyPlaying?.let {
+            _playlistCurrentlyPlaying?.let {
                it.copy(currentMusicPosition = exoPlayer.currentMediaItemIndex)
-
             }
-
-
          }
 
          override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
              isPlayingObserver.value = isPlaying
-         }
-
-         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
-
-            super.onTimelineChanged(timeline, reason)
-            Log.i("INFO_", "onTimelineChanged: $reason : $timeline")
-
          }
       })
    }
@@ -143,22 +134,23 @@ class PlayerRepository @Inject constructor(
       exoPlayer.release()
    }
    fun  addItemFromListMusic(soundsToInsertPlayList: Set<Sound>){
-       val  updateMediaItem  = mutableListOf<MediaItem>()
-       val mediaItemList = createMediaItemList(soundsToInsertPlayList)
-          mediaItemList.forEachIndexed{ index, mediaItem ->
-          if (!listMediaItem.contains(mediaItem)){
-                  updateMediaItem.add(mediaItem)
-                  listMediaItem.plus(mediaItem)
-                  playlistCurrentlyPlaying?.listSound?.add(soundsToInsertPlayList.elementAt(index))
-              }
-          }
-       if (updateMediaItem.isNotEmpty()){
-           exoPlayer.addMediaItems(updateMediaItem)
-       }
+      if (_playlistCurrentlyPlaying != null){
+         val  updateMediaItem  = mutableListOf<Sound>()
+         soundsToInsertPlayList.forEachIndexed{ index, sound ->
+            if (!_playlistCurrentlyPlaying?.listSound?.contains(sound)!!){
+               updateMediaItem.add(sound)
+               _playlistCurrentlyPlaying?.listSound?.add(soundsToInsertPlayList.elementAt(index))
+            }
+         }
+         if (updateMediaItem.isNotEmpty()){
+            val mediaItemList = createMediaItemList(updateMediaItem.toSet())
+            exoPlayer.addMediaItems(mediaItemList.toList())
+         }
+      }
    }
     fun removeItemFromListMusic(index : Int){
-        val sound = playlistCurrentlyPlaying?.listSound?.elementAt(index)
-       val isRemoved = playlistCurrentlyPlaying?.listSound?.remove(sound)
+        val sound = _playlistCurrentlyPlaying?.listSound?.elementAt(index)
+       val isRemoved = _playlistCurrentlyPlaying?.listSound?.remove(sound)
         if (isRemoved == true){
             exoPlayer.removeMediaItem(index)
         }

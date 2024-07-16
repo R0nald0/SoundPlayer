@@ -9,8 +9,10 @@ object Constants {
      const val DATABASE_NAME ="playlist_database"
      const val  ALL_MUSIC_NAME ="All Musics"
      const val  PREFERENCE_NAME ="settings"
+
       val POSITION_KEY = intPreferencesKey("postionKey")
       val ID_PLAYLIST_KEY = longPreferencesKey("playlist")
       val ID_DARKMODE_KEY = booleanPreferencesKey("isDarkMode")
       val ID_SIZE_TEXT_TITLE_MUSIC= floatPreferencesKey("sizeTextTitleMusic")
+     val  ID_ORDERED_SONS_PREFFERENCE = intPreferencesKey("orderedKey")
 }

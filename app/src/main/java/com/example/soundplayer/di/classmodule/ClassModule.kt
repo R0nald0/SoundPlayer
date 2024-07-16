@@ -36,9 +36,10 @@ class ClassModule {
     fun provideServicePlayer(
         playerRepository: PlayerRepository,
         soundRepository: SoundRepository,
-        soundPlayListRepository: SoundPlayListRepository
+        soundPlayListRepository: SoundPlayListRepository,
+        dataStorePreferenceRepository: DataStorePreferenceRepository
     ) :ServicePlayer{
-        return  ServicePlayer(playerRepository,soundPlayListRepository,soundRepository)
+        return  ServicePlayer(playerRepository,soundPlayListRepository,soundRepository,dataStorePreferenceRepository)
     }
     @Singleton
     @Provides
@@ -79,7 +80,7 @@ class ClassModule {
 
     @Provides
     fun providePlaylistAndSoundCross(databasePlaylist: DatabasePlaylist):PlaylistAndSoundCrossDao{
-        return  databasePlaylist.playListAndSoundCrossDao();
+        return  databasePlaylist.playListAndSoundCrossDao()
     }
 
     @Singleton

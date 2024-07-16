@@ -7,14 +7,14 @@
     android:layout_height="110dp"
     android:layout_marginStart="8dp"
     android:layout_marginEnd="16dp"
-    android:background="@drawable/border_playlist_item"
+    android:background="@drawable/border_playlist_selected_item"
     android:padding="2dp"
-    tools:background="@drawable/border_playlist_item">
+    tools:background="@drawable/border_playlist_selected_item">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@drawable/border_playlist_item"
+        android:background="@drawable/border_playlist_selected_item"
         app:cardCornerRadius="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,7 +60,7 @@
                 android:fontFamily="casual"
                 android:gravity="center"
                 style="@style/TextAppearance.Material3.HeadlineLarge"
-                android:text="Play List Name"
+                android:text="@string/play_list_name"
 
                 android:textSize="13sp"
                 android:textStyle="bold|italic" />

@@ -1,6 +1,7 @@
 package com.example.soundplayer.presentation.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +20,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class SettingsFragment : Fragment() {
     private  lateinit var binding : FragmentSettingsBinding
     var checkedItem = 0
+    var orderChoesed = 0
     val singleItems = arrayOf("Pequena", "Média", "Grande")
+    val options = arrayOf("Nome","Nome Decrescente","Inserido por ultimo")
     private val preferencesViewModel by activityViewModels<PreferencesViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +47,7 @@ class SettingsFragment : Fragment() {
 
         super.onStart()
         preferencesViewModel.readDarkModePreference()
+        preferencesViewModel.readAllPrefference()
         readPreference()
     }
     fun initBinding() = binding.apply {
@@ -56,13 +60,46 @@ class SettingsFragment : Fragment() {
         }
 
        llLayouSizeFont.setOnClickListener {
-            showDialog("Escolha o tamanho da font do titulo da musica")
+            showDialog(
+                title = "Escolha o tamanho da font do titulo da musica",
+                selectedItem = checkedItem,
+                options = singleItems,
+                onSelected = {chosedItem->
+                    when(chosedItem){
+                        0 -> {preferencesViewModel.saveSizeTextMusicPrefrence(15f)}
+                        1 -> {preferencesViewModel.saveSizeTextMusicPrefrence(18f)}
+                        2 -> {preferencesViewModel.saveSizeTextMusicPrefrence(20f)}
+                    }
+                    binding.txvOpcaoSize.text = singleItems[chosedItem]
+                    checkedItem = chosedItem
+                }
+            )
        }
+
+
+        llLayoutOrderedSound.setOnClickListener {
+            showDialog(
+             title = "Ordenar Sons por",
+             options = options ,
+             selectedItem = orderChoesed,
+             onSelected = {chosedItem->
+                 when(chosedItem){
+                     0 -> {preferencesViewModel.saveOrderedSoundPrefference(chosedItem)}
+                     1 -> {preferencesViewModel.saveOrderedSoundPrefference(chosedItem)}
+                     2 -> {preferencesViewModel.saveOrderedSoundPrefference(chosedItem)}
+                 }
+
+                 requireContext().exibirToast("Ás playlists que não estão tocando serão ordenados por  ${options[chosedItem]} ")
+                 binding.txvOpcaoOrder.text =options[chosedItem]
+                 orderChoesed = chosedItem
+             }
+         )
+
+        }
 
 
     }
     fun configureModeUi(isDarkMode: Boolean){
-
           if (isDarkMode) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
           else{AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)}
           preferencesViewModel.saveDarkModePrefrence(isDarkMode)
@@ -79,6 +116,10 @@ class SettingsFragment : Fragment() {
                   }
               }
          }
+        preferencesViewModel.uiStatePreffs.observe(viewLifecycleOwner){userPref->
+              orderChoesed = userPref.orderedSound
+              Log.i("INFO_", "readAllPrefference: $userPref")
+        }
 
         preferencesViewModel.sizeTextTitleMusic.observe(viewLifecycleOwner){ statePreference ->
             when(statePreference){
@@ -97,19 +138,20 @@ class SettingsFragment : Fragment() {
 
             }
             binding.txvOpcaoSize.text = singleItems[checkedItem]
+            binding.txvOpcaoOrder.text =options[orderChoesed]
         }
     }
-    fun showDialog(title:String){
+    fun showDialog(
+          title:String,
+          options: Array<String>,
+          selectedItem :Int,
+          onSelected : (Int)->Unit,
+    ){
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(title)
-            .setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
-                binding.txvOpcaoSize.text = singleItems[which]
+            .setSingleChoiceItems(options, selectedItem) { dialog, chosedItem ->
                 dialog.cancel()
-                when(which){
-                    0 -> {preferencesViewModel.saveSizeTextMusicPrefrence(15f)}
-                    1 -> {preferencesViewModel.saveSizeTextMusicPrefrence(18f)}
-                    2 -> {preferencesViewModel.saveSizeTextMusicPrefrence(20f)}
-                }
+                onSelected(chosedItem)
             }
             .show()
     }

@@ -70,7 +70,7 @@ class SelectPlayListDialogFragment : DialogFragment() {
     }
     private fun inicializerBinding() {
         adapterPlaylistSelect = AdapterSelectePlayList(){selectedPlayList->
-            playListViewModel.updatSoundAtPlaylist(
+            playListViewModel.updateSoundAtPlaylist(
                 DataSoundPlayListToUpdate(
                     idPlayList =  selectedPlayList.idPlayList ?: 0,
                     positionSound = posToUpdate,

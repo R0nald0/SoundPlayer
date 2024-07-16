@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.soundplayer.model.Sound
+import java.util.Date
 
 
 @Entity(tableName = "sound")
@@ -15,6 +16,7 @@ data class SoundEntity(
     val duration :String ="",
     val urlMediaImage :String ="",
     val urlAlbumImage :String ="",
+    val insertedDate : Long = Date().time
 )
 
 fun SoundEntity.toSound() = Sound(
@@ -23,5 +25,6 @@ fun SoundEntity.toSound() = Sound(
     duration = this.duration,
     title = this.title,
     uriMedia = Uri.parse(this.urlMediaImage),
-    uriMediaAlbum = Uri.parse(this.urlAlbumImage)
+    uriMediaAlbum = Uri.parse(this.urlAlbumImage),
+    insertedDate = this.insertedDate
 )

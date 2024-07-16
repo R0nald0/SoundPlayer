@@ -12,7 +12,8 @@ data class Sound(
     val duration:String ="",
     var title: String ="",
     var uriMedia: Uri? = null,
-    var uriMediaAlbum: Uri? =null
+    var uriMediaAlbum: Uri? =null,
+    val insertedDate : Long?
 ):Parcelable{
     constructor(soundEntity: SoundEntity):this(
         idSound = soundEntity.soundId,
@@ -20,7 +21,8 @@ data class Sound(
         duration = soundEntity.duration,
         title = soundEntity.title,
         uriMedia = Uri.parse(soundEntity.urlMediaImage),
-        uriMediaAlbum = Uri.parse(soundEntity.urlAlbumImage)
+        uriMediaAlbum = Uri.parse(soundEntity.urlAlbumImage),
+        insertedDate = soundEntity.insertedDate
     )
 }
 
@@ -30,5 +32,5 @@ fun Sound.toSoundEntity()= SoundEntity(
     path = this.path,
     duration =this.duration,
     urlAlbumImage = this.uriMediaAlbum.toString(),
-    urlMediaImage = this.uriMedia.toString()
+    urlMediaImage = this.uriMedia.toString(),
 )

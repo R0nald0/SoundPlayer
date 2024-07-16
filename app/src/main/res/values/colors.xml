@@ -8,8 +8,8 @@
     <color name="red">#E35252</color>
     <color name="redStronger">#FD3333</color>
 
-    <color name="colorPrimaryContainer">#4CAF50</color>
-    <color name="colorOnPrimaryContainer">#FFFFFF</color>
+    <color name="colorPrimaryContainer">#E35252</color>
+    <color name="colorOnPrimaryContainer">#FD3333</color>
 
     <color name="colorSurfaceVariant">#e7e0ec</color>
     <color name="my_primary">#242325</color>

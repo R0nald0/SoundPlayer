@@ -32,7 +32,8 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:visibility="gone" />
 
             <TextView
                 android:id="@+id/txv_title_toolbar"
@@ -60,37 +61,38 @@
         android:id="@+id/Lineart_layout_empty_sound"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:gravity="center"
+        android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
+        app:layout_constraintVertical_bias="0.5"
+        tools:visibility="gone">
 
         <TextView
             android:id="@+id/txv_sound_not_found"
             style="@style/TextAppearance.Material3.BodyMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:fontFamily="cursive"
+            android:gravity="center_horizontal"
             android:text="Nenhuma Mùsica"
             android:textSize="28sp"
-            android:gravity="center_horizontal"
-            android:layout_gravity="center"
             android:visibility="visible"
             tools:visibility="visible" />
 
         <Button
-            android:layout_marginTop="18dp"
             android:id="@+id/btn_find_sounds"
             style="@style/ThemeOverlay.Material3.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Buscar músicas"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="18dp"
+            android:text="Buscar músicas"
             android:textColor="@color/white"
             android:visibility="visible"
             tools:visibility="visible" />
@@ -107,7 +109,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline2"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <TextView
             android:id="@+id/txv_quantidade_musics"
@@ -120,18 +122,32 @@
             android:letterSpacing="0.1"
             android:lines="1"
             android:padding="4dp"
-            android:text="Musicas : 20"
+            android:tag="@string/total_de_musicas"
+            android:text="Total de Músicas: 0"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txv_playList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:text="Playlists"
             android:textSize="12sp"
             android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/id_rv_favorite_list"
+            android:id="@+id/id_rv_playlist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_marginTop="16dp"
             android:foregroundGravity="bottom"
-            android:orientation="horizontal" />
+            android:orientation="horizontal"
+            android:paddingLeft="8dp"
+            android:visibility="visible"
+            tools:listitem="@layout/play_list_item"
+            tools:visibility="visible" />
 
         <View
             android:id="@+id/divider"
@@ -140,6 +156,15 @@
             android:layout_marginTop="16dp"
             android:background="#F40505"
             android:backgroundTint="#F40505" />
+
+        <TextView
+            android:id="@+id/txv_sounds"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
+            android:text="Músicas"
+            android:textSize="12sp"
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_sound"
@@ -174,7 +199,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/border_playlist_item"
+        android:background="@drawable/border_playlist_selected_item"
         android:clickable="true"
         android:contentDescription="TODO"
         android:src="@drawable/baseline_playlist_add_24"

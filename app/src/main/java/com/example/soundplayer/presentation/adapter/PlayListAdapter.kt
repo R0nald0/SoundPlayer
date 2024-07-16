@@ -40,7 +40,7 @@ class PlayListAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun getCurrentPlayListPlayind(playList: PlayList){
+    fun getCurrentPlayListPlaying(playList: PlayList){
         currentPlayListPlaying = playList
         notifyDataSetChanged()
     }
@@ -60,7 +60,8 @@ class PlayListAdapter(
     inner class  PlayLisViewHolder( val binding : PlayListItemBinding): RecyclerView.ViewHolder(binding.root){
         fun bind(actualPlayList: PlayList, position: Int){
             if(!positionPlayListClicked.containsValue(position)){
-                binding.idContraintPlayList.background = ContextCompat.getDrawable(binding.root.context,R.drawable.border_playlist_item_selected)
+                binding.idContraintPlayList.background =
+                    ContextCompat.getDrawable(binding.root.context,R.drawable.border_playlist_item_not_selected)
             }
             initBindings(actualPlayList, position)
         }
@@ -93,8 +94,8 @@ class PlayListAdapter(
             positionPlayListClicked.put(position, position)
             if (positionPlayListClicked.containsValue(position)) {
                 binding.idContraintPlayList.background =
-                    ContextCompat.getDrawable(binding.root.context, R.drawable.border_playlist_item)
-                notifyDataSetChanged()
+                    ContextCompat.getDrawable(binding.root.context, R.drawable.border_playlist_selected_item)
+                notifyItemChanged(position)
             }
         }
 
@@ -107,12 +108,14 @@ class PlayListAdapter(
                 binding.imgPlayList.isVisible =true
             }
         }
-        fun setUpBorderPlayListFirst(position: Int) {
+
+        fun setBorderOnPlayListFirstCharging(position: Int) {
             positionPlayListClicked.clear()
             positionPlayListClicked.put(position, position)
             if (positionPlayListClicked.containsValue(position)) {
                 binding.idContraintPlayList.background =
-                    ContextCompat.getDrawable(binding.root.context, R.drawable.border_playlist_item)
+                    ContextCompat.getDrawable(binding.root.context, R.drawable.border_playlist_selected_item)
+
             }
         }
     }
@@ -134,8 +137,7 @@ class PlayListAdapter(
         val playListWithMusic = playlistWithSoundDomainMutableSet.elementAt(position)
 
         if (userPositionPreferePlayListId == playListWithMusic.playList.idPlayList){
-            holder.setUpBorderPlayListFirst(position)
-            userPositionPreferePlayListId =-1
+            holder.setBorderOnPlayListFirstCharging(position)
         }
 
         currentPlayListPlaying?.let {actualPlayListPlaying->
@@ -145,12 +147,7 @@ class PlayListAdapter(
                 actualPlayList =  playListWithMusic.playList
             )
         }
-//        val playList = PlayList(
-//            idPlayList = playListWithMusic.playList.idPlayList,
-//            listSound = playListWithMusic.soundOfPlayList,
-//            name = playListWithMusic.playList.name,
-//            currentMusicPosition = playListWithMusic.playList.currentMusicPosition
-//        )
+
         playListWithMusic.playList.listSound.addAll(playListWithMusic.soundOfPlayList)
         holder.bind(playListWithMusic.playList,position)
     }

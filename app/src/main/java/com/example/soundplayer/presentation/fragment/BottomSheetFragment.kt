@@ -39,8 +39,8 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
 
 
         binding.btnCreatePlayList.setOnClickListener {
-              createdSounds  = bottomSheetAdapter.getSoundSelected() ?: emptySet()
-            //<- Todo Verificar se necessario alterar metodo para retornar lista
+              createdSounds  = bottomSheetAdapter.getSoundSelected()
+
               val namePlayList  = binding.edtPlayList.text.toString()
               if (namePlayList.isNotEmpty()){
                    if (createdSounds.isNotEmpty()){
@@ -64,6 +64,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         binding.rvMusics.adapter = bottomSheetAdapter
         binding.rvMusics.addItemDecoration(DividerItemDecoration( binding.root.context,RecyclerView.HORIZONTAL))
         binding.rvMusics.layoutManager = LinearLayoutManager(binding.root.context,LinearLayoutManager.VERTICAL,false)
+        binding.btnCreatePlayList.text = getString(R.string.text_criar_playlist)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,7 +74,8 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onStart() {
         super.onStart()
-            binding.btnCreatePlayList.text = getString(R.string.text_criar_playlist)
+        playListViewModel.findAllSound()
+
     }
     override fun onResume() {
         super.onResume()
@@ -81,7 +83,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     private fun sizeView(){
      val bottomSheetBehavior  = BottomSheetBehavior.from(view?.parent as View)
         bottomSheetBehavior.peekHeight = bottomSheetPeekHeight
-       val layoutManager  = binding.root.rootView.layoutParams
+         val layoutManager  = binding.root.rootView.layoutParams
     }
 
     private fun observerLiveData(){
