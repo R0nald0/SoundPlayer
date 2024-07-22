@@ -69,13 +69,13 @@ class MainFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         myMenuProvider = MyMenuProvider()
+
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         getPermissions()
-
         binding = FragmentMainBinding.inflate(inflater,container,false)
         return binding.root
     }
@@ -95,6 +95,11 @@ class MainFragment : Fragment() {
 
     override fun onStart() {
         preferencesViewModel.readSizeTextMusicPreference()
+        val sound = soundViewModel.actualSound?.value
+        if (sound != null){
+            adapterSound.getActualSound(sound)
+        }
+
         super.onStart()
     }
 
@@ -192,6 +197,7 @@ class MainFragment : Fragment() {
 
     }
 
+    @SuppressLint("StringFormatMatches")
     private fun verifyPermissions(isPermitted : Boolean) {
         if (!isPermitted) {
             binding.LineartLayoutEmptySound.isVisible= true
@@ -271,9 +277,9 @@ class MainFragment : Fragment() {
     }
 
     private fun updateViewWhenMenuChange(isUpdate: Boolean) {
+       requireActivity().removeMenuProvider(myMenuProvider)
+       requireActivity().addMenuProvider(myMenuProvider)
 
-        requireActivity().removeMenuProvider(myMenuProvider)
-        requireActivity().addMenuProvider(myMenuProvider)
         if (isUpdate) {
             binding.fabAddPlayList.isVisible = false
             binding.mainFragmentBackButton.setOnClickListener {
@@ -303,6 +309,10 @@ class MainFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+    }
+
     override fun onStop() {
         CoroutineScope(Dispatchers.Main).launch{
             soundViewModel.savePreference()
@@ -320,7 +330,6 @@ class MainFragment : Fragment() {
                 binding.txvTitleToolbar.text = getString(R.string.app_name)
                 binding.mainFragmentBackButton.isVisible =false
                 menuInflater.inflate(R.menu.menu_toolbar,menu)
-
             }else{
                 binding.txvTitleToolbar.text= getString(R.string.selecionar_itens)
                 binding.mainFragmentBackButton.isVisible =true

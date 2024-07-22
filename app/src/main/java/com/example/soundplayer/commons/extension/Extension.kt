@@ -1,9 +1,12 @@
 package com.example.soundplayer.commons.extension
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.res.Configuration
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -35,7 +38,7 @@ fun Context.showAlerDialog(messenger :String, positiveButton:String, negativeBut
 }
 
 fun Context.exibirToast(messenger: String){
-    Toast.makeText(this, messenger, Toast.LENGTH_SHORT).show()
+    Toast.makeText(this, messenger, Toast.LENGTH_LONG).show()
 }
 
 fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
@@ -45,4 +48,13 @@ fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observ
             removeObserver(this)
         }
     })
+}
+
+fun Activity.checkThemeMode(){
+   val a =applicationContext.resources.configuration.uiMode and
+            Configuration.UI_MODE_NIGHT_MASK ==
+            Configuration.UI_MODE_NIGHT_YES
+
+    if (a) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+    else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 }

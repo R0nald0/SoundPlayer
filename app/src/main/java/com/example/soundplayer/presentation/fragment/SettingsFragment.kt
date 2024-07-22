@@ -1,5 +1,6 @@
 package com.example.soundplayer.presentation.fragment
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.example.soundplayer.commons.extension.checkThemeMode
 import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.databinding.FragmentSettingsBinding
 import com.example.soundplayer.presentation.viewmodel.PreferencesViewModel
@@ -19,10 +21,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SettingsFragment : Fragment() {
     private  lateinit var binding : FragmentSettingsBinding
+    var modeUiChecked = 2
     var checkedItem = 0
     var orderChoesed = 0
     val singleItems = arrayOf("Pequena", "Média", "Grande")
     val options = arrayOf("Nome","Nome Decrescente","Inserido por ultimo")
+    val modeUIOptions = arrayOf("Light","DarkMode","Mesmo que o sistema")
     private val preferencesViewModel by activityViewModels<PreferencesViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,9 +59,35 @@ class SettingsFragment : Fragment() {
             findNavController().popBackStack()
         }
 
-        switchDarkMode.setOnCheckedChangeListener { buttonView, isChecked ->
+      /*  switchDarkMode.setOnCheckedChangeListener { buttonView, isChecked ->
              configureModeUi(isChecked)
         }
+*/
+       llLayouDarkMode.setOnClickListener {
+           showDialog(
+               title = "Escolha o modo de visualisção",
+               selectedItem = modeUiChecked,
+               options = modeUIOptions,
+               onSelected = {onSelected->
+                   when(onSelected){
+                       0 -> {
+                          // AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                           preferencesViewModel.saveDarkModePrefrence(0)
+                       }
+                       1 -> {
+                           //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                           preferencesViewModel.saveDarkModePrefrence(1)
+                       }
+                       2 -> {
+                          preferencesViewModel.saveDarkModePrefrence(2)
+                       }
+                   }
+
+                   binding.txvOpcaoModeUi.text = modeUIOptions[onSelected]
+                   modeUiChecked = onSelected
+               }
+           )
+       }
 
        llLayouSizeFont.setOnClickListener {
             showDialog(
@@ -99,17 +129,26 @@ class SettingsFragment : Fragment() {
 
 
     }
-    fun configureModeUi(isDarkMode: Boolean){
-          if (isDarkMode) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-          else{AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)}
-          preferencesViewModel.saveDarkModePrefrence(isDarkMode)
-    }
 
     fun  readPreference(){
          preferencesViewModel.isDarkMode.observe(viewLifecycleOwner){statePreference->
               when(statePreference){
                   is StatePrefre.Sucess<*> ->{
-                     binding.switchDarkMode.isChecked = statePreference.succssResult as Boolean
+                    val result =  statePreference.succssResult as Int
+                      when(result){
+                          0 ->{
+                              AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                          }
+                          1-> {
+                              AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                          }
+                          2 -> {
+                               requireActivity().checkThemeMode()
+                          }
+                      }
+
+                      modeUiChecked = result
+                      binding.txvOpcaoModeUi.text = modeUIOptions[result]
                   }
                   is StatePrefre.Error ->{
                       requireActivity().exibirToast(statePreference.mensagem)
@@ -155,5 +194,11 @@ class SettingsFragment : Fragment() {
             }
             .show()
     }
+    private fun verifySystemModeUI() :Boolean {
+        return requireActivity().applicationContext.resources.configuration.uiMode and
+        Configuration.UI_MODE_NIGHT_MASK ==
+                Configuration.UI_MODE_NIGHT_YES
+    }
+
 
 }

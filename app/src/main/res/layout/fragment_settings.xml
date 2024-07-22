@@ -50,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
-        android:paddingHorizontal="22dp"
+        android:paddingHorizontal="@dimen/spacing_high"
         android:paddingVertical="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -58,23 +58,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settingToolbar">
 
-        <Switch
-            android:id="@+id/switchDarkMode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/darkmode"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            tools:ignore="UseSwitchCompatOrMaterialXml" />
-        <com.google.android.material.divider.MaterialDivider
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="16dp"
-            app:dividerColor="@color/gray"
-            />
-
         <LinearLayout
-            android:id="@+id/ll_layou_size_font"
+            android:id="@+id/ll_layou_dark_mode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -82,7 +67,37 @@
             <TextView
                 style="@style/TextAppearance.Material3.LabelLarge"
                 android:layout_width="match_parent"
+                android:textSize="@dimen/size_title_sound"
                 android:layout_height="wrap_content"
+                android:text="@string/thema_visualizacao" />
+
+            <TextView
+                android:id="@+id/txv_opcao_mode_ui"
+                style="@style/TextAppearance.Material3.LabelSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mesmo que o sistema"
+                android:layout_marginStart="@dimen/spacing_light"
+                android:textColor="@color/gray" />
+        </LinearLayout>
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/spacing_half"
+            app:dividerColor="@color/gray"
+            />
+        <LinearLayout
+            android:id="@+id/ll_layou_size_font"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_half"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/TextAppearance.Material3.LabelLarge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/size_title_sound"
                 android:text="@string/tamanho_titulo_musica" />
 
             <TextView
@@ -90,28 +105,37 @@
                 style="@style/TextAppearance.Material3.LabelSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_light"
                 android:text="@string/pequena"
                 android:textColor="@color/gray" />
         </LinearLayout>
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/spacing_half"
+            app:dividerColor="@color/gray"
+            />
         <LinearLayout
             android:id="@+id/ll_layout_ordered_sound"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="@dimen/spacing_half"
             >
 
             <TextView
                 style="@style/TextAppearance.Material3.LabelLarge"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Ordenar Sons Por..." />
+                android:textSize="@dimen/size_title_sound"
+                android:text="@string/ordenar_sons_por" />
 
             <TextView
                 android:id="@+id/txv_opcao_order"
                 style="@style/TextAppearance.Material3.LabelSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_light"
                 android:text="Nome"
                 android:textColor="@color/gray" />
         </LinearLayout>

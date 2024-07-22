@@ -1,7 +1,9 @@
 package com.example.soundplayer.presentation
 
 
+
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -19,7 +21,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
+import android.content.res.Configuration
+import androidx.navigation.ui.AppBarConfiguration
+import com.example.soundplayer.commons.extension.checkThemeMode
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -30,9 +34,9 @@ class MainActivity : AppCompatActivity() {
 
     private val  soundViewModel by viewModels<SoundViewModel>()
     private val preferencesViewModel by viewModels<PreferencesViewModel>()
-
     private var isLoading = true
     private lateinit var  navController : NavController
+    private lateinit var appBarConfiguration :AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,37 +47,54 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         getNavHost()
         observer()
+        setupNavitionBarColor()
+    }
+
+    private fun setupNavitionBarColor() {
         val color = 0xffFF400404
-        window.navigationBarColor = ColorUtils.setAlphaComponent(color.toInt(),230)
+        window.navigationBarColor = ColorUtils.setAlphaComponent(color.toInt(), 230)
     }
 
     override fun onStart() {
         preferencesViewModel.readDarkModePreference()
         super.onStart()
+        soundViewModel.updateAudioFocos()
     }
+
     private fun observer(){
-        preferencesViewModel.isDarkMode.observe(this){statePreference->
-            when(statePreference){
-                is StatePrefre.Sucess<*> ->{
-                    if (statePreference.succssResult as Boolean)AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                    else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+         //TODO Verificar se dark mode igual a opccao do sistema
+           preferencesViewModel.isDarkMode.observe(this){statePreference->
+                when(statePreference){
+                    is StatePrefre.Sucess<*> ->{
+                       val result =  statePreference.succssResult as Int
+                        when(result){
+                            0 ->{ AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) }
+                            1-> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                            2 -> {
+                               this.checkThemeMode()
+                            }
+                        }
+
+                    }
+                    is StatePrefre.Error ->{
+                        exibirToast(statePreference.mensagem)
+                    }
                 }
-                is StatePrefre.Error ->{
-                    exibirToast(statePreference.mensagem)
-                }
+               isLoading =false
             }
-            isLoading =false
-        }
+
 
     }
+
     private fun getNavHost() {
         val navHost = supportFragmentManager.findFragmentById(R.id.myHostFragment) as NavHostFragment
         navController = navHost.navController
+        appBarConfiguration = AppBarConfiguration(navController.graph)
+
 
     }
     override fun onStop() {
         CoroutineScope(Dispatchers.Main).launch {
-
             soundViewModel.savePreference()
         }
         super.onStop()

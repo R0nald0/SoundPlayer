@@ -7,19 +7,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.data.entities.UserDataPreferecence
-import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.service.ServicePlayer
+import com.example.soundplayer.service.UserPrefferencesService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
 @HiltViewModel
 class PreferencesViewModel @Inject constructor(
-    private val prefrencesRepository: DataStorePreferenceRepository,
+    private val  serviceDataPreference: UserPrefferencesService,
     private val servicePlayer: ServicePlayer
 ) :ViewModel() {
 
@@ -32,18 +30,14 @@ class PreferencesViewModel @Inject constructor(
     private val  _uiStatePreffs =MutableLiveData<UserDataPreferecence>()
     var uiStatePreffs : LiveData<UserDataPreferecence> = _uiStatePreffs
 
-  init {
-
-  }
     fun readAllPrefference(){
         viewModelScope.launch {
             runCatching {
-                prefrencesRepository.readAllPreferecenceData()
+                serviceDataPreference.readAppAllPrefferences()
             }.fold(
                 onSuccess = {userPreff->
                      if (userPreff != null){
                          _uiStatePreffs.value = userPreff!!
-
                      } else{
                          Log.i("INFO_", "readAllPrefference: user pref Null")
                      }
@@ -52,36 +46,31 @@ class PreferencesViewModel @Inject constructor(
             )
         }
     }
-    fun saveDarkModePrefrence(isDarkMode :Boolean){
+    fun saveDarkModePrefrence(valueModeUi :Int){
        viewModelScope.launch {
-           prefrencesRepository.savePrefferenceUser(
-               value = isDarkMode,
-               key = Constants.ID_DARKMODE_KEY
+           serviceDataPreference.savePrefferenceUser(
+               value = valueModeUi,
+               key = Constants.ID_DARK_MODE_KEY
            )
        }
     }
 
      fun readDarkModePreference(){
          viewModelScope.launch {
-            runCatching {
-                prefrencesRepository.readBooleansPreference()
-            }.fold(
-                onSuccess = {result ->
-                   withContext(Dispatchers.Main){
-                       _isDarkMode.value = StatePrefre.Sucess(result ?: false)
-                   }
-                },
-                onFailure = {
-                    Log.i("INFO_", "preferências music sound: ${it.message}")
-                    StatePrefre.Error("Erro ao ler as preferências de Mode ui")
-                }
-            )
+             serviceDataPreference.readUserPrefference(Constants.ID_DARK_MODE_KEY).
+                 catch {error->
+                     Log.i("INFO_", "preferências music sound: ${error.message}")
+                     StatePrefre.Error("Erro ao ler as preferências de Mode ui")
+                 }
+                 .collect{result ->
+                     _isDarkMode.value = StatePrefre.Sucess(result ?: 2)
+                 }
          }
     }
 
     fun saveSizeTextMusicPrefrence(size :Float){
         viewModelScope.launch {
-            prefrencesRepository.savePrefferenceUser(
+            serviceDataPreference.savePrefferenceUser(
                 value =  size,
                 key = Constants.ID_SIZE_TEXT_TITLE_MUSIC
             )
@@ -90,7 +79,7 @@ class PreferencesViewModel @Inject constructor(
 
     fun readSizeTextMusicPreference(){
         viewModelScope.launch {
-            prefrencesRepository
+            serviceDataPreference
                 .readUserPrefference(Constants.ID_SIZE_TEXT_TITLE_MUSIC)
                 .catch {
                     Log.i("INFO_", "readDarkModePreference: ${it.message}")
@@ -105,13 +94,13 @@ class PreferencesViewModel @Inject constructor(
     fun  saveOrderedSoundPrefference(value : Int){
         viewModelScope.launch {
             runCatching {
-                prefrencesRepository.savePrefferenceUser(
+                serviceDataPreference.savePrefferenceUser(
                     value = value,
                     key = Constants.ID_ORDERED_SONS_PREFFERENCE
                 )
             }.fold(
                 onSuccess = {
-                    prefrencesRepository
+                    serviceDataPreference
                         .readUserPrefference(Constants.ID_ORDERED_SONS_PREFFERENCE)
                         .collect{
 

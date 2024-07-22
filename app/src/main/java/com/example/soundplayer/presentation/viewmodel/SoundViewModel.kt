@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.AudioAttributes
 import androidx.media3.common.Player
 import com.example.soundplayer.data.entities.UserDataPreferecence
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
@@ -42,6 +43,7 @@ class SoundViewModel @Inject constructor(
          isPlaying()
          getActualSound()
          getActualPlayList()
+
     }
 
     fun getCurrentPositionSound():Int{
@@ -109,6 +111,12 @@ class SoundViewModel @Inject constructor(
 
     private fun getPlayer() {
         myPlayer = servicePlayer.getPlayer()
+    }
+
+    fun updateAudioFocos(){
+        myPlayer.setAudioAttributes(
+            AudioAttributes.DEFAULT,true
+        )
     }
 
 }
