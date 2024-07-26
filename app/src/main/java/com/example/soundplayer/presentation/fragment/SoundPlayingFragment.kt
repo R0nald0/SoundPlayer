@@ -2,7 +2,6 @@ package com.example.soundplayer.presentation.fragment
 
 import android.content.ComponentName
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +14,7 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import androidx.navigation.fragment.findNavController
 import com.example.soundplayer.R
+import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.databinding.FragmentSoundPlayingBinding
 import com.example.soundplayer.presentation.service.SoundService
 import com.example.soundplayer.presentation.viewmodel.SoundViewModel
@@ -70,7 +70,6 @@ class SoundPlayingFragment : Fragment() {
         soundViewModel.actualSound?.observe(viewLifecycleOwner) { sound ->
             binding.txvNameMusic.isSelected = true
             binding.txvNameMusic.text = sound.title
-            Log.i("INFO_", "Sound title vm: ${sound!!.title}")
 
             if (sound.uriMediaAlbum != null){
                 binding.imvSong.setImageURI(sound.uriMediaAlbum)
@@ -79,13 +78,15 @@ class SoundPlayingFragment : Fragment() {
                 }
             }
         }
+        soundViewModel.playBackError.observe(viewLifecycleOwner){playbackError->
+            if (playbackError != null){
+                requireActivity().exibirToast(playbackError)
+            }
+        }
     }
     @OptIn(UnstableApi::class)
     private fun  initPlayer(){
         binding.myPlayerView.player = soundViewModel.myPlayer
-//        soundViewModel.getPlayer().let { exoPlayer ->
-//             = exoPlayer
-//        }
     }
 
 }

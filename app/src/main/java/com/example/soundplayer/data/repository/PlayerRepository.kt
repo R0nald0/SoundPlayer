@@ -1,8 +1,10 @@
 package com.example.soundplayer.data.repository
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.example.soundplayer.model.PlayList
@@ -17,18 +19,17 @@ class PlayerRepository @Inject constructor(
    private var playBackPosition: Long = -0L
    private var _playlistCurrentlyPlaying :PlayList ? = null
    private var _actualSound  = MutableLiveData<Sound>()
+   private var _playBackError  = MutableLiveData<String?>()
    private  var isPlayingObserver  = MutableLiveData<Boolean>()
 
-    fun getPlayer() = exoPlayer
-     fun getActaulSound() =_actualSound
+   fun getPlayer() = exoPlayer
+   fun getActaulSound() = _actualSound
+   fun getPlayBackError() = _playBackError
    fun getAcutalPlayList() :PlayList?{
         return  _playlistCurrentlyPlaying
    }
    fun isPlaying()  = isPlayingObserver
 
-   fun replaceMediaItem(list: Set<Sound>){
-
-   }
    fun getAllMusics(playList: PlayList): PlayList? {
 
       if ( _playlistCurrentlyPlaying != null &&  _playlistCurrentlyPlaying!!.name != playList.name){
@@ -67,7 +68,6 @@ class PlayerRepository @Inject constructor(
          exoPlayer.playWhenReady = playerWhenRead
          exoPlayer.prepare()
       }
-
       configActualSound()
    }
 
@@ -87,23 +87,53 @@ class PlayerRepository @Inject constructor(
       }
 
       exoPlayer.addListener(object : Player.Listener{
+         override fun onEvents(player: Player, events: Player.Events) {
+            super.onEvents(player, events)
+            Log.d("INFO_", "onEvents: ${events}")
+         }
+
+         override fun onPlayerError(error: PlaybackException) {
+            super.onPlayerError(error)
+            Log.e("INFO_", "onPlayerError: ${error.message} :${error.errorCode}")
+            when(error.errorCode){
+               PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED -> {
+                  _playBackError.value = "Erro ao repoduzir mídia,formato incompatível. "
+                  exoPlayer.seekToNext()
+                  exoPlayer.playWhenReady
+                  exoPlayer.prepare()
+                  exoPlayer.play()
+               }
+            }
+            _playBackError.value = null
+         }
+
+         override fun onPlayerErrorChanged(error: PlaybackException?) {
+            super.onPlayerErrorChanged(error)
+            if (error != null) {
+               Log.d("INFO_", "onPlayerErrorChanged: ${error.message} :${error.errorCode}")
+            }
+         }
+
          override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
             super.onMediaMetadataChanged(mediaMetadata)
 
-            val sound =Sound(
-               idSound = null,
-               path = "",
-               title = mediaMetadata.displayTitle.toString(),
-               duration = exoPlayer.duration.toString(),
-               uriMediaAlbum = mediaMetadata.artworkUri,
-               insertedDate = null
-            )
+            Log.d("INFO_", "onMediaMetadataChanged: ${exoPlayer.duration}")
 
-            _actualSound.value= sound
-            currentItem = exoPlayer.currentMediaItemIndex
-            _playlistCurrentlyPlaying?.let {
-               it.copy(currentMusicPosition = exoPlayer.currentMediaItemIndex)
-            }
+               val sound =Sound(
+                  idSound = null,
+                  path = "",
+                  title = mediaMetadata.displayTitle.toString(),
+                  duration = exoPlayer.duration.toString(),
+                  uriMediaAlbum = mediaMetadata.artworkUri,
+                  insertedDate = null
+               )
+
+               _actualSound.value= sound
+               currentItem = exoPlayer.currentMediaItemIndex
+               _playlistCurrentlyPlaying?.let {
+                  it.copy(currentMusicPosition = exoPlayer.currentMediaItemIndex)
+               }
+
          }
 
          override fun onIsPlayingChanged(isPlaying: Boolean) {

@@ -26,6 +26,7 @@ class SoundViewModel @Inject constructor(
 ) :ViewModel(){
 
     var actualSound  : LiveData<Sound> ? = null
+    lateinit var playBackError  : LiveData<String?>
     var isPlayingObserver  = MutableLiveData<Boolean>()
 
     private var _currentPlayingPlayList = MutableLiveData<PlayList>()
@@ -43,9 +44,14 @@ class SoundViewModel @Inject constructor(
          isPlaying()
          getActualSound()
          getActualPlayList()
-
+         getPlayback()
     }
 
+    fun getPlayback() {
+        viewModelScope.launch {
+            playBackError = servicePlayer.getPlayBackError()
+        }
+    }
     fun getCurrentPositionSound():Int{
       return  _currentPlayingPlayList.value?.currentMusicPosition ?: 0
     }
@@ -70,7 +76,6 @@ class SoundViewModel @Inject constructor(
           }
        }
     suspend fun savePreference(){
-
         runCatching {
             if(_currentPlayingPlayList.value != null){
                 dataStorePreferenceRepository
@@ -87,6 +92,7 @@ class SoundViewModel @Inject constructor(
             },
             onFailure = {
                 Log.i("INFO_", "savePreference: erro ao salvar preferencias ${it.message}")
+
             }
         )
 

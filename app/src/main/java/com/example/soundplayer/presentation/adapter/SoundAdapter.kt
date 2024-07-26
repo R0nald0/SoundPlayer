@@ -31,8 +31,9 @@ class SoundAdapter(
     private  var actualSound :Sound? = null
     private val soundSelecionados  = mutableSetOf<Pair<Int,Sound>>()
     var sizeTitleMusic =16f
-    private var isPlay = false;
+    private var isPlay = false
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateAnimationWithPlaying(isPlaying : Boolean){
         isPlay = isPlaying
         notifyDataSetChanged()
@@ -63,8 +64,6 @@ class SoundAdapter(
             binding.txvDuration.text = duration
             binding.txvTitle.text =soudd.title
             binding.txvTitle.textSize = sizeTitleMusic
-
-            //showHideOptionsMenu(soudd, position)
 
             binding.idBtnOptionSound.setOnClickListener {
                 createOptionsMenu(it,soudd,position)

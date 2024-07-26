@@ -1,5 +1,6 @@
 package com.example.soundplayer.service
 
+import androidx.lifecycle.MutableLiveData
 import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.data.entities.toSound
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
@@ -23,8 +24,8 @@ class ServicePlayer @Inject constructor(
     }
     suspend fun findAllPlayList() = soundPlayListRepository.findAllPlayListWithSong()
 
-  private  fun ondenate(soundList:MutableSet<Sound>, ondanateType:Int):MutableSet<Sound>{
-      return  when(ondanateType){
+  private  fun ondenate(soundList:MutableSet<Sound>, ondernateType:Int):MutableSet<Sound>{
+      return  when(ondernateType){
             0-> soundList.sortedBy { it.title }.toMutableSet()
             1->  soundList.sortedByDescending { it.title }.toMutableSet()
             2-> soundList.sortedBy { it.insertedDate }.toMutableSet()
@@ -56,12 +57,16 @@ class ServicePlayer @Inject constructor(
     suspend fun deletePlayList(playList : PlayList):Int{
         return soundPlayListRepository.deletePlaylist(playList)
     }
-  suspend  fun getActualSound() =playerRepository.getActaulSound()
+  suspend  fun getActualSound():MutableLiveData<Sound> {
+
+      return playerRepository.getActaulSound()
+  }
     fun getActualPlayList()= playerRepository.getAcutalPlayList()
     fun isiPlaying() =playerRepository.isPlaying()
 
     fun destroyPlayer() =playerRepository.destroyPlayer()
     fun getPlayer() =playerRepository.getPlayer()
+   suspend  fun getPlayBackError() = playerRepository.getPlayBackError()
 
     suspend fun  addItemFromListMusic(idPlayList:Long, soundsToInsertPlayList: Set<Sound>):List<Long>{
 
