@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <resources>
-    <dimen name="list_item_spacing">16dp</dimen>
-    <dimen name="list_item_spacing_half">8dp</dimen>
+    <dimen name="spacing_light">4dp</dimen>
+    <dimen name="spacing_high">16dp</dimen>
+    <dimen name="spacing_half">8dp</dimen>
     <dimen name="expanded_bottom_sheet">86dp</dimen>
     <dimen name="size_title_sound">16sp</dimen>
+    <dimen name="medium_spacing">18dp</dimen>
 </resources>

@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.AudioAttributes
 import androidx.media3.common.Player
 import com.example.soundplayer.data.entities.UserDataPreferecence
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
@@ -25,6 +26,7 @@ class SoundViewModel @Inject constructor(
 ) :ViewModel(){
 
     var actualSound  : LiveData<Sound> ? = null
+    lateinit var playBackError  : LiveData<String?>
     var isPlayingObserver  = MutableLiveData<Boolean>()
 
     private var _currentPlayingPlayList = MutableLiveData<PlayList>()
@@ -42,8 +44,14 @@ class SoundViewModel @Inject constructor(
          isPlaying()
          getActualSound()
          getActualPlayList()
+         getPlayback()
     }
 
+    fun getPlayback() {
+        viewModelScope.launch {
+            playBackError = servicePlayer.getPlayBackError()
+        }
+    }
     fun getCurrentPositionSound():Int{
       return  _currentPlayingPlayList.value?.currentMusicPosition ?: 0
     }
@@ -68,7 +76,6 @@ class SoundViewModel @Inject constructor(
           }
        }
     suspend fun savePreference(){
-
         runCatching {
             if(_currentPlayingPlayList.value != null){
                 dataStorePreferenceRepository
@@ -85,6 +92,7 @@ class SoundViewModel @Inject constructor(
             },
             onFailure = {
                 Log.i("INFO_", "savePreference: erro ao salvar preferencias ${it.message}")
+
             }
         )
 
@@ -109,6 +117,12 @@ class SoundViewModel @Inject constructor(
 
     private fun getPlayer() {
         myPlayer = servicePlayer.getPlayer()
+    }
+
+    fun updateAudioFocos(){
+        myPlayer.setAudioAttributes(
+            AudioAttributes.DEFAULT,true
+        )
     }
 
 }

@@ -4,7 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import com.example.soundplayer.commons.constants.Constants
-import com.example.soundplayer.commons.constants.Constants.ID_DARKMODE_KEY
+import com.example.soundplayer.commons.constants.Constants.ID_DARK_MODE_KEY
 import com.example.soundplayer.commons.constants.Constants.ID_ORDERED_SONS_PREFFERENCE
 import com.example.soundplayer.commons.constants.Constants.ID_PLAYLIST_KEY
 import com.example.soundplayer.commons.constants.Constants.ID_SIZE_TEXT_TITLE_MUSIC
@@ -22,7 +22,7 @@ class DataStorePreferenceRepository @Inject constructor(
     suspend fun savePreference(playlistKeyId:Long?, positionSoundKey:Int){
         try {
             dataStore.edit { prefen ->
-                prefen[Constants.ID_PLAYLIST_KEY] = playlistKeyId ?:1
+                prefen[ID_PLAYLIST_KEY] = playlistKeyId ?:1
                 prefen[POSITION_KEY] = positionSoundKey
             }
         }catch (ioException:IOException){
@@ -59,16 +59,16 @@ class DataStorePreferenceRepository @Inject constructor(
 
     suspend fun readAllPreferecenceData(): UserDataPreferecence? {
            try {
-              val position = readPreferencesPos(POSITION_KEY)
-                val idPlay= readPreferences(ID_PLAYLIST_KEY)
-               val isDarkMode= readBooleansPreference()
+               val position = readPreferencesPos(POSITION_KEY)
+               val idPlay= readPreferences(ID_PLAYLIST_KEY)
+               val isDarkMode= readUserPrefference(ID_DARK_MODE_KEY)
                val sizeTitleMusic = readUserPrefference(ID_SIZE_TEXT_TITLE_MUSIC)
                val  orderedSound = readUserPrefference(ID_ORDERED_SONS_PREFFERENCE)
                if (idPlay!=null){
                    return  UserDataPreferecence(
                        idPreference = idPlay ,
                        postionPreference = position ?: 0,
-                       isDarkMode =isDarkMode ?: false,
+                       isDarkMode =isDarkMode.first() ?: 0,
                        sizeTitleMusic = sizeTitleMusic.first() ?: 16f,
                        orderedSound =  orderedSound.first() ?: 0,
                    )
@@ -87,8 +87,8 @@ class DataStorePreferenceRepository @Inject constructor(
                 orderedSound = data[ID_ORDERED_SONS_PREFFERENCE] ?: 0,
                 idPreference = data[ID_PLAYLIST_KEY] ?: 1L,
                 postionPreference = data[POSITION_KEY] ?: 0,
-                isDarkMode = data[ID_DARKMODE_KEY] ?: false,
-                sizeTitleMusic = data[ID_SIZE_TEXT_TITLE_MUSIC] ?: 16f
+                isDarkMode = data[ID_DARK_MODE_KEY] ?: 0,
+                sizeTitleMusic = data[ID_SIZE_TEXT_TITLE_MUSIC] ?: 15f
             )
         }catch (ioException:IOException){
             throw ioException
@@ -96,17 +96,6 @@ class DataStorePreferenceRepository @Inject constructor(
             throw exception
         }
     }
-    suspend fun readBooleansPreference():Boolean?{
-        try {
-            val data  = dataStore.data.first()
-            return data[ID_DARKMODE_KEY]
-        }catch (ioException:IOException){
-            throw ioException
-        }catch (exception :Exception){
-            throw exception
-        }
-    }
-
 
     suspend fun <T>readUserPrefference(key: Preferences.Key<T>): Flow<T?> {
         try {

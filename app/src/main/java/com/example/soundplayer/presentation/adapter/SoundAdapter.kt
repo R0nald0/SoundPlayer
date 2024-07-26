@@ -31,8 +31,9 @@ class SoundAdapter(
     private  var actualSound :Sound? = null
     private val soundSelecionados  = mutableSetOf<Pair<Int,Sound>>()
     var sizeTitleMusic =16f
-    private var isPlay = false;
+    private var isPlay = false
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateAnimationWithPlaying(isPlaying : Boolean){
         isPlay = isPlaying
         notifyDataSetChanged()
@@ -44,6 +45,8 @@ class SoundAdapter(
         soundsPlayList = actualPlayList
         notifyDataSetChanged()
     }
+
+
     @SuppressLint("NotifyDataSetChanged")
     fun getActualSound(sound :Sound){
         actualSound = sound
@@ -54,7 +57,6 @@ class SoundAdapter(
         return Pair (soundsPlayList?.idPlayList?: 1, soundSelecionados)
     }
 
-
     inner class  SoundViewHolder(private val binding : ItemSoundBinding): ViewHolder(binding.root){
         fun bind(soudd :Sound,position: Int){
 
@@ -62,9 +64,6 @@ class SoundAdapter(
             binding.txvDuration.text = duration
             binding.txvTitle.text =soudd.title
             binding.txvTitle.textSize = sizeTitleMusic
-
-
-            //showHideOptionsMenu(soudd, position)
 
             binding.idBtnOptionSound.setOnClickListener {
                 createOptionsMenu(it,soudd,position)
@@ -82,23 +81,18 @@ class SoundAdapter(
             }
 
             clickItemEvent(position, soudd)
+            //todo verificar se esta sendo chamado em, dois lugares
             configApperenceItemImage(soudd)
             longPressEvent(position,soudd)
         }
 
-        fun configurAnimationWhenPlaying(isPlaying: Boolean) {
+      fun configurAnimationWhenPlaying(isPlaying: Boolean) {
             if (isPlaying){
                 binding.txvTitle.isSelected = true
                 binding.lottieSoundAnimePlaying.isVisible = true
             }else{
-                binding.txvTitle.isSelected = false
+               binding.txvTitle.isSelected = false
                 binding.lottieSoundAnimePlaying.isVisible = false
-                binding.txvTitle.setTextColor(
-                    ContextCompat.getColor(
-                        binding.root.context,
-                        R.color.my_primary
-                    )
-                )
             }
         }
 
@@ -133,7 +127,9 @@ class SoundAdapter(
                         R.color.red
                     )
                 )
+
                 configurAnimationWhenPlaying(true)
+
             } else {
                 binding.txvTitle.setTextColor(
                     ContextCompat.getColor(
@@ -210,6 +206,7 @@ class SoundAdapter(
             if (actualSound != null && actualSound?.title == sound.title){
                 holder.configurAnimationWhenPlaying(isPlay)
             }
+
         }
     }
     fun clearSoundListSelected(){

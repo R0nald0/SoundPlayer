@@ -3,6 +3,7 @@ package com.example.soundplayer.presentation.fragment
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -69,19 +71,20 @@ class MainFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         myMenuProvider = MyMenuProvider()
+        Log.d("INFO_", "onCreateContextMenu: onCreate ")
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         getPermissions()
-
         binding = FragmentMainBinding.inflate(inflater,container,false)
+        Log.d("INFO_", "onCreateContextMenu: onCreateView ")
         return binding.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        Log.d("INFO_", "onCreateContextMenu: onViewCreated ")
         observersViewModel()
         initAdapter()
         initBindigs()
@@ -95,6 +98,11 @@ class MainFragment : Fragment() {
 
     override fun onStart() {
         preferencesViewModel.readSizeTextMusicPreference()
+        val sound = soundViewModel.actualSound?.value
+        if (sound != null){
+            adapterSound.getActualSound(sound)
+        }
+        Log.d("INFO_", "onCreateContextMenu: onStart ")
         super.onStart()
     }
 
@@ -177,6 +185,12 @@ class MainFragment : Fragment() {
                 }
             }
         }
+
+        soundViewModel.playBackError.observe(viewLifecycleOwner){playbackError->
+            if (playbackError != null){
+                requireActivity().exibirToast(playbackError)
+            }
+        }
     }
 
     private fun getPermissions(){
@@ -192,6 +206,7 @@ class MainFragment : Fragment() {
 
     }
 
+    @SuppressLint("StringFormatMatches")
     private fun verifyPermissions(isPermitted : Boolean) {
         if (!isPermitted) {
             binding.LineartLayoutEmptySound.isVisible= true
@@ -233,7 +248,7 @@ class MainFragment : Fragment() {
             },
             soundViewModel =  soundViewModel,
             isUpdateList = {isUpdate->
-                updateViewWhenMenuChange(isUpdate)
+               updateViewWhenMenuChange(isUpdate)
             },
             onClickInitNewFragment = {
                 findNavController().navigate(R.id.action_mainFragment_to_soundPlayingFragment)
@@ -271,9 +286,9 @@ class MainFragment : Fragment() {
     }
 
     private fun updateViewWhenMenuChange(isUpdate: Boolean) {
+       requireActivity().removeMenuProvider(myMenuProvider)
+       requireActivity().addMenuProvider(myMenuProvider)
 
-        requireActivity().removeMenuProvider(myMenuProvider)
-        requireActivity().addMenuProvider(myMenuProvider)
         if (isUpdate) {
             binding.fabAddPlayList.isVisible = false
             binding.mainFragmentBackButton.setOnClickListener {
@@ -303,6 +318,10 @@ class MainFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+    }
+
     override fun onStop() {
         CoroutineScope(Dispatchers.Main).launch{
             soundViewModel.savePreference()
@@ -310,19 +329,19 @@ class MainFragment : Fragment() {
         super.onStop()
     }
 
+
+
     inner class  MyMenuProvider() : MenuProvider {
         @SuppressLint("SuspiciousIndentation")
         override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-
             val pairPlayList = adapterSound.getSoundSelecionados()
 
             if (pairPlayList.second.isEmpty()){
-                binding.txvTitleToolbar.text = getString(R.string.app_name)
+                binding.txvTitleToolbar.text = context?.let { ContextCompat.getString(it,R.string.app_name) }
                 binding.mainFragmentBackButton.isVisible =false
                 menuInflater.inflate(R.menu.menu_toolbar,menu)
-
             }else{
-                binding.txvTitleToolbar.text= getString(R.string.selecionar_itens)
+                binding.txvTitleToolbar.text= context?.let { ContextCompat.getString(it,R.string.app_name) }
                 binding.mainFragmentBackButton.isVisible =true
                 menuInflater.inflate(R.menu.update_toolbar_menu,menu)
             }
@@ -351,5 +370,6 @@ class MainFragment : Fragment() {
 
         }
     }
+
 
 }
