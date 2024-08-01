@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.model.Sound
 import java.io.File
@@ -80,6 +81,15 @@ object MyContetntProvider {
            }catch (nullPointer : NullPointerException){
                nullPointer.printStackTrace()
                context.exibirToast( "Null ${nullPointer.printStackTrace()}")
+           }catch (  illegalArgumentException: IllegalArgumentException){
+               Log.e("Error", "illegalArgumentException: ${illegalArgumentException.message}", )
+               illegalArgumentException.printStackTrace()
+               context.exibirToast( "Null ${illegalArgumentException.printStackTrace()}")
+           }
+           catch ( fileNotFound : Exception){
+               Log.e("Error", "FILE NOT FOUND: ${fileNotFound.message}", )
+               fileNotFound.printStackTrace()
+               context.exibirToast( "Null ${fileNotFound.printStackTrace()}")
            }
        }
        return MyContetntProvider

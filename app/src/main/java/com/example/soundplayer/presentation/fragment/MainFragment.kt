@@ -119,6 +119,7 @@ class MainFragment : Fragment() {
     private fun setupToolbar() {
         val activity  = activity as AppCompatActivity
         activity.setSupportActionBar(binding.toolbarSelecrionItemsMaterial)
+
     }
     @SuppressLint("StringFormatMatches")
     private  fun observersViewModel(){
@@ -129,7 +130,6 @@ class MainFragment : Fragment() {
         }
 
         soundViewModel.isPlayingObserver.observe(viewLifecycleOwner){ isPlaying ->
-
             if (isPlaying){
                 //TODO PlayList vindo nula
                 soundViewModel.currentPlayList.observe(viewLifecycleOwner){actualPLayiingPlayList->

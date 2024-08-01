@@ -9,7 +9,7 @@ class SoundPlayerReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         // This method is called when the BroadcastReceiver is receiving an Intent broadcast.
-         val action = intent.action
+        val action = intent.action
        val resul  = when (action){
             Intent.ACTION_MEDIA_SCANNER_STARTED -> "Action media scanner"
             Intent.ACTION_MEDIA_SHARED -> "Action media shared"

@@ -115,7 +115,7 @@ class SoundViewModel @Inject constructor(
 
     }
 
-    private fun getPlayer() {
+     fun getPlayer() {
         myPlayer = servicePlayer.getPlayer()
     }
 

@@ -3,15 +3,17 @@ package com.example.soundplayer.presentation
 
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.graphics.ColorUtils
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavController
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
 import com.example.soundplayer.R
+import com.example.soundplayer.commons.extension.checkThemeMode
 import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.databinding.ActivityMainBinding
 import com.example.soundplayer.presentation.viewmodel.PreferencesViewModel
@@ -21,9 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import android.content.res.Configuration
-import androidx.navigation.ui.AppBarConfiguration
-import com.example.soundplayer.commons.extension.checkThemeMode
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -48,6 +47,13 @@ class MainActivity : AppCompatActivity() {
         getNavHost()
         observer()
         setupNavitionBarColor()
+
+        val pendingIntent = NavDeepLinkBuilder(this)
+            .setGraph(R.navigation.sound_navigation_graph)
+            .setDestination(R.id.soundPlayingFragment)
+            .setComponentName(MainActivity::class.java)
+            .createPendingIntent()
+
     }
 
     private fun setupNavitionBarColor() {
@@ -90,8 +96,6 @@ class MainActivity : AppCompatActivity() {
         val navHost = supportFragmentManager.findFragmentById(R.id.myHostFragment) as NavHostFragment
         navController = navHost.navController
         appBarConfiguration = AppBarConfiguration(navController.graph)
-
-
     }
     override fun onStop() {
         CoroutineScope(Dispatchers.Main).launch {

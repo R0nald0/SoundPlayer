@@ -70,6 +70,7 @@ class SoundAdapter(
             }
 
             configSelectionedItemApperence(position,soudd)
+           
 
             if (soudd.uriMediaAlbum != null) {
                 binding.imageView.setImageURI(soudd.uriMediaAlbum)

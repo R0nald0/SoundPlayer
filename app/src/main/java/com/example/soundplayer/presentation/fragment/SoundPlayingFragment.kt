@@ -18,12 +18,14 @@ import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.databinding.FragmentSoundPlayingBinding
 import com.example.soundplayer.presentation.service.SoundService
 import com.example.soundplayer.presentation.viewmodel.SoundViewModel
+import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 
 class SoundPlayingFragment : Fragment() {
     private val binding by lazy {
         FragmentSoundPlayingBinding.inflate(layoutInflater)
     }
+   lateinit var controllerAsync: ListenableFuture<MediaController>
 
     private val  soundViewModel by activityViewModels<SoundViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,10 +55,15 @@ class SoundPlayingFragment : Fragment() {
             requireActivity(),
             ComponentName(requireActivity(), SoundService::class.java)
         )
-        val controllerAsync = MediaController.Builder(requireActivity(), sessonToken).buildAsync()
+         controllerAsync = MediaController.Builder(requireActivity(), sessonToken)
+
+             .buildAsync()
         controllerAsync.addListener({
             binding.myPlayerView.player = controllerAsync.get()
         }, MoreExecutors.directExecutor())
+
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -87,6 +94,11 @@ class SoundPlayingFragment : Fragment() {
     @OptIn(UnstableApi::class)
     private fun  initPlayer(){
         binding.myPlayerView.player = soundViewModel.myPlayer
+    }
+
+    override fun onStop() {
+        MediaController.releaseFuture(controllerAsync)
+        super.onStop()
     }
 
 }

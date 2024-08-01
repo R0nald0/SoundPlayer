@@ -83,13 +83,12 @@ class PlayerRepository @Inject constructor(
             insertedDate = null
          )
          _actualSound.value =  sound
-
       }
 
       exoPlayer.addListener(object : Player.Listener{
          override fun onEvents(player: Player, events: Player.Events) {
             super.onEvents(player, events)
-            Log.d("INFO_", "onEvents: ${events}")
+            Log.d("INFO_", "onEvents: $events")
          }
 
          override fun onPlayerError(error: PlaybackException) {
@@ -97,7 +96,7 @@ class PlayerRepository @Inject constructor(
             Log.e("INFO_", "onPlayerError: ${error.message} :${error.errorCode}")
             when(error.errorCode){
                PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED -> {
-                  _playBackError.value = "Erro ao repoduzir mídia,formato incompatível. "
+                  _playBackError.value = "Erro ao reproduzir mídia,formato inválido."
                   exoPlayer.seekToNext()
                   exoPlayer.playWhenReady
                   exoPlayer.prepare()
@@ -107,17 +106,9 @@ class PlayerRepository @Inject constructor(
             _playBackError.value = null
          }
 
-         override fun onPlayerErrorChanged(error: PlaybackException?) {
-            super.onPlayerErrorChanged(error)
-            if (error != null) {
-               Log.d("INFO_", "onPlayerErrorChanged: ${error.message} :${error.errorCode}")
-            }
-         }
 
          override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
             super.onMediaMetadataChanged(mediaMetadata)
-
-            Log.d("INFO_", "onMediaMetadataChanged: ${exoPlayer.duration}")
 
                val sound =Sound(
                   idSound = null,
@@ -127,13 +118,11 @@ class PlayerRepository @Inject constructor(
                   uriMediaAlbum = mediaMetadata.artworkUri,
                   insertedDate = null
                )
-
                _actualSound.value= sound
                currentItem = exoPlayer.currentMediaItemIndex
                _playlistCurrentlyPlaying?.let {
                   it.copy(currentMusicPosition = exoPlayer.currentMediaItemIndex)
                }
-
          }
 
          override fun onIsPlayingChanged(isPlaying: Boolean) {
