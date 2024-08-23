@@ -24,7 +24,7 @@
  * Reproduzir
  * Editar
  * Excluir
- * Seleção de Thema
+ * Seleção de tema do app 
  * Criação e edição de PlayList
  
  ### Tecnologias utilizadas
@@ -37,7 +37,6 @@
   ### Tecnologias utilizadas para testes
   ---
   * junit 4
-  * espresso
   * Arch Core
   * truth
   
