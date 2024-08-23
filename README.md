@@ -13,9 +13,9 @@
 
  ---
 ### Imagens do App
-
-<img src="https://github.com/R0nald0/SoundPlayer/assets/40528885/08c5d63e-9d07-451d-8358-5142e16bfffe" width="300" height="400">
-<img src="https://github.com/R0nald0/SoundPlayer/assets/40528885/d4bc4c3e-f2a2-40b7-a802-1bfff6ef65e8" width="300" height="400">
+<img src="https://github.com/user-attachments/assets/9cb066b0-a9f1-4729-a53d-2b765fafdcfc" width="250" height="450">
+<img src="https://github.com/user-attachments/assets/9846001a-554f-4aa9-9e2d-d874302916ee" width="250" height="450">
+<img src="https://github.com/user-attachments/assets/360fa48c-f138-4c87-a5f6-91ced92de30f" width="250" height="450">
 
 ### Funcionalidades do App
 ---
