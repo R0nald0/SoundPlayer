@@ -24,6 +24,8 @@
  * Reproduzir
  * Editar
  * Excluir
+ * Seleção de Thema
+ * Criação e edição de PlayList
  
  ### Tecnologias utilizadas
  ---
