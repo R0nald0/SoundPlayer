@@ -28,5 +28,5 @@ interface SoundDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend   fun updateSound(sound: SoundEntity)
     @Delete
-    suspend  fun deleteSound(sound: SoundEntity):Int
+    suspend  fun deleteSound( sound: SoundEntity):Int
 }

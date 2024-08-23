@@ -99,8 +99,8 @@ class SoundPlayListRepository @Inject constructor (
             nullPointer.printStackTrace()
             throw NullPointerException("erro ao adiconar musica na playlist,id da playlist não encontrado")
         }
-        catch (exeption:Exception){
-            throw exeption;
+        catch (exception:Exception){
+            throw exception;
         }
     }
 

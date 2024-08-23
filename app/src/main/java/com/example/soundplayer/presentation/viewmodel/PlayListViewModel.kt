@@ -30,12 +30,15 @@ class PlayListViewModel @Inject constructor(
     val playListsWithSounds : LiveData<List<PlaylistWithSoundDomain>>
         get() = _playListsWithSounds
 
-    private val _soundListBd = MutableLiveData<List<Sound>>()
-    val soundListBd : LiveData<List<Sound>>
+    private val _soundListBd = MutableLiveData<Set<Sound>>()
+    val soundListBd : LiveData<Set<Sound>>
         get() = _soundListBd
 
     private val  _listSize = MutableLiveData<Int>()
     var listSize:LiveData<Int>  = _listSize
+
+    private val _hasPerMission =MutableLiveData<Boolean>()
+    val hasPermission :LiveData<Boolean> = _hasPerMission
 
     init {
       countTotalSound()
@@ -43,13 +46,13 @@ class PlayListViewModel @Inject constructor(
 
     fun savePlayList(playList: PlayList){
         viewModelScope.launch {
-            val retor  = servicePlayer.createPrayList(playList)
-            if (retor.isNotEmpty()){
+            val result  = servicePlayer.createPlayList(playList)
+            if (result.isNotEmpty()){
                 getAllPlayList()
             }
         }
-
     }
+
     fun getAllPlayList(){
         viewModelScope.launch {
             runCatching {
@@ -65,13 +68,13 @@ class PlayListViewModel @Inject constructor(
         }
     }
 
-  fun findAllSound(){
+    fun findAllSound(){
       viewModelScope.launch {
           runCatching {
               soundRepository.findAllSound()
           }.fold(
               onSuccess = {soundList->
-                  _soundListBd.value = soundList
+                  _soundListBd.value = soundList.toSet()
               },
               onFailure = {erro->
                   Log.i(TAG, "findAllSound: Erro ao buscar sound ${erro.message}")
@@ -79,31 +82,35 @@ class PlayListViewModel @Inject constructor(
           )
       }
   }
-    fun countTotalSound(){
+    private fun countTotalSound(){
         viewModelScope.launch {
             _listSize.value = soundRepository.findAllSound().size
         }
     }
-    fun saveAllSoundsByContentProvider(sizeListAllMusic: MutableSet<Sound>){
+    fun saveAllSoundsByContentProvider(sizeListAllMusic: Set<Sound>){
+        if (sizeListAllMusic.isEmpty()){
+            _soundListBd.value = emptySet()
+             return
+        }
+
         viewModelScope.launch {
             runCatching {
                 servicePlayer.saveSoundProvideFromDb(sizeListAllMusic)
             }.fold(
                 onSuccess = { listSound->
-                       if (listSound?.size != 0){
+                       if (!listSound.isNullOrEmpty()){
                            val sounds =soundRepository.findAllSound()
-                           _soundListBd.value =  sounds
+                           _soundListBd.value =  sounds.toSet()
                            _listSize.value = sounds.size
                        }
-
-                    Log.i(TAG, "saveAllSoundsByContentProvider: AllMusics salva")
                 },
                 onFailure = {
-                    Log.i(TAG, "saveAllSoundsByContentProvider: erro ao salvar allmucis")
+                    Log.i(TAG, "saveAllSoundsByContentProvider: erro ao salvar allmusics")
                 }
             )
         }
     }
+
     fun deletePlayList(playList: PlayList) {
         viewModelScope.launch {
             val reterno   = servicePlayer.deletePlayList(playList)
@@ -178,5 +185,28 @@ class PlayListViewModel @Inject constructor(
         }
     }
 
+    fun verifyPermissions(permitted:Boolean){
+        viewModelScope.launch {
+            _hasPerMission.value = permitted
+        }
+    }
 
+    fun verifyIfUpdateAllMusicsPlayList(soundsOfSystem : Set<Sound>){
+        viewModelScope.launch {
+            runCatching {
+                 servicePlayer.verifcaSeSoundContemNoSistema(soundOfSystem = soundsOfSystem )
+            }.fold(
+                onSuccess = {removedSound->
+                    if (removedSound.isNotEmpty()){
+                        //atualizar a view
+                        findPlayListById(idPlayList = 1)
+                        getAllPlayList()
+                    }
+
+                },
+                onFailure = {}
+            )
+        }
+
+    }
 }

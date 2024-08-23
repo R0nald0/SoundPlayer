@@ -33,64 +33,61 @@ object MyContetntProvider {
              null
          )!!
 
+
         return MyContetntProvider
     }
 
 
 
    fun getListOfSound(context: Context):MyContetntProvider {
-       if (cursor != null) {
-           try {
-               val id =cursor.getColumnIndexOrThrow( MediaStore.Audio.Media._ID)
-               val albumid =cursor.getColumnIndexOrThrow( MediaStore.Audio.Media.ALBUM_ID)
-               val duarution = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
-               val path  = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
-               val title = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+       try {
+           val id =cursor.getColumnIndexOrThrow( MediaStore.Audio.Media._ID)
+           val albumid =cursor.getColumnIndexOrThrow( MediaStore.Audio.Media.ALBUM_ID)
+           val duarution = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+           val path  = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+           val title = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
 
 
-               while (cursor.moveToNext()){
+           while (cursor.moveToNext()){
 
-                   val idMedia = cursor.getLong(id)
-                   val albumidMedia = cursor.getLong(albumid)
-                   val mediaUriAlbum  = ContentUris.withAppendedId(
-                       Uri.parse("content://media/external/audio/albumart"),albumidMedia)
-
-                   val mediaUri  = ContentUris.withAppendedId(
-                       MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,idMedia)
+               val idMedia = cursor.getLong(id)
+               val albumidMedia = cursor.getLong(albumid)
+               val mediaUriAlbum  = ContentUris.withAppendedId(
+                   Uri.parse("content://media/external/audio/albumart"),albumidMedia)
+              // Log.d("INFO_", "contentProvider id sound: $idMedia ")
+               val mediaUri  = ContentUris.withAppendedId(
+                   MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,idMedia)
 
 //                  val itemPathAlbumMedia = mediaUriAlbum.pathSegments[3].toInt()
-              //    val newMediaAlbum =if(itemPathAlbumMedia == 1 || itemPathAlbumMedia ==3)  null else  mediaUriAlbum
-                   val sound = Sound(
-                       idSound = null,
-                       path = cursor.getString(path),
-                       duration =cursor.getInt(duarution).toString(),
-                       title= cursor.getString(title),
-                       uriMedia = mediaUri,
-                       uriMediaAlbum = mediaUriAlbum,
-                       insertedDate = null
-                   )
+          //    val newMediaAlbum =if(itemPathAlbumMedia == 1 || itemPathAlbumMedia ==3)  null else  mediaUriAlbum
+               val sound = Sound(
+                   idSound =idMedia,
+                   path = cursor.getString(path),
+                   duration =cursor.getInt(duarution).toString(),
+                   title= cursor.getString(title),
+                   uriMedia = mediaUri,
+                   uriMediaAlbum = mediaUriAlbum,
+                   insertedDate = null
+               )
 
-                   if (File(sound.path).exists()){
-                       if (!_listSoundFromContentProvider.contains(sound)){
-                           _listSoundFromContentProvider.add(sound)
-                       }
+               if (File(sound.path).exists()){
+                   if (!_listSoundFromContentProvider.contains(sound)){
+                       _listSoundFromContentProvider.add(sound)
                    }
                }
-               cursor.close()
+           }
+           cursor.close()
 
-           }catch (nullPointer : NullPointerException){
-               nullPointer.printStackTrace()
-               context.exibirToast( "Null ${nullPointer.printStackTrace()}")
-           }catch (  illegalArgumentException: IllegalArgumentException){
-               Log.e("Error", "illegalArgumentException: ${illegalArgumentException.message}", )
-               illegalArgumentException.printStackTrace()
-               context.exibirToast( "Null ${illegalArgumentException.printStackTrace()}")
-           }
-           catch ( fileNotFound : Exception){
-               Log.e("Error", "FILE NOT FOUND: ${fileNotFound.message}", )
-               fileNotFound.printStackTrace()
-               context.exibirToast( "Null ${fileNotFound.printStackTrace()}")
-           }
+       }catch (nullPointer : NullPointerException){
+           nullPointer.printStackTrace()
+           context.exibirToast( "Null ${nullPointer.printStackTrace()}")
+       }catch (  illegalArgumentException: IllegalArgumentException){
+           Log.e("Error", "illegalArgumentException: ${illegalArgumentException.message}", )
+           illegalArgumentException.printStackTrace()
+       }
+       catch ( generalExeption : Exception){
+           generalExeption.printStackTrace()
+           Log.e("Error", "generalExeption: ${generalExeption.message}", )
        }
        return MyContetntProvider
    }

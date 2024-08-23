@@ -74,9 +74,7 @@ class PlayListAdapter(
             }
 
             binding.idContraintPlayList.setOnLongClickListener {view->
-                if (actualPlayList.name != Constants.ALL_MUSIC_NAME){
-                    createOptionsMenu(view,actualPlayList)
-                }
+                createOptionsMenu(view,actualPlayList)
                 true
             }
         }
@@ -154,10 +152,20 @@ class PlayListAdapter(
     private fun createOptionsMenu(view : View,playList: PlayList){
 
         val popupMenu  =PopupMenu(view.context,view)
-        popupMenu.inflate(R.menu.play_list_menu)
+
+        if (playList.name != Constants.ALL_MUSIC_NAME){
+            popupMenu.inflate(R.menu.play_list_menu)
+        }else{
+            popupMenu.inflate(R.menu.allmusic_menu)
+        }
+
         popupMenu.show()
-        popupMenu.setOnMenuItemClickListener {
-            when(it.itemId){
+        popupMenu.setOnMenuItemClickListener {item->
+
+            when(item.itemId){
+                R.id.id_add_music->{
+                    true
+                }
                 R.id.idEdit->{
                     val upadateNameBinding =UpadateNamePlaylistLayoutBinding.inflate(LayoutInflater.from(view.context),null, false)
 

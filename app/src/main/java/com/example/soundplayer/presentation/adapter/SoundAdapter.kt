@@ -82,7 +82,7 @@ class SoundAdapter(
             }
 
             clickItemEvent(position, soudd)
-            //todo verificar se esta sendo chamado em, dois lugares
+
             configApperenceItemImage(soudd)
             longPressEvent(position,soudd)
         }

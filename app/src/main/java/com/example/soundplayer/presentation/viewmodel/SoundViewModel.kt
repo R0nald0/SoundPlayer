@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.Player
+import com.example.soundplayer.commons.execptions.Failure
 import com.example.soundplayer.data.entities.UserDataPreferecence
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.model.PlayList
@@ -26,7 +27,7 @@ class SoundViewModel @Inject constructor(
 ) :ViewModel(){
 
     var actualSound  : LiveData<Sound> ? = null
-    lateinit var playBackError  : LiveData<String?>
+    lateinit var playBackError  : LiveData<Failure?>
     var isPlayingObserver  = MutableLiveData<Boolean>()
 
     private var _currentPlayingPlayList = MutableLiveData<PlayList>()
