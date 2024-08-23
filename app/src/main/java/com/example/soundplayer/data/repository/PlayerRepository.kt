@@ -7,6 +7,7 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.example.soundplayer.commons.execptions.Failure
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import javax.inject.Inject
@@ -19,7 +20,7 @@ class PlayerRepository @Inject constructor(
    private var playBackPosition: Long = -0L
    private var _playlistCurrentlyPlaying :PlayList ? = null
    private var _actualSound  = MutableLiveData<Sound>()
-   private var _playBackError  = MutableLiveData<String?>()
+   private var _playBackError  = MutableLiveData<Failure?>()
    private  var isPlayingObserver  = MutableLiveData<Boolean>()
 
    fun getPlayer() = exoPlayer
@@ -74,6 +75,7 @@ class PlayerRepository @Inject constructor(
    private fun configActualSound(){
 
       val mediaItem   = exoPlayer.currentMediaItem
+      Log.i("INFO_", "configActualSound: ${mediaItem?.mediaId}")
       if (mediaItem != null) {
          val sound =Sound(
             idSound = null,
@@ -88,7 +90,7 @@ class PlayerRepository @Inject constructor(
       exoPlayer.addListener(object : Player.Listener{
          override fun onEvents(player: Player, events: Player.Events) {
             super.onEvents(player, events)
-            Log.d("INFO_", "onEvents: $events")
+
          }
 
          override fun onPlayerError(error: PlaybackException) {
@@ -96,14 +98,31 @@ class PlayerRepository @Inject constructor(
             Log.e("INFO_", "onPlayerError: ${error.message} :${error.errorCode}")
             when(error.errorCode){
                PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED -> {
-                  _playBackError.value = "Erro ao reproduzir mídia,formato inválido."
-                  exoPlayer.seekToNext()
-                  exoPlayer.playWhenReady
-                  exoPlayer.prepare()
-                  exoPlayer.play()
+                 _playBackError.value = Failure(
+                     messages = "Erro ao reproduzir mídia,formato inválido.",
+                     causes =error,
+                     code = 3003
+                  )
+                  moveToNexIfErro()
+               }
+
+               PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND ->{
+                _playBackError.value =  Failure(
+                     messages = "Audio nao encontrado,verifique se o arquivo não foi deletado" ,
+                     causes = error,
+                     code = 2005
+                  )
+                  moveToNexIfErro()
                }
             }
             _playBackError.value = null
+         }
+
+         private fun moveToNexIfErro() {
+            exoPlayer.seekToNext()
+            exoPlayer.playWhenReady
+            exoPlayer.prepare()
+            exoPlayer.play()
          }
 
 

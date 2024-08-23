@@ -27,7 +27,7 @@ data class Sound(
 }
 
 fun Sound.toSoundEntity()= SoundEntity(
-    soundId = idSound,
+    soundId = idSound ?: 0,
     title = this.title,
     path = this.path,
     duration =this.duration,

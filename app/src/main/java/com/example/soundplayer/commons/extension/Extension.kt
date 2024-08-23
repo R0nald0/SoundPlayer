@@ -4,12 +4,11 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Color
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
+import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.TimeUnit
 
 fun Context.convertMilesSecondToMinSec(duration: Long): String {
@@ -22,6 +21,7 @@ fun Context.convertMilesSecondToMinSec(duration: Long): String {
 
 fun Context.showAlerDialog(messenger :String, positiveButton:String, negativeButton:String, layoutResid : View?, onPositive :()->Unit){
     if (layoutResid != null) {
+
         AlertDialog.Builder(this)
             .setView(layoutResid)
             .setMessage(messenger)
@@ -36,19 +36,27 @@ fun Context.showAlerDialog(messenger :String, positiveButton:String, negativeBut
             }.create().show()
     }
 }
+fun View.snackBarSound(
+    messages:String,
+    backGroundColor :Int =Color.GREEN,
+    duration:Int = Snackbar.LENGTH_LONG,
+    actionText:String?,
+    onClick: ((View?) -> Unit)?
+){
+    Snackbar.make(
+        this,messages, duration
+    ).setAction(actionText,onClick)
+        .setTextColor(Color.WHITE)
+        .setBackgroundTint(backGroundColor)
+        .show()
+
+}
 
 fun Context.exibirToast(messenger: String){
     Toast.makeText(this, messenger, Toast.LENGTH_LONG).show()
 }
 
-fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
-    observe(lifecycleOwner, object : Observer<T> {
-        override fun onChanged(value: T) {
-            observer.onChanged(value)
-            removeObserver(this)
-        }
-    })
-}
+
 
 fun Activity.checkThemeMode(){
    val a =applicationContext.resources.configuration.uiMode and

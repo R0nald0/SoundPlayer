@@ -9,8 +9,8 @@ import java.util.Date
 
 @Entity(tableName = "sound")
 data class SoundEntity(
-    @PrimaryKey(autoGenerate = true)
-    val soundId : Long?,
+    @PrimaryKey(autoGenerate = false)
+    val soundId : Long,
     val title : String ="",
     val path : String ="",
     val duration :String ="",

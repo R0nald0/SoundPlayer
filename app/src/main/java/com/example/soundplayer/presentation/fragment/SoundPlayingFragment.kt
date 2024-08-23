@@ -1,6 +1,7 @@
 package com.example.soundplayer.presentation.fragment
 
 import android.content.ComponentName
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.session.MediaController
@@ -15,6 +17,7 @@ import androidx.media3.session.SessionToken
 import androidx.navigation.fragment.findNavController
 import com.example.soundplayer.R
 import com.example.soundplayer.commons.extension.exibirToast
+import com.example.soundplayer.commons.extension.snackBarSound
 import com.example.soundplayer.databinding.FragmentSoundPlayingBinding
 import com.example.soundplayer.presentation.service.SoundService
 import com.example.soundplayer.presentation.viewmodel.SoundViewModel
@@ -25,9 +28,9 @@ class SoundPlayingFragment : Fragment() {
     private val binding by lazy {
         FragmentSoundPlayingBinding.inflate(layoutInflater)
     }
-   lateinit var controllerAsync: ListenableFuture<MediaController>
+    lateinit var controllerAsync: ListenableFuture<MediaController>
 
-    private val  soundViewModel by activityViewModels<SoundViewModel>()
+    private val soundViewModel by activityViewModels<SoundViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -42,26 +45,27 @@ class SoundPlayingFragment : Fragment() {
         return binding.root
     }
 
-    @OptIn(UnstableApi::class) override fun onStart() {
+    @OptIn(UnstableApi::class)
+    override fun onStart() {
         super.onStart()
-        if (Util.SDK_INT > 23){
+        if (Util.SDK_INT > 23) {
             initPlayer()
         }
         configSessionToken()
     }
 
-    @OptIn(UnstableApi::class) private fun configSessionToken() {
+    @OptIn(UnstableApi::class)
+    private fun configSessionToken() {
         val sessonToken = SessionToken(
             requireActivity(),
             ComponentName(requireActivity(), SoundService::class.java)
         )
-         controllerAsync = MediaController.Builder(requireActivity(), sessonToken)
+        controllerAsync = MediaController.Builder(requireActivity(), sessonToken)
 
-             .buildAsync()
+            .buildAsync()
         controllerAsync.addListener({
             binding.myPlayerView.player = controllerAsync.get()
         }, MoreExecutors.directExecutor())
-
 
 
     }
@@ -78,21 +82,42 @@ class SoundPlayingFragment : Fragment() {
             binding.txvNameMusic.isSelected = true
             binding.txvNameMusic.text = sound.title
 
-            if (sound.uriMediaAlbum != null){
+            if (sound.uriMediaAlbum != null) {
                 binding.imvSong.setImageURI(sound.uriMediaAlbum)
-                if (binding.imvSong.drawable == null){
+                if (binding.imvSong.drawable == null) {
                     binding.imvSong.setImageResource(R.drawable.transferir)
                 }
             }
         }
-        soundViewModel.playBackError.observe(viewLifecycleOwner){playbackError->
-            if (playbackError != null){
-                requireActivity().exibirToast(playbackError)
+
+        soundViewModel.playBackError.observe(viewLifecycleOwner) { playbackError ->
+            if (playbackError != null) {
+                when (playbackError.code) {
+                    PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND -> {
+
+                        requireView().snackBarSound(
+                            messages = "${playbackError.message}",
+                            backGroundColor = Color.RED,
+                            onClick = null,
+                            actionText = null,
+                        )
+                    }
+
+                    PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED -> {
+                        requireView().snackBarSound(
+                            messages = "${playbackError.message}",
+                            backGroundColor = Color.RED,
+                            onClick = null,
+                            actionText = null,
+                        )
+                    }
+                }
             }
         }
     }
+
     @OptIn(UnstableApi::class)
-    private fun  initPlayer(){
+    private fun initPlayer() {
         binding.myPlayerView.player = soundViewModel.myPlayer
     }
 
