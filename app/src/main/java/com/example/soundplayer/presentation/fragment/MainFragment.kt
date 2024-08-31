@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.provider.CalendarContract.Colors
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -29,7 +30,7 @@ import com.example.soundplayer.commons.permission.Permission
 import com.example.soundplayer.databinding.FragmentMainBinding
 import com.example.soundplayer.model.DataSoundPlayListToUpdate
 import com.example.soundplayer.model.PlayList
-import com.example.soundplayer.model.Sound
+
 import com.example.soundplayer.model.SoundList
 import com.example.soundplayer.presentation.MyContetntProvider
 import com.example.soundplayer.presentation.adapter.PlayListAdapter
@@ -119,6 +120,7 @@ class MainFragment : Fragment() {
     @SuppressLint("StringFormatMatches")
     private  fun observersViewModel(){
         playListViewModel.hasPermission.observe(viewLifecycleOwner){hasPermission ->
+             //TODO pedir permissao apenas quando  usario tocar no botão
              if (!hasPermission) {
                  showHideViewItems(false)
                  requireActivity().exibirToast(getString(R.string.permiss_o_necessaria_para_carragar_as_m_sicas))
@@ -127,6 +129,10 @@ class MainFragment : Fragment() {
              playListViewModel.listSize.observe(viewLifecycleOwner){sizeListSoundOnBd->
                  binding.txvQuantidadeMusics.text = getString(R.string.total_de_musicas, sizeListSoundOnBd)
                  if (sizeListSoundOnBd <= 0){
+                     requireView().snackBarSound(
+                         messages = "Nenhuma midia de áudio encontrada",
+                     )
+                      //TODO se usuário não tiver musicas no celular,ação deve ser tomada
                      showHideViewItems(false)
                  }else{
                      playListViewModel.getAllPlayList()
@@ -285,7 +291,10 @@ class MainFragment : Fragment() {
                 binding.txvNoMusicAtPlaylist.isVisible =false
                 binding.rvSound.isVisible= false
             },
-            onEdit =   {playList -> playListViewModel.updateNamePlayList(playList) }
+            onEdit =   {playList -> playListViewModel.updateNamePlayList(playList) },
+            onAddSoundAllMusic = {
+                findNavController().navigate(R.id.action_mainFragment_to_updateAllMusicBottomSheetFragment)
+            }
         )
         binding.idRvPlaylist.adapter = playListAdapter
         binding.idRvPlaylist.layoutManager = LinearLayoutManager( requireActivity(),LinearLayoutManager.HORIZONTAL,false)

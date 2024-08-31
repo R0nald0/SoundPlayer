@@ -122,6 +122,7 @@ class ServicePlayer @Inject constructor(
         return afactedLines
     }
 
+
     private suspend fun verificaSeSoundContemNoDatabase(
         soundsBySystemList: Set<Sound>,
     ): Long {
@@ -129,10 +130,6 @@ class ServicePlayer @Inject constructor(
             soundRepository.saveSound(soundByProvider)
         }.first()
 
-        /*for (soundByProvider in soundsBySystemList) {
-          val result = soundRepository.saveSound(soundByProvider)
-          return  result
-      }*/
         return result
     }
 
@@ -152,5 +149,14 @@ class ServicePlayer @Inject constructor(
         }
 
         return removedSounds
+    }
+    suspend fun comparePlayListsAndReturnDiference(soundOfSystem: Set<Sound>, idPlayListToCompare: Long):Set<Sound>{
+        if (soundOfSystem == emptySet<Sound>()) return emptySet()
+        val soundsOfDatbase = findPlayListById(idPlayListToCompare)?.listSound ?: return emptySet()
+
+        val soundsId = soundsOfDatbase.map { it.idSound }
+        val soundsDiff= soundOfSystem.filter { it.idSound !in soundsId }.toSet()
+        return soundsDiff
+
     }
 }
