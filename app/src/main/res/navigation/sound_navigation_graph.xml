@@ -21,6 +21,9 @@
         <action
             android:id="@+id/action_mainFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_updateAllMusicBottomSheetFragment"
+            app:destination="@id/updateAllMusicBottomSheetFragment" />
     </fragment>
     <dialog
         android:id="@+id/bottomSheetFragment"
@@ -45,4 +48,8 @@
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" >
     </fragment>
+    <dialog
+        android:id="@+id/updateAllMusicBottomSheetFragment"
+        android:name="com.example.soundplayer.presentation.fragment.UpdateAllMusicBottomSheetFragment"
+        android:label="UpdateAllMusicBottomSheetFragment" />
 </navigation>

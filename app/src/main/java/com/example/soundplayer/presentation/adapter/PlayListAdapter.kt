@@ -23,7 +23,8 @@ import com.example.soundplayer.model.PlaylistWithSoundDomain
 class PlayListAdapter(
     val onclick :(PlayList)->Unit,
     val onDelete :(PlayList)->Unit,
-    val onEdit :(PlayList)->Unit
+    val onEdit :(PlayList)->Unit,
+    val onAddSoundAllMusic:()->Unit
 ) :RecyclerView.Adapter<PlayListAdapter.PlayLisViewHolder>(){
     private var playlistWithSoundDomainMutableSet = mutableSetOf<PlaylistWithSoundDomain>()
     private var userPositionPreferePlayListId = -1L
@@ -164,6 +165,7 @@ class PlayListAdapter(
 
             when(item.itemId){
                 R.id.id_add_music->{
+                    onAddSoundAllMusic()
                     true
                 }
                 R.id.idEdit->{

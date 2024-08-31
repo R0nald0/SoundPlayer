@@ -15,7 +15,6 @@ import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.presentation.adapter.BottomPlayListAdapter
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -28,16 +27,15 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     }
    private  lateinit var  bottomSheetAdapter  : BottomPlayListAdapter
    private val playListViewModel by activityViewModels<PlayListViewModel>()
-   private var bottomSheetPeekHeight = 0
    private lateinit var createdSounds : Set<Sound>
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+
         binding.edtPlayList.clearFocus()
         binding.textInputLayoutCratePlayList.clearFocus()
-
-
         binding.btnCreatePlayList.setOnClickListener {
               createdSounds  = bottomSheetAdapter.getSoundSelected()
 
@@ -51,7 +49,6 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
                   }
 
               }else{
-
                    requireContext().exibirToast("Escolha um nome válido para sua e playlist ")
               }
         }
@@ -77,14 +74,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         playListViewModel.findAllSound()
 
     }
-    override fun onResume() {
-        super.onResume()
-    }
-    private fun sizeView(){
-     val bottomSheetBehavior  = BottomSheetBehavior.from(view?.parent as View)
-        bottomSheetBehavior.peekHeight = bottomSheetPeekHeight
-         val layoutManager  = binding.root.rootView.layoutParams
-    }
+
 
     private fun observerLiveData(){
          playListViewModel.soundListBd.observe(this){soundsDatabase->

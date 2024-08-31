@@ -6,12 +6,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.soundplayer.data.repository.SoundRepository
 import com.example.soundplayer.model.DataSoundPlayListToUpdate
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.PlaylistWithSoundDomain
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.service.ServicePlayer
+import com.example.soundplayer.service.SoundDomainService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PlayListViewModel @Inject constructor(
-    private val soundRepository: SoundRepository,
+    private val soundDomainService: SoundDomainService,
     private val servicePlayer: ServicePlayer
 ):ViewModel() {
     private val TAG = "INFO_"
@@ -39,6 +39,9 @@ class PlayListViewModel @Inject constructor(
 
     private val _hasPerMission =MutableLiveData<Boolean>()
     val hasPermission :LiveData<Boolean> = _hasPerMission
+
+    private val _soundListCompared = MutableLiveData<Set<Sound>>()
+    val soundListCompared : LiveData<Set<Sound>> = _soundListCompared
 
     init {
       countTotalSound()
@@ -71,7 +74,7 @@ class PlayListViewModel @Inject constructor(
     fun findAllSound(){
       viewModelScope.launch {
           runCatching {
-              soundRepository.findAllSound()
+              soundDomainService.findAllSound()
           }.fold(
               onSuccess = {soundList->
                   _soundListBd.value = soundList.toSet()
@@ -84,7 +87,7 @@ class PlayListViewModel @Inject constructor(
   }
     private fun countTotalSound(){
         viewModelScope.launch {
-            _listSize.value = soundRepository.findAllSound().size
+            _listSize.value = soundDomainService.findAllSound().size
         }
     }
     fun saveAllSoundsByContentProvider(sizeListAllMusic: Set<Sound>){
@@ -99,7 +102,7 @@ class PlayListViewModel @Inject constructor(
             }.fold(
                 onSuccess = { listSound->
                        if (!listSound.isNullOrEmpty()){
-                           val sounds =soundRepository.findAllSound()
+                           val sounds =soundDomainService.findAllSound()
                            _soundListBd.value =  sounds.toSet()
                            _listSize.value = sounds.size
                        }
@@ -138,17 +141,16 @@ class PlayListViewModel @Inject constructor(
 
             if (result.isNotEmpty()) {
                 verifyAndUpdateSizeListSound(idPlaylist)
-                findPlayListById(idPlayList = idPlaylist)
-                getAllPlayList()
             }
         }
     }
 
     private suspend fun verifyAndUpdateSizeListSound(idPlaylist: Long) {
         if (idPlaylist == 1L) {
-            _listSize.value = soundRepository.findAllSound().size
-            Log.i(TAG, "verifyAndUpdateSizeListSound: ${listSize.value}")
+            _listSize.value = soundDomainService.findAllSound().size
         }
+        findPlayListById(idPlayList = idPlaylist)
+        getAllPlayList()
     }
 
     fun removePlaySoundFromPlayList(dataSoundToUpdate : DataSoundPlayListToUpdate){
@@ -162,8 +164,6 @@ class PlayListViewModel @Inject constructor(
 
             if (itemsRemoved != 0){
                 verifyAndUpdateSizeListSound(dataSoundToUpdate.idPlayList)
-                findPlayListById(idPlayList = dataSoundToUpdate.idPlayList)
-                getAllPlayList()
             }
 
         }
@@ -191,22 +191,36 @@ class PlayListViewModel @Inject constructor(
         }
     }
 
-    fun verifyIfUpdateAllMusicsPlayList(soundsOfSystem : Set<Sound>){
+    fun updateSoundList(sounds : Set<Sound>){
         viewModelScope.launch {
             runCatching {
-                 servicePlayer.verifcaSeSoundContemNoSistema(soundOfSystem = soundsOfSystem )
+                soundDomainService.saveSound(sounds)
             }.fold(
-                onSuccess = {removedSound->
-                    if (removedSound.isNotEmpty()){
-                        //atualizar a view
-                        findPlayListById(idPlayList = 1)
-                        getAllPlayList()
-                    }
-
+                onSuccess = {item->
+                     if (item.isNotEmpty()){
+                         val longList = servicePlayer.addItemFromListMusic(1, sounds)
+                         if (longList.isNotEmpty()) {
+                             verifyAndUpdateSizeListSound(1)
+                         }
+                     }
                 },
                 onFailure = {}
             )
         }
+    }
 
+    fun  comparePlayLists(soundOfSystem: Set<Sound>,idPlayListToCompare: Long){
+         viewModelScope.launch {
+             runCatching {
+                 servicePlayer.comparePlayListsAndReturnDiference(soundOfSystem,idPlayListToCompare)
+             }.fold(
+                 onSuccess = {sounds ->
+                     _soundListCompared.postValue(sounds)
+                 },
+                 onFailure = {error->
+
+                 }
+             )
+         }
     }
 }
