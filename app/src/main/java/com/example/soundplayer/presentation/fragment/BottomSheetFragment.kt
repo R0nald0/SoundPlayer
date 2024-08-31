@@ -15,7 +15,6 @@ import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.presentation.adapter.BottomPlayListAdapter
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -28,13 +27,12 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     }
    private  lateinit var  bottomSheetAdapter  : BottomPlayListAdapter
    private val playListViewModel by activityViewModels<PlayListViewModel>()
-   private var bottomSheetPeekHeight = 0
    private lateinit var createdSounds : Set<Sound>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         binding.edtPlayList.clearFocus()
         binding.textInputLayoutCratePlayList.clearFocus()

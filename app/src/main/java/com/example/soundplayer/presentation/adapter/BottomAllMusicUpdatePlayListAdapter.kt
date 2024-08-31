@@ -1,5 +1,6 @@
 package com.example.soundplayer.presentation.adapter
 
+import android.annotation.SuppressLint
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ class BottomAllMusicUpdatePlayListAdapter (): RecyclerView.Adapter<BottomAllMusi
    fun getSoundSelected() : Set<Sound>{
         return soundSelecionados.toSet()
    }
+
     fun getListSound(listMusics : Set<Sound>){
         sounds.addAll(listMusics)
         notifyDataSetChanged()

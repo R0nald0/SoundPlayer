@@ -1,6 +1,5 @@
 package com.example.soundplayer.presentation.fragment
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,18 +10,10 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.soundplayer.R
-import com.example.soundplayer.commons.extension.exibirToast
-import com.example.soundplayer.commons.extension.snackBarSound
 import com.example.soundplayer.databinding.FragmentBottomAllmusicLayoutBinding
-import com.example.soundplayer.databinding.FragmentItemListDialogListDialogBinding
-import com.example.soundplayer.model.DataSoundPlayListToUpdate
-import com.example.soundplayer.model.PlayList
-import com.example.soundplayer.model.Sound
 import com.example.soundplayer.presentation.MyContetntProvider
 import com.example.soundplayer.presentation.adapter.BottomAllMusicUpdatePlayListAdapter
-import com.example.soundplayer.presentation.adapter.BottomPlayListAdapter
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -60,7 +51,7 @@ class UpdateAllMusicBottomSheetFragment : BottomSheetDialogFragment() {
         binding.rvMusics.adapter = bottomSheetAdapter
         binding.rvMusics.addItemDecoration(DividerItemDecoration( binding.root.context,RecyclerView.HORIZONTAL))
         binding.rvMusics.layoutManager = LinearLayoutManager(binding.root.context,LinearLayoutManager.VERTICAL,false)
-        binding.btnCreatePlayList.text = "Adicionao músicas"
+        binding.btnCreatePlayList.text = getString(R.string.adicionar_a_playlist)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
