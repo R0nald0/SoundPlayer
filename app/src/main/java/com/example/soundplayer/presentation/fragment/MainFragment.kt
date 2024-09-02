@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -12,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
@@ -53,9 +55,7 @@ class MainFragment : Fragment() {
     private val playListViewModel by activityViewModels<PlayListViewModel>()
     private val preferencesViewModel by activityViewModels<PreferencesViewModel>()
     private var actualPlayListPLayingMain :PlayList? =null
-
-
-    private val listPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+    val listPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
         setOf(
             android.Manifest.permission.READ_MEDIA_AUDIO,
             android.Manifest.permission.FOREGROUND_SERVICE,
@@ -67,8 +67,10 @@ class MainFragment : Fragment() {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
         )
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         myMenuProvider = MyMenuProvider()
     }
     override fun onCreateView(
@@ -82,12 +84,17 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observersViewModel()
+
+        /*val isPepermited  = if (Permission.listPermissionsNotAccepted.isEmpty()) true else false
+        playListViewModel.verifyPermissions(isPepermited)*/
+
         initAdapter()
         initBindigs()
         binding.toolbarSelecrionItemsMaterial.title =""
 
         CoroutineScope(Dispatchers.Main).launch {
             soundViewModel.readPreferences()
+            //-TODO remover coroutine
         }
         setupToolbar()
     }
@@ -103,7 +110,7 @@ class MainFragment : Fragment() {
 
     private fun initBindigs() {
         binding.btnFindSounds.setOnClickListener {
-            Permission.requestPermission(gerenciarPermissoes,listPermission)
+            Permission.requestPermission(requireActivity(),gerenciarPermissoes,listPermission)
         }
 
         binding.fabAddPlayList.setOnClickListener {
@@ -118,16 +125,14 @@ class MainFragment : Fragment() {
     @SuppressLint("StringFormatMatches")
     private  fun observersViewModel(){
         playListViewModel.hasPermission.observe(viewLifecycleOwner){hasPermission ->
-             //TODO pedir permissao apenas quando  usario tocar no botão
              if (!hasPermission) {
                  showHideViewItems(false)
-                 requireActivity().exibirToast(getString(R.string.permiss_o_necessaria_para_carragar_as_m_sicas))
+                //requireActivity().exibirToast(getString(R.string.permiss_o_necessaria_para_carragar_as_m_sicas))
          } else {
             getMusicFromContentProvider()
              playListViewModel.listSize.observe(viewLifecycleOwner){sizeListSoundOnBd->
                  binding.txvQuantidadeMusics.text = getString(R.string.total_de_musicas, sizeListSoundOnBd)
                  if (sizeListSoundOnBd <= 0){
-                      //TODO se usuário não tiver musicas no celular,ação deve ser tomada
                      showHideViewItems(false)
                  }else{
                      playListViewModel.getAllPlayList()
@@ -230,18 +235,21 @@ class MainFragment : Fragment() {
         if (showListSoundtItem){
             binding.LineartLayoutEmptySound.isVisible = false
             binding.linearMusics.visibility = View.VISIBLE
+            binding.rvSound.isVisible = true
             binding.fabAddPlayList.visibility = View.VISIBLE
             binding.txvQuantidadeMusics.visibility = View.VISIBLE
             binding.txvPlayList.visibility = View.VISIBLE
             binding.txvSounds.visibility = View.VISIBLE
         }else{
             binding.LineartLayoutEmptySound.isVisible = true
+            binding.rvSound.isVisible = true
             binding.linearMusics.visibility = View.GONE
             binding.fabAddPlayList.visibility = View.GONE
             binding.txvQuantidadeMusics.visibility = View.GONE
             binding.txvPlayList.visibility = View.GONE
             binding.txvSounds.visibility = View.GONE
         }
+
     }
 
     private fun getPermissions(){
@@ -249,12 +257,20 @@ class MainFragment : Fragment() {
             ActivityResultContracts
                 .RequestMultiplePermissions()){permission: Map<String, Boolean> ->
 
-            val isPepermited  =Permission.getPermissions(permission)
-            playListViewModel.verifyPermissions(isPepermited)
+            val isPepermited = Permission.getPermissions(permission)
+            playListViewModel.verifyPermissions( isPepermited)
         }
+       // Permission.requestPermission(gerenciarPermissoes,listPermission)
+    }
 
-       Permission.requestPermission(gerenciarPermissoes,listPermission)
-
+    override fun onResume() {
+        val t = Permission.chekPerMission(this.requireActivity(),listPermission)
+        if (t.isNotEmpty()){
+            showHideViewItems(false)
+        }else{
+            playListViewModel.verifyPermissions( true)
+        }
+        super.onResume()
     }
 
     private fun initAdapter() {
@@ -332,15 +348,11 @@ class MainFragment : Fragment() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-
-    }
-
     override fun onStop() {
         CoroutineScope(Dispatchers.Main).launch{
             soundViewModel.savePreference()
         }
+        //TODO remover coroutine scope
         super.onStop()
     }
 

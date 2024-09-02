@@ -1,6 +1,7 @@
 
 package com.example.soundplayer.presentation.viewmodel
 
+import android.os.Build
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -43,8 +44,11 @@ class PlayListViewModel @Inject constructor(
     private val _soundListCompared = MutableLiveData<Set<Sound>>()
     val soundListCompared : LiveData<Set<Sound>> = _soundListCompared
 
+
+
     init {
       countTotalSound()
+
     }
 
     fun savePlayList(playList: PlayList){

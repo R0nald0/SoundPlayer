@@ -39,8 +39,6 @@ class UpdateAllMusicBottomSheetFragment : BottomSheetDialogFragment() {
                       dismiss()
                   }
 
-             //TODO verificar quando list vir vazia
-
         }
 
         return binding.root

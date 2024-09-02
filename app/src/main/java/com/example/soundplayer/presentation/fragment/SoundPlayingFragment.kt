@@ -16,7 +16,6 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import androidx.navigation.fragment.findNavController
 import com.example.soundplayer.R
-import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.commons.extension.snackBarSound
 import com.example.soundplayer.databinding.FragmentSoundPlayingBinding
 import com.example.soundplayer.presentation.service.SoundService

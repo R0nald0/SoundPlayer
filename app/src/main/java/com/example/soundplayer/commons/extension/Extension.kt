@@ -40,8 +40,8 @@ fun View.snackBarSound(
     messages:String,
     backGroundColor :Int =Color.GREEN,
     duration:Int = Snackbar.LENGTH_LONG,
-    actionText:String?,
-    onClick: ((View?) -> Unit)?
+    actionText:String? =null,
+    onClick: ((View?) -> Unit)? = null
 ){
     Snackbar.make(
         this,messages, duration
