@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -13,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
@@ -25,7 +23,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soundplayer.R
 import com.example.soundplayer.commons.constants.Constants
-import com.example.soundplayer.commons.extension.exibirToast
 import com.example.soundplayer.commons.extension.snackBarSound
 import com.example.soundplayer.commons.permission.Permission
 import com.example.soundplayer.databinding.FragmentMainBinding
@@ -39,9 +36,6 @@ import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
 import com.example.soundplayer.presentation.viewmodel.PreferencesViewModel
 import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import com.example.soundplayer.presentation.viewmodel.StatePrefre
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MainFragment : Fragment() {
 
@@ -85,17 +79,11 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observersViewModel()
 
-        /*val isPepermited  = if (Permission.listPermissionsNotAccepted.isEmpty()) true else false
-        playListViewModel.verifyPermissions(isPepermited)*/
-
         initAdapter()
         initBindigs()
         binding.toolbarSelecrionItemsMaterial.title =""
+        preferencesViewModel.readAllPrefference()
 
-        CoroutineScope(Dispatchers.Main).launch {
-            soundViewModel.readPreferences()
-            //-TODO remover coroutine
-        }
         setupToolbar()
     }
 
@@ -142,16 +130,20 @@ class MainFragment : Fragment() {
          }
 
          }
-        soundViewModel.userDataPreferecence.observe(viewLifecycleOwner){userDataPreference->
-            if (userDataPreference.idPreference != null  ){
-                playListViewModel.findPlayListById(userDataPreference.idPreference)
+        preferencesViewModel.uiStatePreffs.observe(viewLifecycleOwner){ uiStatePref->
+            if (uiStatePref.idPreference != null){
+                playListViewModel.findPlayListById(uiStatePref.idPreference)
             }
+
         }
 
         soundViewModel.isPlayingObserver.observe(viewLifecycleOwner){ isPlaying ->
             if (isPlaying){
                 soundViewModel.currentPlayList.observe(viewLifecycleOwner){actualPLayiingPlayList->
+
                     if (actualPLayiingPlayList != null){
+                        preferencesViewModel.savePlayListIdPlayList(actualPLayiingPlayList.idPlayList!!)
+
                         playListAdapter.getCurrentPlayListPlaying(
                             playList = actualPLayiingPlayList
                         )
@@ -163,7 +155,9 @@ class MainFragment : Fragment() {
                    // Log.i("INFO_", "Main:${soundLiveDataActual.title} ${cont++}")
                     //TODO VERIFICAR CHAMAdasS MULTIPLAS
                     adapterSound.getActualSound(soundLiveDataActual)
-                    binding.rvSound.scrollToPosition(soundViewModel.getCurrentPositionSound())
+                    val currentPositionSound = soundViewModel.getCurrentPositionSound()
+                    binding.rvSound.scrollToPosition(currentPositionSound)
+                    preferencesViewModel.savePlayListIdCurrenPositionSound(currentPositionSound)
                 }
             }
             adapterSound.updateAnimationWithPlaying(isPlaying)
@@ -260,7 +254,6 @@ class MainFragment : Fragment() {
             val isPepermited = Permission.getPermissions(permission)
             playListViewModel.verifyPermissions( isPepermited)
         }
-       // Permission.requestPermission(gerenciarPermissoes,listPermission)
     }
 
     override fun onResume() {
@@ -349,10 +342,7 @@ class MainFragment : Fragment() {
     }
 
     override fun onStop() {
-        CoroutineScope(Dispatchers.Main).launch{
-            soundViewModel.savePreference()
-        }
-        //TODO remover coroutine scope
+        soundViewModel.savePreference()
         super.onStop()
     }
 

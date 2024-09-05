@@ -3,22 +3,14 @@
     <style name="Base.Theme.SoundPlayer" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/colorPrimaryContainer</item>
-
         <item name="actionOverflowButtonStyle">@style/ActionOverFlowButton</item>
-
-        <!-- Floating actin button
-        <item name="colorPrimaryContainer">@color/colorPrimaryContainer</item>
-        <item name="colorOnPrimaryContainer">@color/colorOnPrimaryContainer</item>
-
-         card
- -->
-        <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+        <item name="colorSurfaceVariant">@color/colorNightSurfaceVariant</item>
         <item name="android:statusBarColor">@color/redStronger</item>
-
+        <item name="textInputStyle">@style/ThemeOverlay.App.TextInputLayoutLight</item>
     </style>
 
-    <style name="Theme.SoundPlayer" parent="Base.Theme.SoundPlayer"
-        />
+    <style name="Theme.SoundPlayer" parent="Base.Theme.SoundPlayer"/>
 
     <style name="ActionOverFlowButton" parent="Widget.AppCompat.ActionButton.Overflow">
         <item name="tint">@color/white</item>
@@ -27,7 +19,6 @@
     <style name="ToolbarTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorControlNormal">@color/white</item>
     </style>
-    
     <style name="ThemeCustomSelecteItemPlayList" parent="Theme.AppCompat.Light.Dialog">
          <item name="android:windowBackground">@android:color/transparent</item>
     </style>

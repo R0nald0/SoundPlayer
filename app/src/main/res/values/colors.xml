@@ -11,7 +11,7 @@
     <color name="colorPrimaryContainer">#E35252</color>
     <color name="colorOnPrimaryContainer">#FD3333</color>
 
-    <color name="colorSurfaceVariant">#e7e0ec</color>
+    <color name="colorNightSurfaceVariant">#e7e0ec</color>
     <color name="my_primary">#242325</color>
 
 </resources>

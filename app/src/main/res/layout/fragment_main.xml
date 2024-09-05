@@ -175,7 +175,7 @@
             android:paddingBottom="0dp"
             android:visibility="visible"
             tools:listitem="@layout/item_sound"
-            tools:visibility="visible"></androidx.recyclerview.widget.RecyclerView>
+            tools:visibility="visible"/>
 
         <TextView
             android:id="@+id/txv_no_music_at_playlist"
@@ -187,20 +187,19 @@
             android:text="@string/est_playlist_esta_vazia"
             android:visibility="gone" />
 
-
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_play_list"
-        style="@style/ThemeOverlay.Material3.FloatingActionButton.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/border_playlist_selected_item"
+        android:backgroundTint="@color/colorPrimaryContainer"
         android:clickable="true"
-        android:contentDescription="TODO"
+        android:contentDescription="Botão para criar playlist"
         android:src="@drawable/baseline_playlist_add_24"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

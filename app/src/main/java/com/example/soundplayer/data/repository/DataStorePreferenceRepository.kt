@@ -8,6 +8,7 @@ import com.example.soundplayer.commons.constants.Constants.ID_ORDERED_SONS_PREFF
 import com.example.soundplayer.commons.constants.Constants.ID_PLAYLIST_KEY
 import com.example.soundplayer.commons.constants.Constants.ID_SIZE_TEXT_TITLE_MUSIC
 import com.example.soundplayer.commons.constants.Constants.POSITION_KEY
+import com.example.soundplayer.commons.execptions.Failure
 import com.example.soundplayer.data.entities.UserDataPreferecence
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -55,30 +56,6 @@ class DataStorePreferenceRepository @Inject constructor(
          }
      }
 
-
-    suspend fun readAllPreferecenceData(): UserDataPreferecence? {
-           try {
-               val position = readPreferencesPos(POSITION_KEY)
-               val idPlay= readPreferences(ID_PLAYLIST_KEY)
-               val isDarkMode= readUserPrefference(ID_DARK_MODE_KEY)
-               val sizeTitleMusic = readUserPrefference(ID_SIZE_TEXT_TITLE_MUSIC)
-               val  orderedSound = readUserPrefference(ID_ORDERED_SONS_PREFFERENCE)
-               if (idPlay!=null){
-                   return  UserDataPreferecence(
-                       idPreference = idPlay ,
-                       postionPreference = position ?: 0,
-                       isDarkMode =isDarkMode.first() ?: 0,
-                       sizeTitleMusic = sizeTitleMusic.first() ?: 16f,
-                       orderedSound =  orderedSound.first() ?: 0,
-                   )
-               }
-               return  null
-           }catch (exeption:Exception){
-               Log.e("error", "error : ${exeption.message} ", )
-               throw Exception("erro ao ler dados em cache")
-           }
-    }
-
     suspend fun readAppAllPrefferences():UserDataPreferecence{
         try {
             val data = dataStore.data.first()
@@ -90,7 +67,8 @@ class DataStorePreferenceRepository @Inject constructor(
                 sizeTitleMusic = data[ID_SIZE_TEXT_TITLE_MUSIC] ?: 15f
             )
         }catch (ioException:IOException){
-            throw ioException
+            Log.e("error", "error : ${ioException.message} ", )
+            throw Failure(messages = "Não conseguimos ler as preferências",ioException,ioException.hashCode())
         }catch (exception :Exception){
             throw exception
         }

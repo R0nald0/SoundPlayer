@@ -11,7 +11,11 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayoutCratePlayList"
-        style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
+        app:endIconMode="clear_text"
+        app:endIconDrawable="@drawable/ic_cancel_24"
+        app:endIconContentDescription="Limpar campo"
+        app:errorEnabled="true"
+        android:maxLines="1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -22,7 +26,8 @@
             android:id="@+id/edtPlayList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nome da Play List" />
+            android:inputType="textCapWords"
+            android:hint="Nome da Playlist" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

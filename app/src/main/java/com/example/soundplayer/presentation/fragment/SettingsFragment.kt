@@ -27,6 +27,7 @@ class SettingsFragment : Fragment() {
     val singleItems = arrayOf("Pequena", "Média", "Grande")
     val options = arrayOf("Nome","Nome Decrescente","Inserido por ultimo")
     val modeUIOptions = arrayOf("Light","DarkMode","Mesmo que o sistema")
+
     private val preferencesViewModel by activityViewModels<PreferencesViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {

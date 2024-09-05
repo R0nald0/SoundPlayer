@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.soundplayer.commons.constants.Constants
+import com.example.soundplayer.commons.constants.Constants.ID_PLAYLIST_KEY
+import com.example.soundplayer.commons.constants.Constants.POSITION_KEY
 import com.example.soundplayer.data.entities.UserDataPreferecence
 import com.example.soundplayer.service.ServicePlayer
 import com.example.soundplayer.service.UserPrefferencesService
@@ -30,17 +32,14 @@ class PreferencesViewModel @Inject constructor(
     private val  _uiStatePreffs =MutableLiveData<UserDataPreferecence>()
     var uiStatePreffs : LiveData<UserDataPreferecence> = _uiStatePreffs
 
+
     fun readAllPrefference(){
         viewModelScope.launch {
             runCatching {
                 serviceDataPreference.readAppAllPrefferences()
             }.fold(
                 onSuccess = {userPreff->
-                     if (userPreff != null){
-                         _uiStatePreffs.value = userPreff!!
-                     } else{
-                         Log.i("INFO_", "readAllPrefference: user pref Null")
-                     }
+                    _uiStatePreffs.value = userPreff
                 },
                 onFailure = {}
             )
@@ -54,8 +53,7 @@ class PreferencesViewModel @Inject constructor(
            )
        }
     }
-
-     fun readDarkModePreference(){
+    fun readDarkModePreference(){
          viewModelScope.launch {
              serviceDataPreference.readUserPrefference(Constants.ID_DARK_MODE_KEY).
                  catch {error->
@@ -67,7 +65,6 @@ class PreferencesViewModel @Inject constructor(
                  }
          }
     }
-
     fun saveSizeTextMusicPrefrence(size :Float){
         viewModelScope.launch {
             serviceDataPreference.savePrefferenceUser(
@@ -76,7 +73,6 @@ class PreferencesViewModel @Inject constructor(
             )
         }
     }
-
     fun readSizeTextMusicPreference(){
         viewModelScope.launch {
             serviceDataPreference
@@ -90,8 +86,7 @@ class PreferencesViewModel @Inject constructor(
                 }
         }
     }
-
-    fun  saveOrderedSoundPrefference(value : Int){
+    fun saveOrderedSoundPrefference(value : Int){
         viewModelScope.launch {
             runCatching {
                 serviceDataPreference.savePrefferenceUser(
@@ -108,6 +103,32 @@ class PreferencesViewModel @Inject constructor(
                 },
                 onFailure = {}
             )
+        }
+    }
+    fun savePlayListIdPlayList(idPlayList :Long){
+        viewModelScope.launch {
+           runCatching {
+               serviceDataPreference.savePrefferenceUser(idPlayList ,ID_PLAYLIST_KEY)
+           }.fold(
+               onSuccess = {
+                   readAllPrefference()
+               } ,
+               onFailure ={
+
+               }
+           )
+        }
+    }
+    fun savePlayListIdCurrenPositionSound(currentMusicPosition : Int){
+        viewModelScope.launch {
+           runCatching {
+               serviceDataPreference.savePrefferenceUser(currentMusicPosition,POSITION_KEY)
+           }.fold(
+               onSuccess = {} ,
+               onFailure ={
+
+               }
+           )
         }
     }
 

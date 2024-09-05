@@ -1,7 +1,6 @@
 
 package com.example.soundplayer.presentation.viewmodel
 
-import android.os.Build
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -23,6 +22,7 @@ class PlayListViewModel @Inject constructor(
     private val soundDomainService: SoundDomainService,
     private val servicePlayer: ServicePlayer
 ):ViewModel() {
+
     private val TAG = "INFO_"
     private val _clickedPlayList = MutableLiveData<PlayList>()
     val clickedPlayList : LiveData<PlayList> = _clickedPlayList
@@ -43,8 +43,6 @@ class PlayListViewModel @Inject constructor(
 
     private val _soundListCompared = MutableLiveData<Set<Sound>>()
     val soundListCompared : LiveData<Set<Sound>> = _soundListCompared
-
-
 
     init {
       countTotalSound()

@@ -14,15 +14,15 @@ import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.service.ServicePlayer
+import com.example.soundplayer.service.UserPrefferencesService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class SoundViewModel @Inject constructor(
     private  val dataStorePreferenceRepository: DataStorePreferenceRepository,
+    private val userPrefferencesService: UserPrefferencesService,
     private val servicePlayer: ServicePlayer
 ) :ViewModel(){
 
@@ -76,43 +76,40 @@ class SoundViewModel @Inject constructor(
               isPlaying()
           }
        }
-    suspend fun savePreference(){
-        runCatching {
-            if(_currentPlayingPlayList.value != null){
-                dataStorePreferenceRepository
-                    .savePreference(
-                         playlistKeyId =  _currentPlayingPlayList.value!!.idPlayList,
-                        positionSoundKey = _currentPlayingPlayList.value!!.currentMusicPosition
-                    )
-            }
-        }.fold(
-            onSuccess = {
-                withContext(Dispatchers.Main){
-                    readPreferences()
-                }
-            },
-            onFailure = {
-                Log.i("INFO_", "savePreference: erro ao salvar preferencias ${it.message}")
-
-            }
-        )
-
-    }
-    suspend  fun readPreferences(){
-        runCatching {
-            dataStorePreferenceRepository.readAllPreferecenceData()
-        }.fold(
-            onSuccess = {readAllPreferecenceData->
-                withContext(Dispatchers.Main){
-                    _userDataPreferecenceObs.value = readAllPreferecenceData
-                        ?: UserDataPreferecence(idPreference = 1, postionPreference = 1
+    fun savePreference(){
+        viewModelScope.launch {
+            runCatching {
+                if(_currentPlayingPlayList.value != null){
+                    dataStorePreferenceRepository
+                        .savePreference(
+                            playlistKeyId =  _currentPlayingPlayList.value!!.idPlayList,
+                            positionSoundKey = _currentPlayingPlayList.value!!.currentMusicPosition
                         )
                 }
-            },
-            onFailure = {
-                Log.i("Play_", "readPreferences: erro ao ler dados da store : ${it.message}")
-            }
-        )
+            }.fold(
+                onSuccess = {
+                    readPreferences()
+                },
+                onFailure = {
+                    Log.i("INFO_", "savePreference: erro ao salvar preferencias ${it.message}")
+                }
+            )
+        }
+
+    }
+      fun readPreferences(){
+         viewModelScope.launch {
+             runCatching {
+                 userPrefferencesService.readAppAllPrefferences()
+             }.fold(
+                 onSuccess = {readAllPreferecenceData->
+                     _userDataPreferecenceObs.value = readAllPreferecenceData
+                 },
+                 onFailure = {
+                     Log.i("Play_", "readPreferences: erro ao ler dados da store : ${it.message}")
+                 }
+             )
+         }
 
     }
 

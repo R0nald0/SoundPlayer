@@ -1,6 +1,5 @@
 package com.example.soundplayer.presentation.adapter
 
-import android.annotation.SuppressLint
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.ViewGroup

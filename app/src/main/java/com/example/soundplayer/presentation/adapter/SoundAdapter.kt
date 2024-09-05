@@ -105,7 +105,7 @@ class SoundAdapter(
                 } else {
                     binding.cardItemSound.setCardBackgroundColor(
                         ContextCompat.getColor(
-                            binding.root.context, R.color.colorSurfaceVariant
+                            binding.root.context, R.color.colorNightSurfaceVariant
                         )
                     )
                 }
@@ -113,7 +113,7 @@ class SoundAdapter(
                 isUpdateList(false)
                 binding.cardItemSound.setCardBackgroundColor(
                     ContextCompat.getColor(
-                        binding.root.context, R.color.colorSurfaceVariant
+                        binding.root.context, R.color.colorNightSurfaceVariant
                     )
                 )
             }
@@ -160,7 +160,7 @@ class SoundAdapter(
                     } else {
                         binding.cardItemSound.setCardBackgroundColor(
                             ContextCompat.getColor(
-                                binding.root.context, R.color.colorSurfaceVariant
+                                binding.root.context, R.color.colorNightSurfaceVariant
                             )
                         )
                         soundSelecionados.remove(Pair(position,soudd))

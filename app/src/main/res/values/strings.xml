@@ -23,7 +23,6 @@
     <string name="est_playlist_esta_vazia">Esta playlist está vazia</string>
     <string name="deletar">Deletar</string>
     <string name="nenhuma_m_sica">Nenhuma Mùsica</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="permiss_o_necessaria_para_carragar_as_m_sicas">Permissão necessaria para carragar as músicas</string>
     <string name="total_de_musicas">Total de músicas: %1$s</string>
     <string name="criar_playlist">Criar PlayList</string>

@@ -2,10 +2,14 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.SoundPlayer" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-         <item name="colorPrimary">@color/colorSurfaceVariant</item>
+         <item name="colorPrimary">@color/colorNightSurfaceVariant</item>
+        <item name="android:statusBarColor">@color/colorNightSurfaceStatusBar</item>
+        <item name="colorSurfaceVariant">@color/colorNightSurfaceVariant</item>
+        <item name="colorPrimaryContainer">@color/red</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorError">@color/red</item>
+        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
 
-        <item name="android:statusBarColor">@color/colorSurfaceStatusBar</item>
-        <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
     </style>
 
     <style name="ActionOverFlowButton" parent="Widget.AppCompat.ActionButton.Overflow">
@@ -15,5 +19,7 @@
     <style name="ToolbarTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorControlNormal">@color/white</item>
     </style>
+
+
 
 </resources>

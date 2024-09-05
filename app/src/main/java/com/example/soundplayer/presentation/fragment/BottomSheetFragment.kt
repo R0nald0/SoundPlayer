@@ -9,8 +9,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.soundplayer.R
+import com.example.soundplayer.commons.extension.afterTextChanged
 import com.example.soundplayer.commons.extension.exibirToast
-import com.example.soundplayer.databinding.FragmentItemListDialogListDialogBinding
+import com.example.soundplayer.databinding.FragmentBottomSheetDialogBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.presentation.adapter.BottomPlayListAdapter
@@ -23,7 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class BottomSheetFragment : BottomSheetDialogFragment() {
 
     private val binding by  lazy {
-        FragmentItemListDialogListDialogBinding.inflate(layoutInflater)
+        FragmentBottomSheetDialogBinding.inflate(layoutInflater)
     }
    private  lateinit var  bottomSheetAdapter  : BottomPlayListAdapter
    private val playListViewModel by activityViewModels<PlayListViewModel>()
@@ -34,27 +35,37 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        binding.edtPlayList.clearFocus()
-        binding.textInputLayoutCratePlayList.clearFocus()
-        binding.btnCreatePlayList.setOnClickListener {
-              createdSounds  = bottomSheetAdapter.getSoundSelected()
-
-              val namePlayList  = binding.edtPlayList.text.toString()
-              if (namePlayList.isNotEmpty()){
-                   if (createdSounds.isNotEmpty()){
-                       savePlayList(namePlayList,createdSounds.toMutableSet())
-                       dismiss()
-                  }else{
-                       requireContext().exibirToast("Você ainda não adicionao musicas a nova playlist")
-                  }
-
-              }else{
-                   requireContext().exibirToast("Escolha um nome válido para sua e playlist ")
-              }
-        }
+        initBindings()
 
         return binding.root
     }
+
+    private fun initBindings() {
+        binding.edtPlayList.clearFocus()
+        binding.textInputLayoutCratePlayList.clearFocus()
+        binding.edtPlayList.afterTextChanged {
+            binding.textInputLayoutCratePlayList.error = null
+        }
+        binding.btnCreatePlayList.setOnClickListener {
+            createdSounds = bottomSheetAdapter.getSoundSelected()
+
+            val namePlayList = binding.edtPlayList.text.toString()
+            if (namePlayList.isNotEmpty()) {
+                if (createdSounds.isNotEmpty()) {
+                    savePlayList(namePlayList, createdSounds.toMutableSet())
+                    dismiss()
+                } else {
+                    requireContext().exibirToast("Você ainda não adicionou músicas a sua nova playlist")
+                }
+            } else {
+                binding.textInputLayoutCratePlayList.error =
+                    "Preencha o campo corretamente"
+            }
+
+
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         bottomSheetAdapter = BottomPlayListAdapter()
