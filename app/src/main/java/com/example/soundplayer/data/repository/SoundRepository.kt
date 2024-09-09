@@ -5,6 +5,8 @@ import com.example.soundplayer.data.entities.SoundEntity
 import com.example.soundplayer.data.entities.toSound
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.toSoundEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class SoundRepository @Inject constructor(
@@ -14,12 +16,11 @@ class SoundRepository @Inject constructor(
         return  soundDao.saveSound(sound = sound.toSoundEntity())
     }
 
-    suspend fun verifyIfSoundContainOnDbByName(sound: Sound):Sound?{
-        val soundEntity = soundDao.findSoundByName(sound.title)
-        if (soundEntity != null){
-            return soundEntity.toSound()
+    suspend fun findSountByTitle(title:String):Flow<List<Sound>>{
+      return  soundDao.findSoundByName(title).map {
+            it.map { it.toSound() }
         }
-        return null
+
     }
 
     suspend fun findSoundById(idSound :Long?):SoundEntity{

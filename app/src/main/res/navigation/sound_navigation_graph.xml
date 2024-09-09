@@ -24,6 +24,9 @@
         <action
             android:id="@+id/action_mainFragment_to_updateAllMusicBottomSheetFragment"
             app:destination="@id/updateAllMusicBottomSheetFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
     </fragment>
     <dialog
         android:id="@+id/bottomSheetFragment"
@@ -52,4 +55,13 @@
         android:id="@+id/updateAllMusicBottomSheetFragment"
         android:name="com.example.soundplayer.presentation.fragment.UpdateAllMusicBottomSheetFragment"
         android:label="UpdateAllMusicBottomSheetFragment" />
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.soundplayer.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_searchFragment_to_soundPlayingFragment"
+            app:destination="@id/soundPlayingFragment" />
+    </fragment>
 </navigation>

@@ -26,6 +26,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     private val binding by  lazy {
         FragmentBottomSheetDialogBinding.inflate(layoutInflater)
     }
+
    private  lateinit var  bottomSheetAdapter  : BottomPlayListAdapter
    private val playListViewModel by activityViewModels<PlayListViewModel>()
    private lateinit var createdSounds : Set<Sound>
@@ -61,8 +62,6 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
                 binding.textInputLayoutCratePlayList.error =
                     "Preencha o campo corretamente"
             }
-
-
         }
     }
 

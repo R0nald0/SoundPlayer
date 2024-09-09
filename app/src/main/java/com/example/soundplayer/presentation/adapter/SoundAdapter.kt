@@ -3,7 +3,6 @@ package com.example.soundplayer.presentation.adapter
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -149,7 +148,7 @@ class SoundAdapter(
                         nonNulPlayList.currentMusicPosition = position
                         nonNulPlayList.listSound.size
                         soundViewModel.getAllMusics(nonNulPlayList)
-                        Log.i("INFO_", "clickItemEvent: ${nonNulPlayList.listSound.size}")
+
                         onClickInitNewFragment()
                     }?: Toast.makeText(it.context, "PlayList null", Toast.LENGTH_SHORT).show()
 

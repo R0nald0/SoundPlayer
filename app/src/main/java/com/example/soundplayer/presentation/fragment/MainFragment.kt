@@ -368,6 +368,10 @@ class MainFragment : Fragment() {
             val pairPlayList  =  adapterSound.getSoundSelecionados()
 
             return  when(menuItem.itemId){
+                R.id.id_search_musica ->{
+                    findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
+                    true
+                }
                 R.id.menu_config->{
                     findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
                     true
