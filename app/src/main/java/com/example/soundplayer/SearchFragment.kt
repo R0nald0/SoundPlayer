@@ -78,7 +78,6 @@ class SearchFragment : Fragment() {
                 }
         }
     }
-
     private fun initSearchView() {
 
          binding.searchView.queryHint ="Digite o título da música"
