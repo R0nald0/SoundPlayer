@@ -31,8 +31,7 @@ class SoundViewModel @Inject constructor(
     var isPlayingObserver  = MutableLiveData<Boolean>()
 
     private var _currentPlayingPlayList = MutableLiveData<PlayList>()
-    val currentPlayList :LiveData<PlayList>
-        get() = _currentPlayingPlayList
+    val currentPlayList :LiveData<PlayList> =_currentPlayingPlayList
 
     private val _userDataPreferecenceObs = MutableLiveData<UserDataPreferecence>()
     val userDataPreferecence : LiveData<UserDataPreferecence>
@@ -69,12 +68,21 @@ class SoundViewModel @Inject constructor(
         }
     }
     fun getAllMusics(playList: PlayList) = viewModelScope.launch {
-          val currentPlayList =  servicePlayer.playPlaylist(playList)
-          if (currentPlayList != null){
-              _currentPlayingPlayList.value = currentPlayList!!
-              getActualSound()
-              isPlaying()
-          }
+          runCatching {
+             servicePlayer.playPlaylist(playList)
+          }.fold(
+              onSuccess = {currentPlayList ->
+                  if (currentPlayList != null ){
+                      _currentPlayingPlayList.value = currentPlayList!!
+                      getActualSound()
+                      isPlaying()
+                  }
+              },
+              onFailure = {
+                  Log.e("INFO_", "savePreference: erro ao salvar preferencias ${it.message}")
+                 // playBackError =Failure(messages = "")
+              }
+          )
        }
     fun savePreference(){
         viewModelScope.launch {
@@ -95,7 +103,17 @@ class SoundViewModel @Inject constructor(
                 }
             )
         }
+    }
+    fun playAllMusicFromFist(listSound : Set<Sound>) = viewModelScope.launch {
+         kotlin.runCatching {
+              servicePlayer.playAllMusicFromFist(listSound)
+         }.fold(
+             onSuccess = {
 
+             }, onFailure = {
+                 Log.e("INFO_", "erro ao iniciar player ${it.message}")
+             }
+         )
     }
       fun readPreferences(){
          viewModelScope.launch {
@@ -110,7 +128,6 @@ class SoundViewModel @Inject constructor(
                  }
              )
          }
-
     }
 
      fun getPlayer() {

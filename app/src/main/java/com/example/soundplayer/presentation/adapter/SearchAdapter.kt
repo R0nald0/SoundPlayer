@@ -1,41 +1,66 @@
 package com.example.soundplayer.presentation.adapter
 
+import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.soundplayer.R
+import com.example.soundplayer.data.entities.SongWithPlaylists
+import com.example.soundplayer.data.entities.toSound
+import com.example.soundplayer.databinding.ItemSearchPlaylistChipBinding
 import com.example.soundplayer.databinding.ItemSoundSearchLayoutBinding
+import com.example.soundplayer.model.PlayList
+import com.example.soundplayer.model.SongWithPlayListDomain
 import com.example.soundplayer.model.Sound
 
 class SearchAdapter (
-    private val onTap :(Sound)-> Unit
+    private val onTap :(SongWithPlayListDomain,PlayList)-> Unit
 ):RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
-    private var listSoundWithPlayList = emptyList<Sound>()
+    private var listSoundWithPlayList = emptyList<SongWithPlayListDomain>()
+    private lateinit var itemChipPlayListSearchAdapter : ItemChipPlayListSearchAdapter
 
 
-    fun getSoundOFSearch(list: List<Sound>){
+    fun getSoundOFSearch(list: List<SongWithPlayListDomain>){
         listSoundWithPlayList = list
         notifyDataSetChanged()
     }
 
     inner class  SearchViewHolder(private  val binding: ItemSoundSearchLayoutBinding) : ViewHolder(binding.root){
 
-        fun bind(sound :Sound){
-             val imageSound = sound.uriMediaAlbum ?: sound.uriMedia ?: Uri.EMPTY
+        fun bind(sound :SongWithPlayListDomain){
+             val imageSound = sound.sound.uriMediaAlbum ?: sound.sound.uriMedia ?: Uri.EMPTY
             if (imageSound != null){
                 binding.imgCapaSound.setImageURI(imageSound)
             }else{
                 binding.imgCapaSound.setImageResource(R.drawable.transferir)
             }
-            binding.txvTituloSound.text = sound.title
-            binding.constraintItemSoundSearch.setOnClickListener {
-                onTap(sound)
-            }
+            binding.txvTituloSound.text = sound.sound.title
 
         }
+
+        fun initItemChipPlayListSearched(songWithPlaylists: SongWithPlayListDomain){
+            itemChipPlayListSearchAdapter = ItemChipPlayListSearchAdapter { playList ->
+
+                  onTap(songWithPlaylists,playList)
+            }
+
+            binding.rvSearchPlaylist.adapter =itemChipPlayListSearchAdapter
+            binding.rvSearchPlaylist.layoutManager =LinearLayoutManager(
+                binding.rvSearchPlaylist.context,
+                RecyclerView.HORIZONTAL,
+                false
+            )
+
+        }
+
     }
+
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
        val searchView  = ItemSoundSearchLayoutBinding.inflate(
@@ -49,7 +74,13 @@ class SearchAdapter (
     override fun getItemCount() = listSoundWithPlayList.size
 
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
-       val soundsWithPlayList = listSoundWithPlayList[position]
+        val soundsWithPlayList = listSoundWithPlayList[position]
+
         holder.bind(soundsWithPlayList)
+
+        holder.initItemChipPlayListSearched(soundsWithPlayList)
+
+        itemChipPlayListSearchAdapter.getAllSearchedPlayList(soundsWithPlayList.listOfPlayLists.toSet())
+
     }
 }

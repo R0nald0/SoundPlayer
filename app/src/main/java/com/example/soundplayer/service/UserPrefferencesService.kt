@@ -9,7 +9,6 @@ class UserPrefferencesService @Inject constructor(
 ) {
     suspend fun readAppAllPrefferences() = dataStorePreferenceRepository.readAppAllPrefferences()
     suspend fun <T>readUserPrefference(key: Preferences.Key<T>) = dataStorePreferenceRepository.readUserPrefference(key)
-
     suspend fun <T>savePrefferenceUser(value: T ,key : Preferences.Key<T>) =
            dataStorePreferenceRepository.savePrefferenceUser(value,key)
 }

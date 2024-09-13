@@ -1,6 +1,7 @@
-package com.example.soundplayer
+package com.example.soundplayer.presentation.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,10 +15,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.soundplayer.R
 import com.example.soundplayer.commons.extension.snackBarSound
 import com.example.soundplayer.databinding.FragmentSearchBinding
+import com.example.soundplayer.model.SongWithPlayListDomain
+import com.example.soundplayer.model.Sound
+import com.example.soundplayer.presentation.adapter.ItemChipPlayListSearchAdapter
 import com.example.soundplayer.presentation.adapter.SearchAdapter
+import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
 import com.example.soundplayer.presentation.viewmodel.SearchViewModel
+import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -29,29 +36,37 @@ class SearchFragment : Fragment() {
     }
     private lateinit var  searchAdapter :SearchAdapter
     private  val searchSoundViewModel by viewModels<SearchViewModel>()
+    private  val playerViewModel by viewModels<SoundViewModel>()
+    private val playListViewModel  by viewModels<PlayListViewModel>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+    private var soundChosed : Sound? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
+        initObservers()
+        initSearchView()
+        inicializarAdapter()
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        initObservers()
-        initSearchView()
-        inicializarAdapter()
     }
 
     private fun initObservers() {
+        playListViewModel.clickedPlayList.observe(viewLifecycleOwner){chosedPlayLis->
+            chosedPlayLis.let {playList ->
+                if (soundChosed != null){
+                    val  position = playList.listSound.indexOf(soundChosed)
+                    playList.currentMusicPosition = position
+                }
+                playerViewModel.getAllMusics(playList = playList)
+                findNavController().navigate(R.id.soundPlayingFragment)
+            }
+        }
+
      searchSoundViewModel.loader.asLiveData().observe(viewLifecycleOwner){loader->
          if (loader){
              binding.rvItemSoundSearch.isVisible =false
@@ -104,11 +119,12 @@ class SearchFragment : Fragment() {
     }
 
     private fun inicializarAdapter() {
+
+
         searchAdapter = SearchAdapter(
-            onTap = {sound->
-                requireView().snackBarSound(
-                    messages = sound.title
-                )
+            onTap = {sound,playlist->
+                 playListViewModel.findPlayListById(playlist.idPlayList ?: 1)
+                soundChosed = sound.sound
             }
         )
         binding.rvItemSoundSearch.apply {
@@ -117,6 +133,7 @@ class SearchFragment : Fragment() {
 
         }
     }
+
 
 
 }

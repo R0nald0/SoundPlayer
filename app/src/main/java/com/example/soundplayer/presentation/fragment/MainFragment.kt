@@ -278,7 +278,8 @@ class MainFragment : Fragment() {
             isUpdateList = {isUpdate->
                updateViewWhenMenuChange(isUpdate)
             },
-            onClickInitNewFragment = {
+            onClickInitNewFragment = {playList->
+                soundViewModel.getAllMusics(playList)
                 findNavController().navigate(R.id.action_mainFragment_to_soundPlayingFragment)
             }
         )

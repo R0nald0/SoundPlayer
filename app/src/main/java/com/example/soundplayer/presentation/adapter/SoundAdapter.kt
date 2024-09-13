@@ -23,7 +23,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class SoundAdapter(
     private val soundViewModel: SoundViewModel,
     val isUpdateList :(Boolean)->Unit,
-    val onClickInitNewFragment :()->Unit,
+    val onClickInitNewFragment :(PlayList)->Unit,
     val onDelete : (Long,Pair<Int,Sound>)-> Unit
 ) :RecyclerView.Adapter<SoundAdapter.SoundViewHolder>() {
     private  var soundsPlayList: PlayList? = null
@@ -69,8 +69,6 @@ class SoundAdapter(
             }
 
             configSelectionedItemApperence(position,soudd)
-           
-
             if (soudd.uriMediaAlbum != null) {
                 binding.imageView.setImageURI(soudd.uriMediaAlbum)
                 if (binding.imageView.drawable == null) {
@@ -81,7 +79,6 @@ class SoundAdapter(
             }
 
             clickItemEvent(position, soudd)
-
             configApperenceItemImage(soudd)
             longPressEvent(position,soudd)
         }
@@ -147,9 +144,7 @@ class SoundAdapter(
                     soundsPlayList?.let {nonNulPlayList->
                         nonNulPlayList.currentMusicPosition = position
                         nonNulPlayList.listSound.size
-                        soundViewModel.getAllMusics(nonNulPlayList)
-
-                        onClickInitNewFragment()
+                        onClickInitNewFragment(nonNulPlayList)
                     }?: Toast.makeText(it.context, "PlayList null", Toast.LENGTH_SHORT).show()
 
                 } else {

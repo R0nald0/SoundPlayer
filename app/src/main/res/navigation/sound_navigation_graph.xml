@@ -14,7 +14,9 @@
         <action
             android:id="@+id/action_mainFragment_to_soundPlayingFragment"
             app:destination="@id/soundPlayingFragment"
-            app:enterAnim="@android:anim/fade_in" />
+            app:enterAnim="@android:anim/fade_in"
+        />
+
         <action
             android:id="@+id/action_mainFragment_to_selectPlayListDialogFragment"
             app:destination="@id/id_update" />
@@ -44,7 +46,11 @@
     <fragment
         android:id="@+id/soundPlayingFragment"
         android:name="com.example.soundplayer.presentation.fragment.SoundPlayingFragment"
-        tools:layout="@layout/fragment_sound_playing" />
+        tools:layout="@layout/fragment_sound_playing" >
+        <argument
+            android:name="playLista"
+            app:argType="com.example.soundplayer.model.PlayList" />
+    </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.soundplayer.presentation.fragment.SettingsFragment"
@@ -57,7 +63,7 @@
         android:label="UpdateAllMusicBottomSheetFragment" />
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.example.soundplayer.SearchFragment"
+        android:name="com.example.soundplayer.presentation.fragment.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search" >
         <action

@@ -1,6 +1,7 @@
 package com.example.soundplayer.service
 
 import androidx.lifecycle.MutableLiveData
+import androidx.media3.common.MediaItem
 import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.data.entities.toSound
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
@@ -19,6 +20,7 @@ class ServicePlayer @Inject constructor(
     private val dataStorePreferenceRepository: DataStorePreferenceRepository
 ) {
 
+    fun playAllMusicFromFist(listMediaItem : Set<Sound>) = playerRepository.playAllMusicFromFist(listMediaItem)
     fun playPlaylist(playerList: PlayList): PlayList? {
         return playerRepository.getAllMusics(playerList)
     }
@@ -36,7 +38,7 @@ class ServicePlayer @Inject constructor(
         }
     }
 
-    suspend fun findPlayListById(id: Long): PlayList? {
+    suspend  fun findPlayListById(id: Long): PlayList? {
         val orderBy = dataStorePreferenceRepository
             .readUserPrefference(key = Constants.ID_ORDERED_SONS_PREFFERENCE)
             .first() ?: 0

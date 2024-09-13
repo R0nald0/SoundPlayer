@@ -33,18 +33,18 @@
         app:layout_constraintStart_toEndOf="@+id/img_capa_sound"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/txv_titulo_playList"
-        style="@style/TextAppearance.Material3.BodyMedium"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_search_playlist"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:text="Titulo da playlist"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="@+id/img_capa_sound"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.01"
         app:layout_constraintStart_toEndOf="@+id/img_capa_sound"
-        app:layout_constraintTop_toBottomOf="@+id/txv_titulo_sound" />
+        app:layout_constraintTop_toBottomOf="@+id/txv_titulo_sound"
+        tools:listitem="@layout/item_search_playlist_chip" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,7 +1,10 @@
 package com.example.soundplayer.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.soundplayer.data.entities.SongWithPlaylists
+import com.example.soundplayer.model.SongWithPlayListDomain
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.service.SoundDomainService
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +21,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class  StateUi(
-    val listSoundsSearch :List<Sound> = emptyList(),
+    val listSoundsSearch :List<SongWithPlayListDomain> = emptyList(),
     val error : String? =null
 )
 
@@ -29,7 +32,7 @@ class SearchViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(StateUi())
     var uiState: StateFlow<StateUi> = _uiState.asStateFlow()
 
-    private val _loader = MutableStateFlow<Boolean>(false);
+    private val _loader = MutableStateFlow(false);
     var loader: StateFlow<Boolean> = _loader;
 
     fun findSoundBytitle(title: String) {
@@ -55,8 +58,8 @@ class SearchViewModel @Inject constructor(
                 }
                 .collect { sounds ->
                     _uiState.update {
-                        it.copy(listSoundsSearch = sounds)
-                    }
+                         it.copy(listSoundsSearch = sounds)
+                     }
                     _loader.value = false
                 }
         }
