@@ -43,7 +43,6 @@ class SoundViewModel @Inject constructor(
          getPlayer()
          isPlaying()
          getActualSound()
-         getActualPlayList()
          getPlayback()
     }
 
@@ -67,13 +66,14 @@ class SoundViewModel @Inject constructor(
             _currentPlayingPlayList.value =  servicePlayer.getActualPlayList()
         }
     }
-    fun getAllMusics(playList: PlayList) = viewModelScope.launch {
+    fun setPlayListToPlay(playList: PlayList) = viewModelScope.launch {
           runCatching {
              servicePlayer.playPlaylist(playList)
           }.fold(
               onSuccess = {currentPlayList ->
                   if (currentPlayList != null ){
                       _currentPlayingPlayList.value = currentPlayList!!
+                      savePreference()
                       getActualSound()
                       isPlaying()
                   }
@@ -122,6 +122,7 @@ class SoundViewModel @Inject constructor(
              }.fold(
                  onSuccess = {readAllPreferecenceData->
                      _userDataPreferecenceObs.value = readAllPreferecenceData
+                     Log.d("INFO_", "readPreferences: $readAllPreferecenceData")
                  },
                  onFailure = {
                      Log.i("Play_", "readPreferences: erro ao ler dados da store : ${it.message}")

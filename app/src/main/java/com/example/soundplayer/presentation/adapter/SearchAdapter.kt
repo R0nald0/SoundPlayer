@@ -1,25 +1,19 @@
 package com.example.soundplayer.presentation.adapter
 
-import android.content.Context
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.soundplayer.R
-import com.example.soundplayer.data.entities.SongWithPlaylists
-import com.example.soundplayer.data.entities.toSound
-import com.example.soundplayer.databinding.ItemSearchPlaylistChipBinding
 import com.example.soundplayer.databinding.ItemSoundSearchLayoutBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.SongWithPlayListDomain
-import com.example.soundplayer.model.Sound
 
 class SearchAdapter (
-    private val onTap :(SongWithPlayListDomain,PlayList)-> Unit
+    private val onTap :(SongWithPlayListDomain,PlayList)-> Unit,
+
 ):RecyclerView.Adapter<SearchAdapter.SearchViewHolder>() {
     private var listSoundWithPlayList = emptyList<SongWithPlayListDomain>()
     private lateinit var itemChipPlayListSearchAdapter : ItemChipPlayListSearchAdapter
@@ -40,12 +34,11 @@ class SearchAdapter (
                 binding.imgCapaSound.setImageResource(R.drawable.transferir)
             }
             binding.txvTituloSound.text = sound.sound.title
-
         }
+
 
         fun initItemChipPlayListSearched(songWithPlaylists: SongWithPlayListDomain){
             itemChipPlayListSearchAdapter = ItemChipPlayListSearchAdapter { playList ->
-
                   onTap(songWithPlaylists,playList)
             }
 

@@ -39,6 +39,7 @@ class PreferencesViewModel @Inject constructor(
                 serviceDataPreference.readAppAllPrefferences()
             }.fold(
                 onSuccess = {userPreff->
+                    Log.d("INFO_", "readAllPrefference: $userPreff")
                     _uiStatePreffs.value = userPreff
                 },
                 onFailure = {}

@@ -1,7 +1,6 @@
 package com.example.soundplayer.service
 
 import androidx.lifecycle.MutableLiveData
-import androidx.media3.common.MediaItem
 import com.example.soundplayer.commons.constants.Constants
 import com.example.soundplayer.data.entities.toSound
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository

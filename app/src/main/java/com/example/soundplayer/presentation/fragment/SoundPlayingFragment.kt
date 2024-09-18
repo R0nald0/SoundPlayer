@@ -14,9 +14,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import androidx.navigation.NavArgs
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.example.soundplayer.R
 import com.example.soundplayer.commons.extension.snackBarSound
 import com.example.soundplayer.databinding.FragmentSoundPlayingBinding

@@ -1,7 +1,6 @@
 package com.example.soundplayer.presentation.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,11 +15,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.soundplayer.R
-import com.example.soundplayer.commons.extension.snackBarSound
 import com.example.soundplayer.databinding.FragmentSearchBinding
-import com.example.soundplayer.model.SongWithPlayListDomain
 import com.example.soundplayer.model.Sound
-import com.example.soundplayer.presentation.adapter.ItemChipPlayListSearchAdapter
 import com.example.soundplayer.presentation.adapter.SearchAdapter
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
 import com.example.soundplayer.presentation.viewmodel.SearchViewModel
@@ -62,7 +58,7 @@ class SearchFragment : Fragment() {
                     val  position = playList.listSound.indexOf(soundChosed)
                     playList.currentMusicPosition = position
                 }
-                playerViewModel.getAllMusics(playList = playList)
+                 playerViewModel.setPlayListToPlay(playList = playList)
                 findNavController().navigate(R.id.soundPlayingFragment)
             }
         }
@@ -119,13 +115,12 @@ class SearchFragment : Fragment() {
     }
 
     private fun inicializarAdapter() {
-
-
         searchAdapter = SearchAdapter(
             onTap = {sound,playlist->
                  playListViewModel.findPlayListById(playlist.idPlayList ?: 1)
                 soundChosed = sound.sound
-            }
+            },
+
         )
         binding.rvItemSoundSearch.apply {
             adapter =searchAdapter

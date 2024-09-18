@@ -9,7 +9,6 @@ import androidx.room.Update
 import com.example.soundplayer.data.entities.PlayListAndSoundCrossEntity
 import com.example.soundplayer.data.entities.PlayListWithSong
 import com.example.soundplayer.data.entities.SongWithPlaylists
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlaylistAndSoundCrossDao {

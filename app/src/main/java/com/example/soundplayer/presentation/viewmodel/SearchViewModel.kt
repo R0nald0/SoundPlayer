@@ -1,11 +1,8 @@
 package com.example.soundplayer.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.soundplayer.data.entities.SongWithPlaylists
 import com.example.soundplayer.model.SongWithPlayListDomain
-import com.example.soundplayer.model.Sound
 import com.example.soundplayer.service.SoundDomainService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
