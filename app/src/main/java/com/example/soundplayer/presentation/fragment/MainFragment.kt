@@ -88,7 +88,9 @@ class MainFragment : Fragment() {
     }
 
     override fun onStart() {
-        preferencesViewModel.readSizeTextMusicPreference()
+        soundViewModel.getActualPlayList()
+       preferencesViewModel.readSizeTextMusicPreference()
+       // preferencesViewModel.readAllPrefference()
         val sound = soundViewModel.actualSound?.value
         if (sound != null){
             adapterSound.getActualSound(sound)
@@ -130,6 +132,7 @@ class MainFragment : Fragment() {
          }
 
          }
+
         preferencesViewModel.uiStatePreffs.observe(viewLifecycleOwner){ uiStatePref->
             if (uiStatePref.idPreference != null){
                 playListViewModel.findPlayListById(uiStatePref.idPreference)
@@ -139,7 +142,7 @@ class MainFragment : Fragment() {
 
         soundViewModel.isPlayingObserver.observe(viewLifecycleOwner){ isPlaying ->
             if (isPlaying){
-                soundViewModel.currentPlayList.observe(viewLifecycleOwner){actualPLayiingPlayList->
+                soundViewModel.currentPlayList.observe(viewLifecycleOwner){ actualPLayiingPlayList->
 
                     if (actualPLayiingPlayList != null){
                         preferencesViewModel.savePlayListIdPlayList(actualPLayiingPlayList.idPlayList!!)
@@ -170,9 +173,9 @@ class MainFragment : Fragment() {
         }
 
         playListViewModel.clickedPlayList.observe(viewLifecycleOwner){touchedPlayList->
-            binding.rvSound.scrollToPosition(touchedPlayList.currentMusicPosition)
-            playListAdapter.setLastOpenPlayListBorder(touchedPlayList.idPlayList ?: 1)
             updateViewWhenPlayListIsEmpty(touchedPlayList)
+            binding.rvSound.scrollToPosition(touchedPlayList.currentMusicPosition)
+            playListAdapter.setLastOpenPlayListBorder(touchedPlayList.idPlayList ?: -1)
         }
 
         playListViewModel.soundListBd.observe(viewLifecycleOwner){listSound->
@@ -257,8 +260,8 @@ class MainFragment : Fragment() {
     }
 
     override fun onResume() {
-        val t = Permission.chekPerMission(this.requireActivity(),listPermission)
-        if (t.isNotEmpty()){
+        val listPermissions = Permission.chekPerMission(this.requireActivity(),listPermission)
+        if (listPermissions.isNotEmpty()){
             showHideViewItems(false)
         }else{
             playListViewModel.verifyPermissions( true)
@@ -278,7 +281,8 @@ class MainFragment : Fragment() {
             isUpdateList = {isUpdate->
                updateViewWhenMenuChange(isUpdate)
             },
-            onClickInitNewFragment = {
+            onClickInitNewFragment = {playList->
+                soundViewModel.setPlayListToPlay(playList)
                 findNavController().navigate(R.id.action_mainFragment_to_soundPlayingFragment)
             }
         )
@@ -342,7 +346,6 @@ class MainFragment : Fragment() {
     }
 
     override fun onStop() {
-        soundViewModel.savePreference()
         super.onStop()
     }
 
@@ -368,6 +371,10 @@ class MainFragment : Fragment() {
             val pairPlayList  =  adapterSound.getSoundSelecionados()
 
             return  when(menuItem.itemId){
+                R.id.id_search_musica ->{
+                    findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
+                    true
+                }
                 R.id.menu_config->{
                     findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
                     true

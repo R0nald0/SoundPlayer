@@ -94,7 +94,7 @@ class ClassModule {
 
     @Singleton
     @Provides
-    fun provideSoundRepository(soundDao: SoundDao):SoundRepository = SoundRepository(soundDao)
+    fun provideSoundRepository(soundDao: SoundDao,playListCrossSounddao : PlaylistAndSoundCrossDao):SoundRepository = SoundRepository(soundDao,playListCrossSounddao )
 
     @Singleton
     @Provides

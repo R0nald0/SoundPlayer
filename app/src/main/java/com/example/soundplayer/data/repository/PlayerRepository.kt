@@ -48,7 +48,7 @@ class PlayerRepository @Inject constructor(
          _playlistCurrentlyPlaying = playList
          exoPlayer.seekTo(playList.currentMusicPosition,playBackPosition)
          currentItem = playList.currentMusicPosition
-         playAllMusicFromFist(createMediaItemList(playList.listSound))
+         playAllMusicFromFist(playList.listSound)
       }
       else{
          playBackPosition =0L
@@ -60,7 +60,8 @@ class PlayerRepository @Inject constructor(
       return  _playlistCurrentlyPlaying
    }
 
-   private fun playAllMusicFromFist(listMediaItem : Set<MediaItem>){
+    fun playAllMusicFromFist( sounds: Set<Sound>){
+      val listMediaItem =  createMediaItemList(sounds)
       if (exoPlayer.mediaItemCount == 0){
          exoPlayer.addMediaItems(listMediaItem.toList())
          exoPlayer.playWhenReady = playerWhenRead

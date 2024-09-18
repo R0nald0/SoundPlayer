@@ -29,7 +29,9 @@ class SoundPlayingFragment : Fragment() {
     }
     lateinit var controllerAsync: ListenableFuture<MediaController>
 
+
     private val soundViewModel by activityViewModels<SoundViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -72,7 +74,7 @@ class SoundPlayingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.btnBack.setOnClickListener {
-            findNavController().popBackStack()
+            findNavController().popBackStack(R.id.mainFragment,false)
         }
     }
 
@@ -93,7 +95,6 @@ class SoundPlayingFragment : Fragment() {
             if (playbackError != null) {
                 when (playbackError.code) {
                     PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND -> {
-
                         requireView().snackBarSound(
                             messages = "${playbackError.message}",
                             backGroundColor = Color.RED,

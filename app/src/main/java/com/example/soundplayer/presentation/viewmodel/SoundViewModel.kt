@@ -31,8 +31,7 @@ class SoundViewModel @Inject constructor(
     var isPlayingObserver  = MutableLiveData<Boolean>()
 
     private var _currentPlayingPlayList = MutableLiveData<PlayList>()
-    val currentPlayList :LiveData<PlayList>
-        get() = _currentPlayingPlayList
+    val currentPlayList :LiveData<PlayList> =_currentPlayingPlayList
 
     private val _userDataPreferecenceObs = MutableLiveData<UserDataPreferecence>()
     val userDataPreferecence : LiveData<UserDataPreferecence>
@@ -44,7 +43,6 @@ class SoundViewModel @Inject constructor(
          getPlayer()
          isPlaying()
          getActualSound()
-         getActualPlayList()
          getPlayback()
     }
 
@@ -68,13 +66,23 @@ class SoundViewModel @Inject constructor(
             _currentPlayingPlayList.value =  servicePlayer.getActualPlayList()
         }
     }
-    fun getAllMusics(playList: PlayList) = viewModelScope.launch {
-          val currentPlayList =  servicePlayer.playPlaylist(playList)
-          if (currentPlayList != null){
-              _currentPlayingPlayList.value = currentPlayList!!
-              getActualSound()
-              isPlaying()
-          }
+    fun setPlayListToPlay(playList: PlayList) = viewModelScope.launch {
+          runCatching {
+             servicePlayer.playPlaylist(playList)
+          }.fold(
+              onSuccess = {currentPlayList ->
+                  if (currentPlayList != null ){
+                      _currentPlayingPlayList.value = currentPlayList!!
+                      savePreference()
+                      getActualSound()
+                      isPlaying()
+                  }
+              },
+              onFailure = {
+                  Log.e("INFO_", "savePreference: erro ao salvar preferencias ${it.message}")
+                 // playBackError =Failure(messages = "")
+              }
+          )
        }
     fun savePreference(){
         viewModelScope.launch {
@@ -95,7 +103,17 @@ class SoundViewModel @Inject constructor(
                 }
             )
         }
+    }
+    fun playAllMusicFromFist(listSound : Set<Sound>) = viewModelScope.launch {
+         kotlin.runCatching {
+              servicePlayer.playAllMusicFromFist(listSound)
+         }.fold(
+             onSuccess = {
 
+             }, onFailure = {
+                 Log.e("INFO_", "erro ao iniciar player ${it.message}")
+             }
+         )
     }
       fun readPreferences(){
          viewModelScope.launch {
@@ -104,13 +122,13 @@ class SoundViewModel @Inject constructor(
              }.fold(
                  onSuccess = {readAllPreferecenceData->
                      _userDataPreferecenceObs.value = readAllPreferecenceData
+                     Log.d("INFO_", "readPreferences: $readAllPreferecenceData")
                  },
                  onFailure = {
                      Log.i("Play_", "readPreferences: erro ao ler dados da store : ${it.message}")
                  }
              )
          }
-
     }
 
      fun getPlayer() {

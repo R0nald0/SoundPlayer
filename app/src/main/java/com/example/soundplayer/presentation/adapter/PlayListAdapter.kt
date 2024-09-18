@@ -57,8 +57,8 @@ class PlayListAdapter(
         notifyDataSetChanged()
     }
 
-
     inner class  PlayLisViewHolder( val binding : PlayListItemBinding): RecyclerView.ViewHolder(binding.root){
+
         fun bind(actualPlayList: PlayList, position: Int){
             if(!positionPlayListClicked.containsValue(position)){
                 binding.idContraintPlayList.background =
@@ -66,6 +66,7 @@ class PlayListAdapter(
             }
             initBindings(actualPlayList, position)
         }
+
         private fun  initBindings(actualPlayList :PlayList, position: Int){
 
             binding.txvTitle.text = actualPlayList.name
@@ -88,7 +89,7 @@ class PlayListAdapter(
             }
         }
         @SuppressLint("NotifyDataSetChanged")
-        private  fun setUpBorderPlayList(position: Int) {
+         private fun setUpBorderPlayList(position: Int) {
             positionPlayListClicked.clear()
             positionPlayListClicked.put(position, position)
             if (positionPlayListClicked.containsValue(position)) {
@@ -114,7 +115,6 @@ class PlayListAdapter(
             if (positionPlayListClicked.containsValue(position)) {
                 binding.idContraintPlayList.background =
                     ContextCompat.getDrawable(binding.root.context, R.drawable.border_playlist_selected_item)
-
             }
         }
     }
@@ -129,7 +129,6 @@ class PlayListAdapter(
 
         return PlayLisViewHolder(view)
     }
-
     override fun getItemCount() = playlistWithSoundDomainMutableSet.size
     override fun onBindViewHolder(holder: PlayLisViewHolder, position: Int) {
 

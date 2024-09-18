@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.example.soundplayer.data.entities.PlayListAndSoundCrossEntity
 import com.example.soundplayer.data.entities.PlayListWithSong
+import com.example.soundplayer.data.entities.SongWithPlaylists
 
 @Dao
 interface PlaylistAndSoundCrossDao {
@@ -37,5 +38,16 @@ interface PlaylistAndSoundCrossDao {
     @Transaction
     @Query(value = "SELECT * FROM playlistandsoundcrossentity WHERE playListId = :idPlaylist")
     suspend fun findPlayListAcrossSoundById(idPlaylist: Long) : PlayListAndSoundCrossEntity
+
+    @Query("""
+        SELECT * FROM sound 
+        INNER JOIN playlistandsoundcrossentity ON sound.soundId = playlistandsoundcrossentity.soundId
+        WHERE sound.title LIKE '%' || :title || '%' 
+          AND playlistandsoundcrossentity.soundId = :soundId
+    """)
+  suspend  fun findSoundByNameAndSoundId(title: String, soundId: Long): SongWithPlaylists
+
+
+
 
 }

@@ -9,4 +9,10 @@
         android:icon="@drawable/baseline_settings_24"
         android:title="@string/tittle_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/id_search_musica"
+        android:contentDescription="@string/bot_o_para_buscar_musica_pelo_nome"
+        android:icon="@drawable/ic_search_24"
+        android:title="@string/buscar_m_sica"
+        app:showAsAction="always" />
 </menu>
