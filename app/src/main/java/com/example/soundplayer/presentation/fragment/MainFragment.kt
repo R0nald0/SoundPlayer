@@ -89,8 +89,7 @@ class MainFragment : Fragment() {
 
     override fun onStart() {
         soundViewModel.getActualPlayList()
-       preferencesViewModel.readSizeTextMusicPreference()
-       // preferencesViewModel.readAllPrefference()
+        preferencesViewModel.readSizeTextMusicPreference()
         val sound = soundViewModel.actualSound?.value
         if (sound != null){
             adapterSound.getActualSound(sound)
@@ -114,24 +113,11 @@ class MainFragment : Fragment() {
     }
     @SuppressLint("StringFormatMatches")
     private  fun observersViewModel(){
-        playListViewModel.hasPermission.observe(viewLifecycleOwner){hasPermission ->
-             if (!hasPermission) {
-                 showHideViewItems(false)
-                //requireActivity().exibirToast(getString(R.string.permiss_o_necessaria_para_carragar_as_m_sicas))
-         } else {
-            getMusicFromContentProvider()
-             playListViewModel.listSize.observe(viewLifecycleOwner){sizeListSoundOnBd->
-                 binding.txvQuantidadeMusics.text = getString(R.string.total_de_musicas, sizeListSoundOnBd)
-                 if (sizeListSoundOnBd <= 0){
-                     showHideViewItems(false)
-                 }else{
-                     playListViewModel.getAllPlayList()
-                     showHideViewItems(true)
-                 }
-             }
-         }
 
-         }
+        playListViewModel.listSize.observe(viewLifecycleOwner){sizeListSoundOnBd->
+            binding.txvQuantidadeMusics.text = getString(R.string.total_de_musicas, sizeListSoundOnBd)
+
+        }
 
         preferencesViewModel.uiStatePreffs.observe(viewLifecycleOwner){ uiStatePref->
             if (uiStatePref.idPreference != null){
@@ -239,7 +225,7 @@ class MainFragment : Fragment() {
             binding.txvSounds.visibility = View.VISIBLE
         }else{
             binding.LineartLayoutEmptySound.isVisible = true
-            binding.rvSound.isVisible = true
+            binding.rvSound.isVisible = false
             binding.linearMusics.visibility = View.GONE
             binding.fabAddPlayList.visibility = View.GONE
             binding.txvQuantidadeMusics.visibility = View.GONE
@@ -255,7 +241,14 @@ class MainFragment : Fragment() {
                 .RequestMultiplePermissions()){permission: Map<String, Boolean> ->
 
             val isPepermited = Permission.getPermissions(permission)
-            playListViewModel.verifyPermissions( isPepermited)
+            val listPermissions = Permission.chekPerMission(this.requireActivity(),listPermission)
+            if(listPermissions.isNotEmpty()){
+                showHideViewItems(!isPepermited)
+            }else{
+                getMusicFromContentProvider()
+                playListViewModel.getAllPlayList()
+                showHideViewItems(isPepermited)
+            }
         }
     }
 
@@ -264,7 +257,8 @@ class MainFragment : Fragment() {
         if (listPermissions.isNotEmpty()){
             showHideViewItems(false)
         }else{
-            playListViewModel.verifyPermissions( true)
+             showHideViewItems(true)
+            playListViewModel.getAllPlayList()
         }
         super.onResume()
     }
@@ -330,7 +324,10 @@ class MainFragment : Fragment() {
                 adapterSound.clearSoundListSelected()
             }
         } else {
+            val listPermissions = Permission.chekPerMission(this.requireActivity(),listPermission)
+            if (listPermissions.isEmpty())
             binding.fabAddPlayList.isVisible = true
+            else binding.fabAddPlayList.isVisible = false
         }
 
     }
@@ -343,10 +340,6 @@ class MainFragment : Fragment() {
 
        playListViewModel.saveAllSoundsByContentProvider(listSoundFromContentProvider)
 
-    }
-
-    override fun onStop() {
-        super.onStop()
     }
 
     inner class  MyMenuProvider() : MenuProvider {

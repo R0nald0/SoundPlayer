@@ -44,11 +44,10 @@ class PlayListViewModel @Inject constructor(
     private val _soundListCompared = MutableLiveData<Set<Sound>>()
     val soundListCompared : LiveData<Set<Sound>> = _soundListCompared
 
+
     init {
       countTotalSound()
-
     }
-
     fun savePlayList(playList: PlayList){
         viewModelScope.launch {
             val result  = servicePlayer.createPlayList(playList)
@@ -104,7 +103,7 @@ class PlayListViewModel @Inject constructor(
             }.fold(
                 onSuccess = { listSound->
                        if (!listSound.isNullOrEmpty()){
-                           val sounds =soundDomainService.findAllSound()
+                           val sounds = soundDomainService.findAllSound()
                            _soundListBd.value =  sounds.toSet()
                            _listSize.value = sounds.size
                        }

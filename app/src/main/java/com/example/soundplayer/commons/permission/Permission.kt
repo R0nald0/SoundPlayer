@@ -17,12 +17,12 @@ class Permission {
                    .setMessage("Precisamos da sua permissão para accessar as mídias de audio do aparelho")
                     .setPositiveButton("Aceitar"){diolog,n->
                          onPositiveBotton()
+                        diolog.dismiss()
                     }
                     .setNegativeButton("Negar"){diolog,n->
                         diolog.dismiss()
                     }
-                    .show()
-
+                   .show()
             }else{
                 gerenciarPermissoes.launch(listPemissions.toTypedArray())
             }
@@ -32,8 +32,6 @@ class Permission {
            val lit= listPemissions.filter {
                ContextCompat.checkSelfPermission(context,it) == PackageManager.PERMISSION_DENIED
             }
-
-
             return lit
         }
 
@@ -43,18 +41,23 @@ class Permission {
             }
             return  true
         }
-        fun  requestPermission( context: Activity, gerenciarPermissoes: ActivityResultLauncher<Array<String>> , listPemissions:Set<String> ){
-                 val l = chekPerMission(context,listPemissions)
-                 l.forEach {
-                     verifyIfPermissionHasDenied(
-                         activity = context,it, gerenciarPermissoes,listPemissions,
-                         onPositiveBotton = {
-                         gerenciarPermissoes.launch(l.toTypedArray())
-                     })
+        fun  requestPermission(
+            context: Activity,
+            gerenciarPermissoes: ActivityResultLauncher<Array<String>> ,
+            listPemissions:Set<String>
+        ){
+            val l = chekPerMission(context,listPemissions)
+            verifyIfPermissionHasDenied(
+                activity = context,
+                permission = l[0],
+                gerenciarPermissoes = gerenciarPermissoes,
+                listPemissions = listPemissions,
+                onPositiveBotton = {
+                    gerenciarPermissoes.launch(l.toTypedArray())
                  }
-
-
+            )
         }
+
     }
 
 }

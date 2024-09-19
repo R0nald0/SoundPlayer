@@ -55,15 +55,11 @@ class SettingsFragment : Fragment() {
         preferencesViewModel.readAllPrefference()
         readPreference()
     }
-    fun initBinding() = binding.apply {
+    private fun initBinding() = binding.apply {
         settingsBackButton.setOnClickListener {
             findNavController().popBackStack()
         }
 
-      /*  switchDarkMode.setOnCheckedChangeListener { buttonView, isChecked ->
-             configureModeUi(isChecked)
-        }
-*/
        llLayouDarkMode.setOnClickListener {
            showDialog(
                title = "Escolha o modo de visualisção",
@@ -131,7 +127,7 @@ class SettingsFragment : Fragment() {
 
     }
 
-    fun  readPreference(){
+    private fun  readPreference(){
          preferencesViewModel.isDarkMode.observe(viewLifecycleOwner){statePreference->
               when(statePreference){
                   is StatePrefre.Sucess<*> ->{
@@ -181,7 +177,7 @@ class SettingsFragment : Fragment() {
             binding.txvOpcaoOrder.text =options[orderChoesed]
         }
     }
-    fun showDialog(
+    private fun showDialog(
           title:String,
           options: Array<String>,
           selectedItem :Int,
