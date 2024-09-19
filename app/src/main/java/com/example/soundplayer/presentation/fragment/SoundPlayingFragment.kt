@@ -28,8 +28,6 @@ class SoundPlayingFragment : Fragment() {
         FragmentSoundPlayingBinding.inflate(layoutInflater)
     }
     lateinit var controllerAsync: ListenableFuture<MediaController>
-
-
     private val soundViewModel by activityViewModels<SoundViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,13 +66,12 @@ class SoundPlayingFragment : Fragment() {
             binding.myPlayerView.player = controllerAsync.get()
         }, MoreExecutors.directExecutor())
 
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.btnBack.setOnClickListener {
-            findNavController().popBackStack(R.id.mainFragment,false)
+            findNavController().popBackStack()
         }
     }
 

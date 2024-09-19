@@ -59,6 +59,7 @@ class SearchFragment : Fragment() {
                     playList.currentMusicPosition = position
                 }
                  playerViewModel.setPlayListToPlay(playList = playList)
+                findNavController().popBackStack()
                 findNavController().navigate(R.id.soundPlayingFragment)
             }
         }
@@ -117,8 +118,8 @@ class SearchFragment : Fragment() {
     private fun inicializarAdapter() {
         searchAdapter = SearchAdapter(
             onTap = {sound,playlist->
-                 playListViewModel.findPlayListById(playlist.idPlayList ?: 1)
                 soundChosed = sound.sound
+                playListViewModel.findPlayListById(playlist.idPlayList ?: 1)
             },
 
         )
