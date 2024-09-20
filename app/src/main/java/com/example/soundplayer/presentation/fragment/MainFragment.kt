@@ -271,7 +271,6 @@ class MainFragment : Fragment() {
                 )
                 playListViewModel.removePlaySoundFromPlayList(dataSoundToUpdate)
             },
-            soundViewModel =  soundViewModel,
             isUpdateList = {isUpdate->
                updateViewWhenMenuChange(isUpdate)
             },

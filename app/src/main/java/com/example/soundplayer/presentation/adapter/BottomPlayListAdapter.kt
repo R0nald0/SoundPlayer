@@ -15,7 +15,10 @@ class BottomPlayListAdapter (): RecyclerView.Adapter<BottomPlayListAdapter.ViewH
         return soundSelecionados.toSet()
    }
     fun getListSound(listMusics : Set<Sound>){
-        sounds.addAll(listMusics)
+      val   sortedList = listMusics.sortedBy {
+            it.title
+        }
+        sounds.addAll(sortedList)
         notifyDataSetChanged()
     }
      inner class ViewHolder(private val binding: FragmentItemListDialogListDialogItemBinding) :RecyclerView.ViewHolder(binding.root) {

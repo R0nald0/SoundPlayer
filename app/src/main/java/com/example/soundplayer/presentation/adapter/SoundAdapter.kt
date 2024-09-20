@@ -21,7 +21,6 @@ import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SoundAdapter(
-    private val soundViewModel: SoundViewModel,
     val isUpdateList :(Boolean)->Unit,
     val onClickInitNewFragment :(PlayList)->Unit,
     val onDelete : (Long,Pair<Int,Sound>)-> Unit

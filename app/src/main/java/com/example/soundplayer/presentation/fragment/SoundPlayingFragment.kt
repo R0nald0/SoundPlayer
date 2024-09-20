@@ -85,6 +85,8 @@ class SoundPlayingFragment : Fragment() {
                 if (binding.imvSong.drawable == null) {
                     binding.imvSong.setImageResource(R.drawable.transferir)
                 }
+            }else{
+                binding.imvSong.setImageResource(R.drawable.transferir)
             }
         }
 
