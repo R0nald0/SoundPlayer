@@ -23,6 +23,8 @@ import com.example.soundplayer.presentation.viewmodel.SearchViewModel
 import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.Timer
+import java.util.TimerTask
 
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
@@ -36,6 +38,7 @@ class SearchFragment : Fragment() {
     private val playListViewModel  by viewModels<PlayListViewModel>()
 
     private var soundChosed : Sound? = null
+    private var timer : Timer? =null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,27 +69,27 @@ class SearchFragment : Fragment() {
 
      searchSoundViewModel.loader.asLiveData().observe(viewLifecycleOwner){loader->
          if (loader){
-             binding.rvItemSoundSearch.isVisible =false
-             binding.txvSoundEmpyt.isVisible =false
+             binding.contraintDataSearch.isVisible =false
              binding.progressLoading.isVisible =true
          }else{
-             binding.rvItemSoundSearch.isVisible =true
              binding.progressLoading.isVisible =false
-             binding.txvSoundEmpyt.isVisible =true
+             binding.contraintDataSearch.isVisible =true
          }
         }
         viewLifecycleOwner.lifecycleScope.launch {
             searchSoundViewModel.uiState.flowWithLifecycle(lifecycle)
                 .collect{uiState ->
+
                     if (uiState.listSoundsSearch.isNotEmpty()){
                         binding.rvItemSoundSearch.isVisible =true
-                        binding.txvSoundEmpyt.isVisible =false
+                        binding.txvSoundEmpty.isVisible =false
                         searchAdapter.getSoundOFSearch(uiState.listSoundsSearch)
                     }else{
                         searchAdapter.getSoundOFSearch(emptyList())
                         binding.rvItemSoundSearch.isVisible =false
-                        binding.txvSoundEmpyt.isVisible =true
+                        binding.txvSoundEmpty.isVisible =true
                     }
+
                 }
         }
     }
@@ -100,14 +103,25 @@ class SearchFragment : Fragment() {
          binding.searchView.setOnQueryTextListener(object :SearchView.OnQueryTextListener {
 
              override fun onQueryTextChange(newText: String?): Boolean {
-                 if (newText != null){
-                     searchSoundViewModel.findSoundBytitle(newText)
+                 timer?.cancel()
+                 if (newText != null ){
+                    timer =Timer()
+
+                     timer?.schedule(
+                         object :TimerTask(){
+                             override fun run() {
+                                 searchSoundViewModel.findSoundBytitle(newText)
+                             }
+                         },900
+                     )
+
+                   return true
                  }
-                 return true
+                 return false
              }
 
              override fun onQueryTextSubmit(title: String?): Boolean {
-                 if (title != null){
+                 if (title != null ){
                      searchSoundViewModel.findSoundBytitle(title)
                  }
                  return true

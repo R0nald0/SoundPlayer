@@ -33,6 +33,7 @@
     <string name="selecione_s_m_sicas_para_adicionar_na_playlist_principal">Selecione as músicas para adicionar na playlist principal</string>
     <string name="bot_o_para_buscar_musica_pelo_nome">botão para buscar musica pelo nome</string>
     <string name="buscar_m_sica">Buscar música</string>
+    <string name="desconhecido">Desconhecido</string>
 
 
 </resources>

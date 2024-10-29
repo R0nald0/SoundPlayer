@@ -3,6 +3,9 @@
     <style name="ImageRounded"  >
         <item name="cornerSize">20%</item>
     </style>
+    <style name="circle_shape_image">
+        <item name="cornerSize">50%</item>
+    </style>
 
     <array  name="fonts_size_array">
         <item>16.0</item>

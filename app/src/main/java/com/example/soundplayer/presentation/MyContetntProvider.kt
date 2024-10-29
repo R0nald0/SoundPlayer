@@ -23,7 +23,10 @@ object MyContetntProvider {
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.ALBUM_ID,
-
+            MediaStore.Audio.Artists.ARTIST,
+            MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media.VOLUME_NAME,
             )
          cursor = context.contentResolver.query(
              MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -46,9 +49,17 @@ object MyContetntProvider {
            val duarution = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
            val path  = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
            val title = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+           val artistIndex = cursor.getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST)
+           val albumIndex = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+           val artistIndexMedia = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+           val volumeNameIndex = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.VOLUME_NAME)
+
 
 
            while (cursor.moveToNext()){
+
+               Log.i("INFO_", "getListOfSound: artistIndexMedia ${cursor.getString(artistIndexMedia)}")
+               Log.i("INFO_", "getListOfSound: volumeNameIndex ${cursor.getString(volumeNameIndex)}")
 
                val idMedia = cursor.getLong(id)
                val albumidMedia = cursor.getLong(albumid)
@@ -63,6 +74,8 @@ object MyContetntProvider {
                val sound = Sound(
                    idSound =idMedia,
                    path = cursor.getString(path),
+                   artistName = cursor.getString(artistIndex),
+                   albumName = cursor.getString(albumIndex),
                    duration =cursor.getInt(duarution).toString(),
                    title= cursor.getString(title),
                    uriMedia = mediaUri,

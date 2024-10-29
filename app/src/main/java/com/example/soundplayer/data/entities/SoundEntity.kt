@@ -12,6 +12,8 @@ data class SoundEntity(
     @PrimaryKey(autoGenerate = false)
     val soundId : Long,
     val title : String ="",
+    val artistsName: String ="",
+    val albumName: String ="",
     val path : String ="",
     val duration :String ="",
     val urlMediaImage :String ="",
@@ -22,6 +24,8 @@ data class SoundEntity(
 fun SoundEntity.toSound() = Sound(
     idSound = this.soundId,
     path = this.path,
+    artistName = this.artistsName,
+    albumName = this.albumName,
     duration = this.duration,
     title = this.title,
     uriMedia = Uri.parse(this.urlMediaImage),

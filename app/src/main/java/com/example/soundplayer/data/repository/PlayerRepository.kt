@@ -1,15 +1,22 @@
 package com.example.soundplayer.data.repository
 
 import android.util.Log
+import androidx.annotation.OptIn
 import androidx.lifecycle.MutableLiveData
+import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.extractor.DefaultExtractorsFactory
+import androidx.media3.extractor.ts.TsExtractor
 import com.example.soundplayer.commons.execptions.Failure
+import com.example.soundplayer.commons.extension.convertMilesSecondToMinSec
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
 class PlayerRepository @Inject constructor(
@@ -57,6 +64,7 @@ class PlayerRepository @Inject constructor(
          currentItem = playList.currentMusicPosition
       }
 
+
       return  _playlistCurrentlyPlaying
    }
 
@@ -80,11 +88,14 @@ class PlayerRepository @Inject constructor(
       if (mediaItem != null) {
          val sound =Sound(
             idSound = null,
+            albumName = mediaItem.mediaMetadata.albumTitle.toString(),
+            artistName = mediaItem.mediaMetadata.artist.toString(),
             path = "",
             title = mediaItem.mediaMetadata.title.toString(),
-            duration = exoPlayer.duration.toString(),
+            duration = exoPlayer.duration.convertMilesSecondToMinSec(),
             insertedDate = null
          )
+
          _actualSound.value =  sound
       }
 
@@ -127,17 +138,29 @@ class PlayerRepository @Inject constructor(
          }
 
 
-         override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+          @OptIn(UnstableApi::class)
+          override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
             super.onMediaMetadataChanged(mediaMetadata)
 
-               val sound =Sound(
+
+                 if (exoPlayer.duration == C.TIME_UNSET){
+
+                }
+
+                  val artistName =mediaMetadata.artist ?: "Desconhecido"
+                  val albumName =mediaMetadata.albumTitle ?: "Desconhecido"
+
+            val sound =Sound(
                   idSound = null,
+                  artistName = artistName.toString() ,
+                  albumName = albumName.toString(),
                   path = "",
                   title = mediaMetadata.displayTitle.toString(),
-                  duration = exoPlayer.duration.toString(),
+                  duration = exoPlayer.duration.convertMilesSecondToMinSec() ,
                   uriMediaAlbum = mediaMetadata.artworkUri,
                   insertedDate = null
                )
+
                _actualSound.value= sound
                currentItem = exoPlayer.currentMediaItemIndex
                _playlistCurrentlyPlaying?.let {

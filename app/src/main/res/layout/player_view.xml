@@ -3,41 +3,80 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:paddingBottom="16dp">
 
+
+    <SeekBar
+        android:id="@+id/exo_progress_placeholder"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|start"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_weight="0.8"
+        android:indeterminate="false"
+        android:progress="0"
+        android:progressTint="#10913B"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/linear_buttons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
         android:orientation="horizontal"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintBottom_toTopOf="@+id/exo_progress_placeholder"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible">
-
-        <TextView
-            android:id="@+id/exo_position"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.1"
-            android:gravity="start"
-            android:text="0:00"
-            android:textColor="@color/white" />
 
         <TextView
             android:id="@+id/exo_duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.1"
-            android:gravity="end"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
             android:text="2:30"
-            android:textColor="@color/white" />
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textColor="@color/blackToolbar"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:text="|"
+            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/exo_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:text="0:00"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textColor="#FFB8B8"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -46,11 +85,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
-        android:orientation="horizontal"
 
-        app:layout_constraintBottom_toTopOf="@+id/linear_buttons"
+        android:layout_marginEnd="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent">
@@ -63,18 +101,6 @@
             android:layout_weight="0.2"
             android:background="@android:color/transparent"
             android:src="@drawable/shuffle_split_24" />
-
-        <SeekBar
-            android:id="@+id/exo_progress_placeholder"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|start"
-            android:layout_weight="0.8"
-            android:indeterminate="false"
-            android:progress="0"
-            android:progressTint="#10913B"
-            android:visibility="visible"
-            tools:visibility="visible" />
 
         <ImageButton
             android:id="@+id/exo_repeat_toggle"
@@ -90,10 +116,12 @@
         android:id="@+id/linear_buttons"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center|center_horizontal|center_vertical"
         android:orientation="horizontal"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -101,46 +129,57 @@
 
         <ImageButton
             android:id="@+id/exo_prev"
-            android:layout_width="45dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.4"
+            android:layout_gravity="center|start"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/rounad_button_shape"
-            android:src="@drawable/media3_notification_seek_to_previous" />
+            android:padding="8dp"
+            android:src="@drawable/media3_icon_previous" />
 
         <ImageButton
             android:id="@+id/exo_rew"
             style="@style/ImageRounded"
-            android:layout_width="10dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.3"
+            android:layout_gravity="center|start"
             android:background="@drawable/rounad_button_shape"
+            android:padding="10dp"
             android:src="@android:drawable/ic_media_rew" />
 
         <ImageButton
             android:id="@+id/exo_play_pause"
             style="@style/ImageRounded"
-            android:layout_width="45dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.6"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center|center_horizontal"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/rounad_button_shape"
+            android:scaleType="fitCenter"
             android:src="@drawable/ic_play_arrow_24" />
 
         <ImageButton
             android:id="@+id/exo_ffwd"
             style="@style/ImageRounded"
-            android:layout_width="15dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.3"
+            android:layout_gravity="center|end"
             android:background="@drawable/rounad_button_shape"
-            android:src="@drawable/media3_notification_seek_forward" />
+            android:padding="10dp"
+            android:src="@drawable/media3_icon_fast_forward" />
 
         <ImageButton
             android:id="@+id/exo_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.4"
+            android:layout_gravity="center|end"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/rounad_button_shape"
-            android:src="@drawable/media3_notification_seek_to_next" />
+            android:padding="8dp"
+            android:src="@drawable/media3_icon_next" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

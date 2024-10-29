@@ -1,5 +1,6 @@
 package com.example.soundplayer.commons.extension
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
@@ -14,11 +15,13 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.TimeUnit
 
-fun Context.convertMilesSecondToMinSec(duration: Long): String {
+
+@SuppressLint("DefaultLocale")
+fun Long.convertMilesSecondToMinSec(): String {
     return String.format(
         "%02d:%02d",
-        TimeUnit.MILLISECONDS.toMinutes(duration) % TimeUnit.HOURS.toMinutes(1),
-        TimeUnit.MILLISECONDS.toSeconds(duration) % TimeUnit.MINUTES.toSeconds(1)
+        TimeUnit.MILLISECONDS.toMinutes(this) % TimeUnit.HOURS.toMinutes(1),
+        TimeUnit.MILLISECONDS.toSeconds(this) % TimeUnit.MINUTES.toSeconds(1)
     )
 }
 

@@ -76,11 +76,13 @@ dependencies {
     //Lottie  https://github.com/airbnb/lottie-android
     implementation ("com.airbnb.android:lottie:$lottieVersion")
 
-    implementation( "androidx.media3:media3-exoplayer:1.2.0")
-    implementation( "androidx.media3:media3-exoplayer-dash:1.2.0")
-    implementation ("androidx.media3:media3-ui:1.2.0")
-    implementation ("androidx.media3:media3-session:1.2.0")
+    implementation( "androidx.media3:media3-exoplayer:1.4.1")
+    implementation( "androidx.media3:media3-exoplayer-dash:1.4.1")
+    implementation ("androidx.media3:media3-ui:1.4.1")
+    implementation ("androidx.media3:media3-session:1.4.1")
 
+    // https://github.com/tankery/CircularSeekBar
+    implementation ("me.tankery.lib:circularSeekBar:1.4.2")
 
     //splshScreen
     implementation("androidx.core:core-splashscreen:1.0.1")
@@ -89,9 +91,9 @@ dependencies {
    //GLide
     implementation ("com.github.bumptech.glide:glide:4.16.0")
 
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.10.0")
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     testImplementation("junit:junit:4.12")
     testImplementation("junit:junit:4.13.2")

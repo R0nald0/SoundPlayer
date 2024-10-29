@@ -17,7 +17,6 @@ import com.example.soundplayer.commons.extension.convertMilesSecondToMinSec
 import com.example.soundplayer.databinding.ItemSoundBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
-import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SoundAdapter(
@@ -58,7 +57,7 @@ class SoundAdapter(
     inner class  SoundViewHolder(private val binding : ItemSoundBinding): ViewHolder(binding.root){
         fun bind(soudd :Sound,position: Int){
 
-            val duration =  binding.root.context.convertMilesSecondToMinSec(soudd.duration.toLong())
+            val duration = soudd.duration.toLong().convertMilesSecondToMinSec()  //binding.root.context.convertMilesSecondToMinSec(soudd.duration.toLong())
             binding.txvDuration.text = duration
             binding.txvTitle.text =soudd.title
             binding.txvTitle.textSize = sizeTitleMusic
@@ -71,10 +70,10 @@ class SoundAdapter(
             if (soudd.uriMediaAlbum != null) {
                 binding.imageView.setImageURI(soudd.uriMediaAlbum)
                 if (binding.imageView.drawable == null) {
-                    binding.imageView.setImageResource(R.drawable.transferir)
+                    binding.imageView.setImageResource(R.drawable.music_player_logo_v1)
                 }
             }else{
-                binding.imageView.setImageResource(R.drawable.transferir)
+                binding.imageView.setImageResource(R.drawable.music_player_logo_v1)
             }
 
             clickItemEvent(position, soudd)

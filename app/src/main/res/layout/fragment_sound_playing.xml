@@ -5,54 +5,178 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient_play"
-    android:orientation="vertical"
-   >
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/txv_title_album"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
+        android:ellipsize="marquee"
+        android:gravity="center"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:maxLines="1"
+        android:text="Titulo do album"
+        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+        android:textColor="@color/gray"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <TextView
         android:id="@+id/txv_name_music"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginEnd="16dp"
-        android:focusableInTouchMode="true"
-        android:marqueeRepeatLimit="marquee_forever"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="8dp"
         android:ellipsize="marquee"
+        android:focusableInTouchMode="true"
+        android:gravity="center"
+        android:marqueeRepeatLimit="marquee_forever"
         android:maxLines="1"
         android:singleLine="true"
         android:text="Song Title"
         android:textColor="@color/white"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_back"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btn_back"
-        app:layout_constraintTop_toTopOf="@+id/btn_back" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txv_title_album" />
 
+    <TextView
+        android:id="@+id/txv_autor_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="24dp"
+        android:ellipsize="marquee"
+        android:gravity="center"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:maxLines="1"
+        android:text="Autor"
+        android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+        android:textColor="@color/gray"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txv_name_music"
+        app:layout_constraintVertical_bias="0.0" />
+
+   <!-- <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="194dp"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/exo_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:text="2:30"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textColor="@color/blackToolbar"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+
+            android:text="|"
+            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/exo_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:text="0:00"
+            android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+            android:textColor="#FFB8B8"
+            android:textStyle="bold" />
+
+    </LinearLayout>-->
+
+    <!--<me.tankery.lib.circularseekbar.CircularSeekBar
+        android:id="@+id/circularSeekBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="96dp"
+        android:elevation="10dp"
+        android:pointerIcon="grab"
+        app:cs_circle_color="@color/blackToolbar"
+        app:cs_circle_progress_color="#FFB8B8"
+        app:cs_circle_stroke_width="5dp"
+        app:cs_circle_style="round"
+        app:cs_end_angle="243"
+        app:cs_max="100"
+        app:cs_move_outside_circle="true"
+        app:cs_pointer_color="@color/colorPrimaryContainer"
+        app:cs_pointer_stroke_width="20dp"
+        app:cs_progress="10"
+        app:cs_start_angle="295"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent">
+
+
+    </me.tankery.lib.circularseekbar.CircularSeekBar>-->
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imv_song"
-        app:shapeAppearanceOverlay="@style/ImageRounded"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
-        android:contentDescription="image album sound"
+        android:layout_width="347dp"
+        android:layout_height="347dp"
+        android:contentDescription="imagem do album da música"
+        android:elevation="10dp"
+        android:padding="16dp"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toTopOf="@+id/myPlayerView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.375"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txv_name_music"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/txv_autor_name"
+        app:shapeAppearance="@style/circle_shape_image"
+        tools:srcCompat="@drawable/music_player_logo_v1" />
 
     <androidx.media3.ui.PlayerControlView
         android:id="@+id/myPlayerView"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="0dp"
         app:controller_layout_id="@layout/player_view"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline"
         app:repeat_toggle_modes="all|none|one"
         app:show_shuffle_button="true"
         app:show_timeout="0"
@@ -68,5 +192,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/back_ios_24" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.73" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

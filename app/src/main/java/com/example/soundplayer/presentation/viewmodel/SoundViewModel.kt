@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import com.example.soundplayer.commons.execptions.Failure
 import com.example.soundplayer.data.entities.UserDataPreferecence
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
@@ -37,7 +38,7 @@ class SoundViewModel @Inject constructor(
     val userDataPreferecence : LiveData<UserDataPreferecence>
         get() = _userDataPreferecenceObs
 
-    lateinit var myPlayer :Player
+    lateinit var myPlayer :ExoPlayer
 
     init {
          getPlayer()

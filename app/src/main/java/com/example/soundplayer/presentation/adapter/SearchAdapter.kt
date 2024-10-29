@@ -27,11 +27,14 @@ class SearchAdapter (
     inner class  SearchViewHolder(private  val binding: ItemSoundSearchLayoutBinding) : ViewHolder(binding.root){
 
         fun bind(sound :SongWithPlayListDomain){
-             val imageSound = sound.sound.uriMediaAlbum ?: sound.sound.uriMedia ?: Uri.EMPTY
-            if (imageSound != null){
+             val imageSound = sound.sound.uriMediaAlbum
+            if (imageSound != null) {
                 binding.imgCapaSound.setImageURI(imageSound)
+                if (binding.imgCapaSound.drawable == null) {
+                    binding.imgCapaSound.setImageResource(R.drawable.music_player_logo_v1)
+                }
             }else{
-                binding.imgCapaSound.setImageResource(R.drawable.transferir)
+                binding.imgCapaSound.setImageResource(R.drawable.music_player_logo_v1)
             }
             binding.txvTituloSound.text = sound.sound.title
         }

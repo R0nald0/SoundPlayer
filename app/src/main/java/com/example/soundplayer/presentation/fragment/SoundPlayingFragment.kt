@@ -9,13 +9,19 @@ import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.extractor.DefaultExtractorsFactory
+import androidx.media3.extractor.ts.TsExtractor
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import androidx.navigation.fragment.findNavController
 import com.example.soundplayer.R
+
 import com.example.soundplayer.commons.extension.snackBarSound
 import com.example.soundplayer.databinding.FragmentSoundPlayingBinding
 import com.example.soundplayer.presentation.service.SoundService
@@ -79,14 +85,18 @@ class SoundPlayingFragment : Fragment() {
         soundViewModel.actualSound?.observe(viewLifecycleOwner) { sound ->
             binding.txvNameMusic.isSelected = true
             binding.txvNameMusic.text = sound.title
+            binding.txvAutorName.text = sound.artistName ?: getString(R.string.desconhecido)
+            binding.txvTitleAlbum.text = sound.albumName ?: getString(R.string.desconhecido)
+            //binding.exoDuration.text = sound.duration
+
 
             if (sound.uriMediaAlbum != null) {
                 binding.imvSong.setImageURI(sound.uriMediaAlbum)
                 if (binding.imvSong.drawable == null) {
-                    binding.imvSong.setImageResource(R.drawable.transferir)
+                    binding.imvSong.setImageResource(R.drawable.music_player_logo_v1)
                 }
             }else{
-                binding.imvSong.setImageResource(R.drawable.transferir)
+                binding.imvSong.setImageResource(R.drawable.music_player_logo_v1)
             }
         }
 
@@ -118,6 +128,18 @@ class SoundPlayingFragment : Fragment() {
     @OptIn(UnstableApi::class)
     private fun initPlayer() {
         binding.myPlayerView.player = soundViewModel.myPlayer
+        val pl = binding.myPlayerView.player
+
+        if (soundViewModel.myPlayer.currentMediaItem != null){
+            val extractorsFactory = DefaultExtractorsFactory()
+            extractorsFactory.setTsExtractorTimestampSearchBytes(1500 * TsExtractor.TS_PACKET_SIZE)
+            val dataSourceFactory = DefaultDataSource.Factory(requireContext())
+            val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
+           // soundViewModel.myPlayer.setMediaSource(mediaSource.createMediaSource(soundViewModel.myPlayer.currentMediaItem!!))
+        }
+
+
+
     }
 
     override fun onStop() {
