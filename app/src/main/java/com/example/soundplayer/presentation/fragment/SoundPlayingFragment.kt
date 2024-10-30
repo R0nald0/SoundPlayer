@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
@@ -21,7 +20,6 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import androidx.navigation.fragment.findNavController
 import com.example.soundplayer.R
-
 import com.example.soundplayer.commons.extension.snackBarSound
 import com.example.soundplayer.databinding.FragmentSoundPlayingBinding
 import com.example.soundplayer.presentation.service.SoundService
@@ -137,8 +135,6 @@ class SoundPlayingFragment : Fragment() {
             val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
            // soundViewModel.myPlayer.setMediaSource(mediaSource.createMediaSource(soundViewModel.myPlayer.currentMediaItem!!))
         }
-
-
 
     }
 

@@ -53,7 +53,7 @@ class PlayListAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun setLastOpenPlayListBorder(idPlayListPrefe:Long){
-        userPositionPreferePlayListId =idPlayListPrefe
+        userPositionPreferePlayListId = idPlayListPrefe
         notifyDataSetChanged()
     }
 
@@ -138,21 +138,21 @@ class PlayListAdapter(
             holder.setBorderOnPlayListFirstCharging(position)
         }
 
-        currentPlayListPlaying?.let {actualPlayListPlaying->
+        currentPlayListPlaying?.let { actualPlayListPlaying->
             holder.setUpImageActualPlayListPlaying(
                 currentPlayList = actualPlayListPlaying,
                 playIng = isPlaying,
                 actualPlayList =  playListWithMusic.playList
             )
-        }
+         }
 
         playListWithMusic.playList.listSound.addAll(playListWithMusic.soundOfPlayList)
         holder.bind(playListWithMusic.playList,position)
     }
+
     private fun createOptionsMenu(view : View,playList: PlayList){
 
-        val popupMenu  =PopupMenu(view.context,view)
-
+        val popupMenu  = PopupMenu(view.context,view)
         if (playList.name != Constants.ALL_MUSIC_NAME){
             popupMenu.inflate(R.menu.play_list_menu)
         }else{
@@ -202,11 +202,10 @@ class PlayListAdapter(
                     )
                     true
                 }
-                else -> false
+                 else -> false
             }
         }
     }
-
 
 
 }

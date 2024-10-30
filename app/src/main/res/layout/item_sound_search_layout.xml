@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearanceOverlay="@style/ImageRounded"
-        app:srcCompat="@drawable/music_logo_v2" />
+        app:srcCompat="@drawable/music_player_logo_v1" />
 
     <TextView
         android:id="@+id/txv_titulo_sound"

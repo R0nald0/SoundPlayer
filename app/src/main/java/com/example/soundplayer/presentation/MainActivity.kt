@@ -23,7 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
@@ -38,7 +37,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen().apply {
             setKeepOnScreenCondition{
-                isLoading}
+                isLoading
+            }
         }
         setContentView(binding.root)
         getNavHost()
@@ -76,7 +76,6 @@ class MainActivity : AppCompatActivity() {
                 }
                isLoading =false
             }
-
 
     }
 

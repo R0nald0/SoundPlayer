@@ -142,11 +142,6 @@ class PlayerRepository @Inject constructor(
           override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
             super.onMediaMetadataChanged(mediaMetadata)
 
-
-                 if (exoPlayer.duration == C.TIME_UNSET){
-
-                }
-
                   val artistName =mediaMetadata.artist ?: "Desconhecido"
                   val albumName =mediaMetadata.albumTitle ?: "Desconhecido"
 

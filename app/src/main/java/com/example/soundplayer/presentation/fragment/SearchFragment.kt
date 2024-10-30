@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.flowWithLifecycle
@@ -19,6 +20,7 @@ import com.example.soundplayer.databinding.FragmentSearchBinding
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.presentation.adapter.SearchAdapter
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
+import com.example.soundplayer.presentation.viewmodel.PreferencesViewModel
 import com.example.soundplayer.presentation.viewmodel.SearchViewModel
 import com.example.soundplayer.presentation.viewmodel.SoundViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,6 +38,7 @@ class SearchFragment : Fragment() {
     private  val searchSoundViewModel by viewModels<SearchViewModel>()
     private  val playerViewModel by viewModels<SoundViewModel>()
     private val playListViewModel  by viewModels<PlayListViewModel>()
+    private val preferencesViewModel by activityViewModels<PreferencesViewModel>()
 
     private var soundChosed : Sound? = null
     private var timer : Timer? =null
@@ -43,7 +46,7 @@ class SearchFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         initObservers()
         initSearchView()
         inicializarAdapter()
@@ -62,6 +65,7 @@ class SearchFragment : Fragment() {
                     playList.currentMusicPosition = position
                 }
                  playerViewModel.setPlayListToPlay(playList = playList)
+                playList.idPlayList?.let { preferencesViewModel.savePlayListIdPlayList(it) }
                 findNavController().popBackStack()
                 findNavController().navigate(R.id.soundPlayingFragment)
             }
@@ -76,10 +80,10 @@ class SearchFragment : Fragment() {
              binding.contraintDataSearch.isVisible =true
          }
         }
+
         viewLifecycleOwner.lifecycleScope.launch {
             searchSoundViewModel.uiState.flowWithLifecycle(lifecycle)
                 .collect{uiState ->
-
                     if (uiState.listSoundsSearch.isNotEmpty()){
                         binding.rvItemSoundSearch.isVisible =true
                         binding.txvSoundEmpty.isVisible =false
@@ -106,7 +110,6 @@ class SearchFragment : Fragment() {
                  timer?.cancel()
                  if (newText != null ){
                     timer =Timer()
-
                      timer?.schedule(
                          object :TimerTask(){
                              override fun run() {
