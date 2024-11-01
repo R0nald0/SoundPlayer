@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textCapWords"
-            android:hint="Nome da Playlist" />
+            android:hint="@string/nome_da_playlist" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -35,9 +35,7 @@
         android:id="@+id/rv_musics"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         tools:listitem="@layout/fragment_item_list_dialog_list_dialog_item" />
 

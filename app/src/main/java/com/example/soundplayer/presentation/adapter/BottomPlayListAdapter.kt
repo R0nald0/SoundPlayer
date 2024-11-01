@@ -4,6 +4,7 @@ import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.soundplayer.R
 import com.example.soundplayer.databinding.FragmentItemListDialogListDialogItemBinding
 import com.example.soundplayer.model.Sound
 
@@ -27,6 +28,14 @@ class BottomPlayListAdapter (): RecyclerView.Adapter<BottomPlayListAdapter.ViewH
 
                 binding.checkFavorite.isChecked = sparseBooleanArray[position,false]
 
+                if (sound.uriMediaAlbum != null) {
+                    binding.imgBack.setImageURI(sound.uriMediaAlbum)
+                    if (binding.imgBack.drawable == null) {
+                        binding.imgBack.setImageResource(R.drawable.music_player_logo_v1)
+                    }
+                }else{
+                    binding.imgBack.setImageResource(R.drawable.music_player_logo_v1)
+                }
                 binding.checkFavorite.setOnClickListener {
                    sparseBooleanArray.put(position,binding.checkFavorite.isChecked)
                     if (binding.checkFavorite.isChecked){

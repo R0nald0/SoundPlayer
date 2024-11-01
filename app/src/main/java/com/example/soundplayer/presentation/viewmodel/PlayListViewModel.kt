@@ -38,16 +38,14 @@ class PlayListViewModel @Inject constructor(
     private val  _listSize = MutableLiveData<Int>()
     var listSize:LiveData<Int>  = _listSize
 
-    private val _hasPerMission =MutableLiveData<Boolean>()
-    val hasPermission :LiveData<Boolean> = _hasPerMission
 
     private val _soundListCompared = MutableLiveData<Set<Sound>>()
     val soundListCompared : LiveData<Set<Sound>> = _soundListCompared
 
+    private val _erroMessage = MutableLiveData<String?>()
+    var erroMassage :LiveData<String?> = _erroMessage
 
-    init {
-      countTotalSound()
-    }
+
     fun savePlayList(playList: PlayList){
         viewModelScope.launch {
             val result  = servicePlayer.createPlayList(playList)
@@ -58,6 +56,7 @@ class PlayListViewModel @Inject constructor(
     }
 
     fun getAllPlayList(){
+        _erroMessage.value = null
         viewModelScope.launch {
             runCatching {
                 servicePlayer.findAllPlayList()
@@ -66,13 +65,15 @@ class PlayListViewModel @Inject constructor(
                     _playListsWithSounds.value = playlistWithSoundDomainsRetorno
                 },
                 onFailure = {
-                    Log.i("INFO_", "getAllPlayList: erro ao buscar todas ás playlists ${it.message}")
+                    Log.e("INFO_", "getAllPlayList: erro ao buscar todas ás playlists ${it.message}")
+                    _erroMessage.value = "Não conseguimos buscar as playlists"
                 }
             )
         }
     }
 
     fun findAllSound(){
+        _erroMessage.value = null
       viewModelScope.launch {
           runCatching {
               soundDomainService.findAllSound()
@@ -82,11 +83,12 @@ class PlayListViewModel @Inject constructor(
               },
               onFailure = {erro->
                   Log.i(TAG, "findAllSound: Erro ao buscar sound ${erro.message}")
+                  _erroMessage.value = "Não conseguimos buscar os audion,tente novamente "
               }
           )
       }
   }
-    private fun countTotalSound(){
+     fun countTotalSound(){
         viewModelScope.launch {
             _listSize.value = soundDomainService.findAllSound().size
         }
@@ -98,6 +100,7 @@ class PlayListViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            _erroMessage.value = null
             runCatching {
                 servicePlayer.saveSoundProvideFromDb(sizeListAllMusic)
             }.fold(
@@ -110,6 +113,7 @@ class PlayListViewModel @Inject constructor(
                 },
                 onFailure = {
                     Log.i(TAG, "saveAllSoundsByContentProvider: erro ao salvar allmusics")
+                    _erroMessage.value = "Algo deu errado ao salvar a plylist,tente novamente"
                 }
             )
         }
@@ -171,6 +175,10 @@ class PlayListViewModel @Inject constructor(
     }
 
     fun findPlayListById(idPlayList:Long) {
+        _erroMessage.value = null
+        if (_listSize.value == null) return
+        if (_listSize.value!! <= 0) return
+
         viewModelScope.launch {
             runCatching {
                 servicePlayer.findPlayListById(idPlayList)
@@ -181,16 +189,13 @@ class PlayListViewModel @Inject constructor(
                     }
                 }, onFailure = {
                     Log.e(TAG, "erro ao buscar  playlist com o id: $idPlayList : ${it.message} ")
+                    _erroMessage.value = "Não conseguimos encontrar á playlist"
                 }
             )
         }
     }
 
-    fun verifyPermissions(permitted:Boolean){
-        viewModelScope.launch {
-            _hasPerMission.value = permitted
-        }
-    }
+
 
     fun updateSoundList(sounds : Set<Sound>){
         viewModelScope.launch {
@@ -219,7 +224,8 @@ class PlayListViewModel @Inject constructor(
                      _soundListCompared.postValue(sounds)
                  },
                  onFailure = {error->
-
+                     Log.e(TAG, "erro ao verificar as playlists: $ : ${error.message} ")
+                     _erroMessage.value = "Não conseguimos verificar as playlists"
                  }
              )
          }

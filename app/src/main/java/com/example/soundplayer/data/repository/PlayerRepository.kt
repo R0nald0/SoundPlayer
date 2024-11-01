@@ -3,20 +3,16 @@ package com.example.soundplayer.data.repository
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.lifecycle.MutableLiveData
-import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.extractor.DefaultExtractorsFactory
-import androidx.media3.extractor.ts.TsExtractor
 import com.example.soundplayer.commons.execptions.Failure
 import com.example.soundplayer.commons.extension.convertMilesSecondToMinSec
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
 class PlayerRepository @Inject constructor(

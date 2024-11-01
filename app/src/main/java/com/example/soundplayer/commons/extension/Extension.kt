@@ -45,6 +45,7 @@ fun Context.showAlerDialog(messenger :String, positiveButton:String, negativeBut
 fun View.snackBarSound(
     messages:String,
     backGroundColor :Int =Color.GREEN,
+    textColor :Int =Color.WHITE,
     duration:Int = Snackbar.LENGTH_LONG,
     actionText:String? =null,
     onClick: ((View?) -> Unit)? = null
@@ -52,7 +53,7 @@ fun View.snackBarSound(
     Snackbar.make(
         this,messages, duration
     ).setAction(actionText,onClick)
-        .setTextColor(Color.WHITE)
+        .setTextColor(textColor)
         .setBackgroundTint(backGroundColor)
         .show()
 

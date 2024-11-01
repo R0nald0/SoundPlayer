@@ -49,7 +49,7 @@ class MainFragment : Fragment() {
     private val playListViewModel by activityViewModels<PlayListViewModel>()
     private val preferencesViewModel by activityViewModels<PreferencesViewModel>()
     private var actualPlayListPLayingMain :PlayList? =null
-    val listPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+    private val listPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
         setOf(
             android.Manifest.permission.READ_MEDIA_AUDIO,
             android.Manifest.permission.FOREGROUND_SERVICE,
@@ -64,9 +64,9 @@ class MainFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         myMenuProvider = MyMenuProvider()
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -99,7 +99,12 @@ class MainFragment : Fragment() {
 
     private fun initBindigs() {
         binding.btnFindSounds.setOnClickListener {
-            Permission.requestPermission(requireActivity(),gerenciarPermissoes,listPermission)
+            val listPermissions = Permission.chekPerMission(this.requireActivity(),listPermission)
+            if (listPermissions.isNotEmpty()){
+                Permission.requestPermission(requireActivity(),gerenciarPermissoes,listPermission)
+            }else{
+                getMusicFromContentProvider()
+            }
         }
 
         binding.fabAddPlayList.setOnClickListener {
@@ -114,8 +119,23 @@ class MainFragment : Fragment() {
     @SuppressLint("StringFormatMatches")
     private  fun observersViewModel(){
 
+        playListViewModel.erroMassage.observe(viewLifecycleOwner){errorMassege->
+            if (errorMassege != null){
+                requireView().snackBarSound(
+                    messages = errorMassege,
+                    backGroundColor = Color.RED
+                )
+            }
+        }
+
         playListViewModel.listSize.observe(viewLifecycleOwner){sizeListSoundOnBd->
             binding.txvQuantidadeMusics.text = getString(R.string.total_de_musicas, sizeListSoundOnBd)
+            if (sizeListSoundOnBd <= 0) showHideViewItems(false)
+            else{
+                playListViewModel.getAllPlayList()
+                showHideViewItems(true)
+            }
+
 
         }
 
@@ -165,6 +185,7 @@ class MainFragment : Fragment() {
         }
 
         playListViewModel.soundListBd.observe(viewLifecycleOwner){listSound->
+
             if (listSound.isNotEmpty()){
                 val playList =  PlayList(
                     idPlayList = null,
@@ -246,20 +267,18 @@ class MainFragment : Fragment() {
                 showHideViewItems(!isPepermited)
             }else{
                 getMusicFromContentProvider()
-                playListViewModel.getAllPlayList()
-                showHideViewItems(isPepermited)
             }
         }
     }
 
     override fun onResume() {
-        val listPermissions = Permission.chekPerMission(this.requireActivity(),listPermission)
-        if (listPermissions.isNotEmpty()){
+        val listPermissionsNotGranted = Permission.chekPerMission(this.requireActivity(),listPermission)
+        if (listPermissionsNotGranted.isNotEmpty()) {
             showHideViewItems(false)
-        }else{
-             showHideViewItems(true)
-            playListViewModel.getAllPlayList()
+        } else {
+            playListViewModel.countTotalSound()
         }
+
         super.onResume()
     }
 
@@ -337,7 +356,16 @@ class MainFragment : Fragment() {
             .getListOfSound(requireContext())
             .listSoundFromContentProvider.toMutableSet()
 
-       playListViewModel.saveAllSoundsByContentProvider(listSoundFromContentProvider)
+       if (listSoundFromContentProvider.isNotEmpty()){
+           playListViewModel.saveAllSoundsByContentProvider(listSoundFromContentProvider)
+       }else{
+           showHideViewItems(false)
+           requireView().snackBarSound(
+               messages = "Não encontramos nenhum arquivo de áudio no seu aparelho,por favor adicione-os",
+               textColor = Color.BLACK
+           )
+       }
+
 
     }
 

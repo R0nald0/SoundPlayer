@@ -47,6 +47,7 @@ class Permission {
             listPemissions:Set<String>
         ){
             val l = chekPerMission(context,listPemissions)
+            if (l.isEmpty()) return
             verifyIfPermissionHasDenied(
                 activity = context,
                 permission = l[0],

@@ -1,28 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_sound"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="8dp">
+    android:layout_height="100dp"
+    android:layout_marginTop="8dp"
+    android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/txv_title_music"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="?attr/selectableItemBackground"
-        android:paddingLeft="@dimen/spacing_high"
-        android:paddingTop="@dimen/spacing_half"
-        android:paddingRight="@dimen/spacing_high"
-        android:paddingBottom="@dimen/spacing_half"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        tools:text="Hello" />
+    <ImageView
+        android:id="@+id/img_back"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:alpha="0.4"
+        android:contentDescription="@string/fundo_imagem_udio"
+        android:scaleType="centerCrop"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/music_player_logo_v1"
+        tools:visibility="visible" />
 
-    <CheckBox
-        android:id="@+id/check_favorite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.2" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical|center_horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5">
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/txv_title_music"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="start|center_vertical"
+            android:maxLines="2"
+            android:paddingLeft="@dimen/spacing_high"
+            android:paddingTop="@dimen/spacing_half"
+            android:paddingRight="@dimen/spacing_high"
+            android:paddingBottom="@dimen/spacing_half"
+            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            tools:text="Hello" />
+
+        <CheckBox
+            android:id="@+id/check_favorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:gravity="clip_vertical" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
