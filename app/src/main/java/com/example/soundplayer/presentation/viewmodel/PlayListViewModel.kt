@@ -170,14 +170,11 @@ class PlayListViewModel @Inject constructor(
             if (itemsRemoved != 0){
                 verifyAndUpdateSizeListSound(dataSoundToUpdate.idPlayList)
             }
-
         }
     }
 
     fun findPlayListById(idPlayList:Long) {
         _erroMessage.value = null
-        if (_listSize.value == null) return
-        if (_listSize.value!! <= 0) return
 
         viewModelScope.launch {
             runCatching {

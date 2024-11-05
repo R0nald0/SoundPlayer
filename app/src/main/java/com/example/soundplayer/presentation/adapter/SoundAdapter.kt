@@ -57,10 +57,13 @@ class SoundAdapter(
     inner class  SoundViewHolder(private val binding : ItemSoundBinding): ViewHolder(binding.root){
         fun bind(soudd :Sound,position: Int){
 
-            val duration = soudd.duration.toLong().convertMilesSecondToMinSec()  //binding.root.context.convertMilesSecondToMinSec(soudd.duration.toLong())
+            val duration = soudd.duration.toLong().convertMilesSecondToMinSec()
             binding.txvDuration.text = duration
             binding.txvTitle.text =soudd.title
             binding.txvTitle.textSize = sizeTitleMusic
+
+            if (soudd.artistName == null || soudd.artistName.contains("unknown"))  binding.idTxvComposer.text = ContextCompat.getString(binding.root.context,R.string.desconhecido)
+            else binding.idTxvComposer.text = soudd.artistName
 
             binding.idBtnOptionSound.setOnClickListener {
                 createOptionsMenu(it,soudd,position)
@@ -143,7 +146,7 @@ class SoundAdapter(
                         nonNulPlayList.currentMusicPosition = position
                         nonNulPlayList.listSound.size
                         onClickInitNewFragment(nonNulPlayList)
-                    }?: Toast.makeText(it.context, "PlayList null", Toast.LENGTH_SHORT).show()
+                    }?: Toast.makeText(it.context, "PlayList não selecionada", Toast.LENGTH_SHORT).show()
 
                 } else {
                     if (!soundSelecionados.contains(Pair(position,soudd))) {

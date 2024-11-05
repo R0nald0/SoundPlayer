@@ -3,6 +3,7 @@ package com.example.soundplayer.presentation.adapter
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.soundplayer.R
 import com.example.soundplayer.databinding.FragmentItemListDialogListDialogItemBinding
@@ -16,7 +17,7 @@ class BottomPlayListAdapter (): RecyclerView.Adapter<BottomPlayListAdapter.ViewH
         return soundSelecionados.toSet()
    }
     fun getListSound(listMusics : Set<Sound>){
-      val   sortedList = listMusics.sortedBy {
+      val  sortedList = listMusics.sortedBy {
             it.title
         }
         sounds.addAll(sortedList)
@@ -27,6 +28,8 @@ class BottomPlayListAdapter (): RecyclerView.Adapter<BottomPlayListAdapter.ViewH
                 binding.txvTitleMusic.text =sound.title
 
                 binding.checkFavorite.isChecked = sparseBooleanArray[position,false]
+                if (sound.artistName == null || sound.artistName.contains("unknown"))  binding.idNameArtist.text = ContextCompat.getString(binding.root.context,R.string.desconhecido)
+                else binding.idNameArtist.text = sound.artistName
 
                 if (sound.uriMediaAlbum != null) {
                     binding.imgBack.setImageURI(sound.uriMediaAlbum)

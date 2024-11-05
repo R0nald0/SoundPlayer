@@ -12,6 +12,8 @@ import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.media3.common.MediaItem
+import com.example.soundplayer.model.Sound
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.TimeUnit
 
@@ -47,6 +49,7 @@ fun View.snackBarSound(
     backGroundColor :Int =Color.GREEN,
     textColor :Int =Color.WHITE,
     duration:Int = Snackbar.LENGTH_LONG,
+    animationSnackbarMode : Int = Snackbar.ANIMATION_MODE_FADE,
     actionText:String? =null,
     onClick: ((View?) -> Unit)? = null
 ){
@@ -54,10 +57,24 @@ fun View.snackBarSound(
         this,messages, duration
     ).setAction(actionText,onClick)
         .setTextColor(textColor)
+        .setDuration(duration)
+        .setAnimationMode(animationSnackbarMode)
         .setBackgroundTint(backGroundColor)
         .show()
 
 }
+
+fun  MediaItem.toSound(duration: Long,insertedDate : Long?,path:String) = Sound(
+    idSound = this.mediaId.toLong(),
+    artistName = mediaMetadata.artist.toString() ,
+    albumName = mediaMetadata.albumTitle.toString() ,
+    path = path,
+    title = mediaMetadata.displayTitle.toString(),
+    duration = duration.convertMilesSecondToMinSec() ,
+    uriMediaAlbum = mediaMetadata.artworkUri,
+    insertedDate = insertedDate
+)
+
 
 fun Context.exibirToast(messenger: String){
     Toast.makeText(this, messenger, Toast.LENGTH_LONG).show()

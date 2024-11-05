@@ -68,7 +68,10 @@ class DataStorePreferenceRepository @Inject constructor(
             )
         }catch (ioException:IOException){
             Log.e("error", "error : ${ioException.message} ", )
-            throw Failure(messages = "Não conseguimos ler as preferências",ioException,ioException.hashCode())
+            throw Failure(
+                messages = "Não conseguimos ler as preferências",
+                ioException,ioException.hashCode()
+            )
         }catch (exception :Exception){
             throw exception
         }

@@ -2,6 +2,7 @@ package com.example.soundplayer.service
 
 import androidx.lifecycle.MutableLiveData
 import com.example.soundplayer.commons.constants.Constants
+import com.example.soundplayer.commons.execptions.PlayBackErrorException
 import com.example.soundplayer.data.entities.toSound
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.data.repository.PlayerRepository
@@ -66,7 +67,6 @@ class ServicePlayer @Inject constructor(
     }
 
     suspend fun getActualSound(): MutableLiveData<Sound> {
-
         return playerRepository.getActaulSound()
     }
 
@@ -75,7 +75,9 @@ class ServicePlayer @Inject constructor(
 
     fun destroyPlayer() = playerRepository.destroyPlayer()
     fun getPlayer() = playerRepository.getPlayer()
-    suspend fun getPlayBackError() = playerRepository.getPlayBackError()
+    fun getPlayBackError() :  MutableLiveData<PlayBackErrorException?> = playerRepository.getPlayBackError()
+
+
 
     suspend fun addItemFromListMusic(
         idPlayList: Long,

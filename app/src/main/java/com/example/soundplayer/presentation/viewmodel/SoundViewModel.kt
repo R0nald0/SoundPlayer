@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.AudioAttributes
 import androidx.media3.exoplayer.ExoPlayer
-import com.example.soundplayer.commons.execptions.Failure
+import com.example.soundplayer.commons.execptions.PlayBackErrorException
 import com.example.soundplayer.data.entities.UserDataPreferecence
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.model.PlayList
@@ -27,7 +27,7 @@ class SoundViewModel @Inject constructor(
 ) :ViewModel(){
 
     var actualSound  : LiveData<Sound> ? = null
-    lateinit var playBackError  : LiveData<Failure?>
+    lateinit var playBackError  : LiveData<PlayBackErrorException?>
     var isPlayingObserver  = MutableLiveData<Boolean>()
 
     private var _currentPlayingPlayList = MutableLiveData<PlayList>()
@@ -45,6 +45,7 @@ class SoundViewModel @Inject constructor(
          getActualSound()
          getPlayback()
     }
+
 
     fun getPlayback() {
         viewModelScope.launch {
@@ -78,9 +79,8 @@ class SoundViewModel @Inject constructor(
                       isPlaying()
                   }
               },
-              onFailure = {
-                  Log.e("INFO_", "savePreference: erro ao salvar preferencias ${it.message}")
-                 // playBackError =Failure(messages = "")
+              onFailure = {erro ->
+                  Log.e("INFO_", "savePreference: erro ao salvar preferencias ${erro.message}")
               }
           )
        }
@@ -104,18 +104,8 @@ class SoundViewModel @Inject constructor(
             )
         }
     }
-    fun playAllMusicFromFist(listSound : Set<Sound>) = viewModelScope.launch {
-         kotlin.runCatching {
-              servicePlayer.playAllMusicFromFist(listSound)
-         }.fold(
-             onSuccess = {
 
-             }, onFailure = {
-                 Log.e("INFO_", "erro ao iniciar player ${it.message}")
-             }
-         )
-    }
-      fun readPreferences(){
+      private fun readPreferences(){
          viewModelScope.launch {
              runCatching {
                  userPrefferencesService.readAppAllPrefferences()

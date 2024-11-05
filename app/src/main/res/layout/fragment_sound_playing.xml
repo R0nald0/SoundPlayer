@@ -161,7 +161,6 @@
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toTopOf="@+id/myPlayerView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.375"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/txv_autor_name"
         app:shapeAppearance="@style/circle_shape_image"

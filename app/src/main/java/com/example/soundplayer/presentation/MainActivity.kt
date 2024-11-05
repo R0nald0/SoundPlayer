@@ -1,9 +1,6 @@
 package com.example.soundplayer.presentation
 
-
-
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -89,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         if (idPlayList  !=  null){
             preferencesViewModel.savePlayListIdPlayList(idPlayList)
         }
-        Log.i("INFO_", "OnStop MAin Activity $idPlayList")
+
         super.onStop()
     }
 

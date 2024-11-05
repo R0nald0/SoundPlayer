@@ -40,27 +40,49 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5">
 
-        <TextView
-            android:id="@+id/txv_title_music"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="?attr/selectableItemBackground"
-            android:gravity="start|center_vertical"
-            android:maxLines="2"
-            android:paddingLeft="@dimen/spacing_high"
-            android:paddingTop="@dimen/spacing_half"
-            android:paddingRight="@dimen/spacing_high"
-            android:paddingBottom="@dimen/spacing_half"
-            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-            tools:text="Hello" />
+            android:paddingTop="8dp"
+            android:paddingStart="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/id_name_artist"
+                android:layout_width="wrap_content"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                android:ellipsize="marquee"
+                android:maxLines="1"
+                android:gravity="start|center_vertical"
+                android:layout_height="wrap_content"
+
+                android:text="@string/desconhecido" />
+
+            <TextView
+                android:id="@+id/txv_title_music"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:background="?attr/selectableItemBackground"
+                android:gravity="start|center_vertical"
+                android:ellipsize="marquee"
+                android:maxLines="2"
+                android:textStyle="bold"
+                android:paddingLeft="@dimen/spacing_high"
+                android:paddingTop="@dimen/spacing_half"
+                android:paddingRight="@dimen/spacing_high"
+                android:paddingBottom="@dimen/spacing_half"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                tools:text="Hello" />
+        </LinearLayout>
 
         <CheckBox
             android:id="@+id/check_favorite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|end"
-            android:gravity="clip_vertical" />
+            android:layout_gravity="center_vertical|end|center_horizontal"
+            android:gravity="clip_vertical|center" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

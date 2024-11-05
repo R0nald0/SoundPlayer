@@ -40,41 +40,58 @@
                 app:shapeAppearanceOverlay="@style/ImageRounded"
                 app:srcCompat="@drawable/music_player_logo_v1" />
 
-            <TextView
-                android:id="@+id/txv_title"
-                style="@style/TextAppearance.Material3.HeadlineLarge"
+            <LinearLayout
+                android:id="@+id/linearLayout3"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:elevation="5dp"
-                android:ellipsize="marquee"
-                android:fontFamily="casual"
-                android:foregroundGravity="left"
-                android:gravity="start"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:maxLines="1"
-                android:padding="16dp"
-                android:singleLine="true"
-                android:text="TItle"
-                android:textSize="15sp"
-                android:textStyle="bold|italic"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
                 app:layout_constraintEnd_toStartOf="@+id/id_btn_option_sound"
                 app:layout_constraintStart_toEndOf="@+id/imageView"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/id_txv_composer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="marquee"
+                    android:gravity="start|center_vertical"
+                    android:maxLines="1"
+                    android:paddingBottom="2dp"
+                    android:text="@string/desconhecido"
+
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+                <TextView
+                    android:id="@+id/txv_title"
+                    style="@style/TextAppearance.Material3.HeadlineLarge"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:elevation="5dp"
+                    android:ellipsize="marquee"
+                    android:fontFamily="casual"
+                    android:foregroundGravity="left"
+                    android:gravity="start"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="TItle"
+                    android:textSize="15sp"
+                    android:textStyle="bold|italic" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/txv_duration"
                 style="@style/TextAppearance.Material3.HeadlineLarge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="17dp"
+                android:layout_marginStart="16dp"
                 android:text="00:00"
                 android:textSize="14sp"
                 android:textStyle="bold|italic"
                 app:layout_constraintBottom_toBottomOf="@+id/imageView"
-                app:layout_constraintStart_toEndOf="@+id/imageView"
-                app:layout_constraintTop_toBottomOf="@+id/txv_title" />
+                app:layout_constraintStart_toEndOf="@+id/imageView" />
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/lottie_sound_anime_playing"
@@ -89,17 +106,18 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.02"
                 app:layout_constraintStart_toEndOf="@+id/txv_duration"
-                app:layout_constraintTop_toBottomOf="@+id/txv_title"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"
-                app:lottie_rawRes="@raw/music_vertical_animation" />
+                app:lottie_rawRes="@raw/music_vertical_animation"
+                tools:visibility="visible" />
 
             <ImageButton
                 android:id="@+id/id_btn_option_sound"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                app:layout_constraintBottom_toBottomOf="@+id/txv_title"
+                app:layout_constraintBottom_toBottomOf="@+id/linearLayout3"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/baseline_more_vert_24" />
