@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 
 object Constants {
      const val DATABASE_NAME ="playlist_database"
-     const val  ALL_MUSIC_NAME ="All Musics"
+     const val  ALL_MUSIC_NAME ="Todas as músicas"
      const val  PREFERENCE_NAME ="settings"
 
       val POSITION_KEY = intPreferencesKey("postionKey")

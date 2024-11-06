@@ -1,13 +1,12 @@
 <resources>
     <string name="app_name">Sound Player</string>
-    <string name="text_delete_playlist">"Deseja deletar a %1$s ?"</string>
+    <string name="text_delete_playlist">"Deseja excluir a %1$s ?"</string>
     <string name="text_atualizar_playlist">Atualizar o nome da Playlist %1$s ?</string>
     <string name="text_criar_playlist">Criar Playlist</string>
     <string name="editar_nome_playlist">Editar nome playlist</string>
     <string name="excluir">Excluir</string>
     <string name="cancelar">Cancelar</string>
-
-    <string name="editar">Editar</string>
+    <string name="atualizar">Atualizar</string>
     <string name="n_o">Não</string>
     <string name="sim">Sim</string>
     <string name="adicionar_a_playlist">Adicionar à playlist</string>
@@ -26,12 +25,11 @@
     <string name="permiss_o_necessaria_para_carragar_as_m_sicas">Permissão necessaria para carragar as músicas</string>
     <string name="total_de_musicas">Total de músicas: %1$s</string>
     <string name="criar_playlist">Criar PlayList</string>
-    <string name="play_list_name">Play List Name</string>
+    <string name="play_list_name">Todas as músicas</string>
     <string name="ordenar_sons_por">Ordenar Sons Por…</string>
     <string name="adicionar_m_sica">Adicionar música</string>
     <string name="nenhuma_m_sica_para_adicionar">Nenhuma música para adicionar</string>
     <string name="selecione_s_m_sicas_para_adicionar_na_playlist_principal">Selecione as músicas para adicionar na playlist principal</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="bot_o_para_buscar_musica_pelo_nome">botão para buscar musica pelo nome</string>
     <string name="buscar_m_sica">Buscar música</string>
     <string name="desconhecido">Desconhecido</string>

@@ -9,6 +9,7 @@
     <color name="redStronger">#FD3333</color>
 
     <color name="colorPrimaryContainer">#E35252</color>
+    <color name="blueLight">#FFFFFF</color>
     <color name="colorOnPrimaryContainer">#FD3333</color>
 
     <color name="colorNightSurfaceVariant">#e7e0ec</color>

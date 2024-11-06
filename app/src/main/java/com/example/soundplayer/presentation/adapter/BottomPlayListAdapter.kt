@@ -1,5 +1,7 @@
 package com.example.soundplayer.presentation.adapter
 
+import android.annotation.SuppressLint
+import android.util.Log
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -16,6 +18,7 @@ class BottomPlayListAdapter (): RecyclerView.Adapter<BottomPlayListAdapter.ViewH
    fun getSoundSelected() : Set<Sound>{
         return soundSelecionados.toSet()
    }
+    @SuppressLint("NotifyDataSetChanged")
     fun getListSound(listMusics : Set<Sound>){
       val  sortedList = listMusics.sortedBy {
             it.title
@@ -26,29 +29,49 @@ class BottomPlayListAdapter (): RecyclerView.Adapter<BottomPlayListAdapter.ViewH
      inner class ViewHolder(private val binding: FragmentItemListDialogListDialogItemBinding) :RecyclerView.ViewHolder(binding.root) {
             fun bind( sound : Sound,position: Int){
                 binding.txvTitleMusic.text =sound.title
-
                 binding.checkFavorite.isChecked = sparseBooleanArray[position,false]
+
                 if (sound.artistName == null || sound.artistName.contains("unknown"))  binding.idNameArtist.text = ContextCompat.getString(binding.root.context,R.string.desconhecido)
                 else binding.idNameArtist.text = sound.artistName
 
-                if (sound.uriMediaAlbum != null) {
-                    binding.imgBack.setImageURI(sound.uriMediaAlbum)
-                    if (binding.imgBack.drawable == null) {
-                        binding.imgBack.setImageResource(R.drawable.music_player_logo_v1)
-                    }
-                }else{
-                    binding.imgBack.setImageResource(R.drawable.music_player_logo_v1)
-                }
-                binding.checkFavorite.setOnClickListener {
-                   sparseBooleanArray.put(position,binding.checkFavorite.isChecked)
-                    if (binding.checkFavorite.isChecked){
-                        soundSelecionados.add(sound)
-                    }else{
-                        soundSelecionados.remove(sound)
-                    }
-                }
+                configureImageSoundBackground(sound)
+                configureClickToCheckChoseSound(position, sound)
             }
-    }
+
+         private fun configureClickToCheckChoseSound(position: Int, sound: Sound) {
+             binding.imgBack.setOnClickListener {
+                 sparseBooleanArray.put(position, binding.checkFavorite.isChecked)
+                 if (!binding.checkFavorite.isChecked) {
+                     binding.checkFavorite.isChecked = true
+                     soundSelecionados.add(sound)
+                 } else {
+                     binding.checkFavorite.isChecked = false
+                     soundSelecionados.remove(sound)
+
+                 }
+             }
+
+             binding.checkFavorite.setOnClickListener {
+                 sparseBooleanArray.put(position, binding.checkFavorite.isChecked)
+                 if (binding.checkFavorite.isChecked) {
+                     soundSelecionados.add(sound)
+                 } else {
+                     soundSelecionados.remove(sound)
+                 }
+             }
+         }
+
+         private fun configureImageSoundBackground(sound: Sound) {
+             if (sound.uriMediaAlbum != null) {
+                 binding.imgBack.setImageURI(sound.uriMediaAlbum)
+                 if (binding.imgBack.drawable == null) {
+                     binding.imgBack.setImageResource(R.drawable.music_player_logo_v1)
+                 }
+             } else {
+                 binding.imgBack.setImageResource(R.drawable.music_player_logo_v1)
+             }
+         }
+     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
         return ViewHolder(

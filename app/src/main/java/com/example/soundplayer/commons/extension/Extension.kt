@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.media3.common.MediaItem
 import com.example.soundplayer.model.Sound
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.util.concurrent.TimeUnit
 
@@ -44,6 +45,39 @@ fun Context.showAlerDialog(messenger :String, positiveButton:String, negativeBut
             }.create().show()
     }
 }
+
+fun View.showMaterialDialog(
+    title:String,
+    message : String? = null,
+    colorTextButtonPositive :Int? = null,
+    colorTextButtonNegative :Int? = null,
+    positiveButtonTitle: String= "Sim",
+    negativeButtonTitle: String= "Não",
+    onPositiveButton:()->Unit,
+    onNegativeButton:()->Unit,
+){
+ val dialog  =  MaterialAlertDialogBuilder(this.context)
+        .setTitle(title)
+        .setMessage(message)
+        .setNegativeButton(negativeButtonTitle){dialog,_ ->
+             onNegativeButton()
+            dialog.dismiss()
+        }
+        .setPositiveButton(positiveButtonTitle){dialog,_->
+            onPositiveButton()
+            dialog.dismiss()
+        }
+        .show()
+
+    if (colorTextButtonPositive != null) {
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(colorTextButtonPositive)
+    }
+    if (colorTextButtonNegative != null) {
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(colorTextButtonNegative)
+    }
+}
+
+
 fun View.snackBarSound(
     messages:String,
     backGroundColor :Int =Color.GREEN,
