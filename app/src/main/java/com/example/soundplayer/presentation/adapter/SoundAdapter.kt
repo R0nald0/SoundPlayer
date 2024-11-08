@@ -14,10 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.soundplayer.R
 import com.example.soundplayer.commons.extension.convertMilesSecondToMinSec
+import com.example.soundplayer.commons.extension.showMaterialDialog
 import com.example.soundplayer.databinding.ItemSoundBinding
 import com.example.soundplayer.model.PlayList
 import com.example.soundplayer.model.Sound
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SoundAdapter(
     val isUpdateList :(Boolean)->Unit,
@@ -218,19 +218,20 @@ class SoundAdapter(
         popupMenu.setOnMenuItemClickListener {
             when(it.itemId){
                 R.id.id_delete->{
-                    MaterialAlertDialogBuilder(view.context)
-                        .setTitle("Deseja deletar ${sound.title} ?")
-                        .setPositiveButton("Sim"){dialog,q->
+                    view.showMaterialDialog(
+                        colorTextButtonNegative = ContextCompat.getColor(view.context,R.color.red) ,
+                        colorTextButtonPositive = ContextCompat.getColor(view.context,R.color.colorPrimaryContainer),
+                        title = "Deseja deletar ${sound.title} ?",
+                        message = "",
+                        negativeButtonTitle = view.context.getString(R.string.n_o),
+                        positiveButtonTitle = view.context.getString(R.string.sim),
+                        onNegativeButton = {},
+                        onPositiveButton = {
                             onDelete(soundsPlayList?.idPlayList!!,Pair(position,sound))
-                            dialog.dismiss()
                         }
-                        .setNegativeButton("Cancelar"){dialog,q->
-                            dialog.dismiss()
-                        }
-                        .show()
+                    )
                     true
                 }
-
                 else -> false
             }
         }

@@ -1,7 +1,6 @@
 package com.example.soundplayer.presentation.adapter
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -13,10 +12,10 @@ import com.example.soundplayer.model.Sound
 
 class BottomPlayListAdapter (): RecyclerView.Adapter<BottomPlayListAdapter.ViewHolder>() {
     private val sounds  = mutableSetOf<Sound>()
-    private val soundSelecionados  = mutableSetOf<Sound>()
+    private val soundSelecteds  = mutableSetOf<Sound>()
     private val sparseBooleanArray  = SparseBooleanArray()
    fun getSoundSelected() : Set<Sound>{
-        return soundSelecionados.toSet()
+        return soundSelecteds.toSet()
    }
     @SuppressLint("NotifyDataSetChanged")
     fun getListSound(listMusics : Set<Sound>){
@@ -43,10 +42,10 @@ class BottomPlayListAdapter (): RecyclerView.Adapter<BottomPlayListAdapter.ViewH
                  sparseBooleanArray.put(position, binding.checkFavorite.isChecked)
                  if (!binding.checkFavorite.isChecked) {
                      binding.checkFavorite.isChecked = true
-                     soundSelecionados.add(sound)
+                     soundSelecteds.add(sound)
                  } else {
                      binding.checkFavorite.isChecked = false
-                     soundSelecionados.remove(sound)
+                     soundSelecteds.remove(sound)
 
                  }
              }
@@ -54,9 +53,9 @@ class BottomPlayListAdapter (): RecyclerView.Adapter<BottomPlayListAdapter.ViewH
              binding.checkFavorite.setOnClickListener {
                  sparseBooleanArray.put(position, binding.checkFavorite.isChecked)
                  if (binding.checkFavorite.isChecked) {
-                     soundSelecionados.add(sound)
+                     soundSelecteds.add(sound)
                  } else {
-                     soundSelecionados.remove(sound)
+                     soundSelecteds.remove(sound)
                  }
              }
          }

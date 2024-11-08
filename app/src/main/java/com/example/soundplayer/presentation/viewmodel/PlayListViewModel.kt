@@ -111,8 +111,8 @@ class PlayListViewModel @Inject constructor(
                            _listSize.value = sounds.size
                        }
                 },
-                onFailure = {
-                    Log.i(TAG, "saveAllSoundsByContentProvider: erro ao salvar allmusics")
+                onFailure = {erro ->
+                    Log.e(TAG, "saveAllSoundsByContentProvider: erro ao salvar allmusics ${erro.message}")
                     _erroMessage.value = "Algo deu errado ao salvar a plylist,tente novamente"
                 }
             )
@@ -186,7 +186,8 @@ class PlayListViewModel @Inject constructor(
                     }
                 }, onFailure = {
                     Log.e(TAG, "erro ao buscar  playlist com o id: $idPlayList : ${it.message} ")
-                    _erroMessage.value = "Não conseguimos encontrar á playlist"
+                    if (_listSize.value != null && _listSize.value!! > 0 )
+                        _erroMessage.value = "Não conseguimos encontrar á playlist"
                 }
             )
         }

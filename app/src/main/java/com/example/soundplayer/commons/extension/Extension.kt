@@ -28,23 +28,6 @@ fun Long.convertMilesSecondToMinSec(): String {
     )
 }
 
-fun Context.showAlerDialog(messenger :String, positiveButton:String, negativeButton:String, layoutResid : View?, onPositive :()->Unit){
-    if (layoutResid != null) {
-
-        AlertDialog.Builder(this)
-            .setView(layoutResid)
-            .setMessage(messenger)
-            .setNegativeButton(negativeButton) { dialog, id ->
-                dialog.cancel()
-                dialog.dismiss()
-            }
-            .setPositiveButton(positiveButton){dialog, id ->
-                dialog.cancel()
-                dialog.dismiss()
-                onPositive()
-            }.create().show()
-    }
-}
 
 fun View.showMaterialDialog(
     title:String,
@@ -73,7 +56,7 @@ fun View.showMaterialDialog(
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(colorTextButtonPositive)
     }
     if (colorTextButtonNegative != null) {
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(colorTextButtonNegative)
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(colorTextButtonNegative)
     }
 }
 

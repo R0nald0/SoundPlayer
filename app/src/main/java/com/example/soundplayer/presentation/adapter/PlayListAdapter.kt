@@ -2,8 +2,6 @@
 package com.example.soundplayer.presentation.adapter
 
 import android.annotation.SuppressLint
-import android.graphics.Color
-import android.os.Build
 import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
@@ -174,7 +172,7 @@ class PlayListAdapter(
                         view.showMaterialDialog(
                             title = String.format(ContextCompat.getString(view.context,R.string.text_atualizar_playlist),playList.name),
                             message = "",
-                            colorTextButtonPositive =  Color.BLUE,
+                            colorTextButtonPositive = ContextCompat.getColor(view.context,R.color.blue_light),
                             negativeButtonTitle = view.context.getString(R.string.cancelar),
                             positiveButtonTitle = view.context.getString(R.string.atualizar),
                             onNegativeButton = {},
@@ -186,7 +184,7 @@ class PlayListAdapter(
                 }
                 R.id.id_delete ->{
                     view.showMaterialDialog(
-                        colorTextButtonPositive = Color.RED,
+                        colorTextButtonPositive = ContextCompat.getColor(view.context,R.color.red),
                         title = String.format(ContextCompat.getString(view.context,R.string.text_delete_playlist),playList.name),
                         message = "",
                         negativeButtonTitle = view.context.getString(R.string.n_o),

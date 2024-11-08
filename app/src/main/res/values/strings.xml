@@ -3,13 +3,13 @@
     <string name="text_delete_playlist">"Deseja excluir a %1$s ?"</string>
     <string name="text_atualizar_playlist">Atualizar o nome da Playlist %1$s ?</string>
     <string name="text_criar_playlist">Criar Playlist</string>
-    <string name="editar_nome_playlist">Editar nome playlist</string>
+    <string name="editar_nome_playlist">Editar nome da playlist</string>
     <string name="excluir">Excluir</string>
     <string name="cancelar">Cancelar</string>
     <string name="atualizar">Atualizar</string>
     <string name="n_o">Não</string>
     <string name="sim">Sim</string>
-    <string name="adicionar_a_playlist">Adicionar à playlist</string>
+    <string name="adicionar_a_playlist">Adicionar na playlist</string>
     <string name="remover_da_playlist">remover da playlist</string>
     <string name="selecionar_items">Selecionar Items</string>
     <string name="escolha_a_playlist">Escolha a Playlist</string>
@@ -22,7 +22,7 @@
     <string name="est_playlist_esta_vazia">Esta playlist está vazia</string>
     <string name="deletar">Deletar</string>
     <string name="nenhuma_m_sica">Nenhuma Mùsica</string>
-    <string name="permiss_o_necessaria_para_carragar_as_m_sicas">Permissão necessaria para carragar as músicas</string>
+    <string name="permiss_o_necessaria_para_carragar_as_m_sicas">Permissão necessária para carregar as músicas.</string>
     <string name="total_de_musicas">Total de músicas: %1$s</string>
     <string name="criar_playlist">Criar PlayList</string>
     <string name="play_list_name">Todas as músicas</string>
@@ -33,7 +33,7 @@
     <string name="bot_o_para_buscar_musica_pelo_nome">botão para buscar musica pelo nome</string>
     <string name="buscar_m_sica">Buscar música</string>
     <string name="desconhecido">Desconhecido</string>
-    <string name="n_o_encontramos_nehum_arquivo_de_a_dio_no_seu_aparelho_por_favor_adicione_as">"Não encontramos nehnum arquivo de aúdio no seu aparelho,por favor adicione-as... "</string>
+    <string name="n_o_encontramos_nehum_arquivo_de_a_dio_no_seu_aparelho_por_favor_adicione_as">"Não encontramos nenhum arquivo de áudio no seu aparelho. Por favor, adicione arquivos de áudio para continuar."</string>
     <string name="fundo_imagem_udio">fundo imagem áudio</string>
     <string name="nome_da_playlist">Nome da Playlist</string>
 

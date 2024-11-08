@@ -1,6 +1,5 @@
 package com.example.soundplayer.data.repository
 
-import android.util.Log
 import androidx.annotation.OptIn
 import androidx.lifecycle.MutableLiveData
 import androidx.media3.common.MediaItem
@@ -171,7 +170,7 @@ class PlayerRepository @Inject constructor(
 
 
                 _playBackError.value =  PlayBackErrorException(
-                     messages = "Áudio não encontrado,verifique se o arquivo não foi excluido" ,
+                     messages = "Áudio não encontrado.Verifique se o arquivo não foi excluído ou movido." ,
                      causes = error,
                      code = 2005,
                      dataSoundPlayListToUpdate =  DataSoundPlayListToUpdate(

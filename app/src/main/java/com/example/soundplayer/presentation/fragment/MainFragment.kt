@@ -42,7 +42,6 @@ class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
     private lateinit var myMenuProvider: MenuProvider
-    var cont = 0
     private lateinit var gerenciarPermissoes: ActivityResultLauncher<Array<String>>
     private lateinit var adapterSound: SoundAdapter
     private lateinit var playListAdapter: PlayListAdapter
@@ -148,7 +147,6 @@ class MainFragment : Fragment() {
             if (uiStatePref.idPreference != null) {
                 playListViewModel.findPlayListById(uiStatePref.idPreference)
             }
-
         }
 
         soundViewModel.isPlayingObserver.observe(viewLifecycleOwner) { isPlaying ->
@@ -166,8 +164,6 @@ class MainFragment : Fragment() {
                 }
 
                 soundViewModel.actualSound?.observe(viewLifecycleOwner) { soundLiveDataActual ->
-                    // Log.i("INFO_", "Main:${soundLiveDataActual.title} ${cont++}")
-                    //TODO VERIFICAR CHAMAdasS MULTIPLAS
                     adapterSound.getActualSound(soundLiveDataActual)
                     val currentPositionSound = soundViewModel.getCurrentPositionSound()
                     binding.rvSound.scrollToPosition(currentPositionSound)
@@ -281,8 +277,7 @@ class MainFragment : Fragment() {
     }
 
     override fun onResume() {
-        val listPermissionsNotGranted =
-            Permission.chekPerMission(this.requireActivity(), listPermission)
+        val listPermissionsNotGranted = Permission.chekPerMission(this.requireActivity(), listPermission)
         if (listPermissionsNotGranted.isNotEmpty()) {
             showHideViewItems(false)
         } else {
@@ -374,11 +369,9 @@ class MainFragment : Fragment() {
             showHideViewItems(false)
             requireView().snackBarSound(
                 messages = "Não encontramos nenhum arquivo de áudio no seu aparelho,por favor adicione-os",
-                textColor = Color.BLACK
+                textColor = Color.BLUE
             )
         }
-
-
     }
 
     inner class MyMenuProvider() : MenuProvider {
