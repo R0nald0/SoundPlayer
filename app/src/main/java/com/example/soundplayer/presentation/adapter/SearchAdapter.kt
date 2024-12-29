@@ -1,5 +1,6 @@
 package com.example.soundplayer.presentation.adapter
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,7 +29,7 @@ class SearchAdapter (
         fun bind(sound :SongWithPlayListDomain){
              val imageSound = sound.sound.uriMediaAlbum
             if (imageSound != null) {
-                binding.imgCapaSound.setImageURI(imageSound)
+                binding.imgCapaSound.setImageURI(Uri.parse(imageSound))
                 if (binding.imgCapaSound.drawable == null) {
                     binding.imgCapaSound.setImageResource(R.drawable.music_player_logo_v1)
                 }

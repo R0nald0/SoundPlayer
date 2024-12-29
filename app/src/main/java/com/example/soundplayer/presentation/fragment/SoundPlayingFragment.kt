@@ -2,6 +2,7 @@ package com.example.soundplayer.presentation.fragment
 
 import android.content.ComponentName
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -79,16 +80,18 @@ class SoundPlayingFragment : Fragment() {
         soundViewModel.actualSound?.observe(viewLifecycleOwner) { sound ->
             binding.txvNameMusic.isSelected = true
             binding.txvNameMusic.text = sound.title
-            binding.txvAutorName.text = if (sound.artistName == null || sound.artistName.contains("unknown"))  getString(R.string.desconhecido)
-                                         else sound.artistName
-            binding.txvTitleAlbum.text =if (sound.albumName == null || sound.albumName.contains("unknown"))   getString(R.string.desconhecido)
-                                        else sound.albumName
+            binding.txvAutorName.text =
+                if (sound.artistName == null || sound.artistName.contains("unknown")) getString(R.string.desconhecido)
+                else sound.artistName
+            binding.txvTitleAlbum.text =
+                if (sound.albumName == null || sound.albumName.contains("unknown")) getString(R.string.desconhecido)
+                else sound.albumName
             if (sound.uriMediaAlbum != null) {
-                binding.imvSong.setImageURI(sound.uriMediaAlbum)
+                binding.imvSong.setImageURI(Uri.parse(sound.uriMediaAlbum))
                 if (binding.imvSong.drawable == null) {
                     binding.imvSong.setImageResource(R.drawable.music_player_logo_v1)
                 }
-            }else{
+            } else {
                 binding.imvSong.setImageResource(R.drawable.music_player_logo_v1)
             }
         }
@@ -125,7 +128,6 @@ class SoundPlayingFragment : Fragment() {
     @OptIn(UnstableApi::class)
     private fun initPlayer() {
         binding.myPlayerView.player = soundViewModel.myPlayer
-        val pl = binding.myPlayerView.player
 
     }
 

@@ -1,6 +1,7 @@
 package com.example.soundplayer.presentation.adapter
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -62,7 +63,7 @@ class BottomPlayListAdapter (): RecyclerView.Adapter<BottomPlayListAdapter.ViewH
 
          private fun configureImageSoundBackground(sound: Sound) {
              if (sound.uriMediaAlbum != null) {
-                 binding.imgBack.setImageURI(sound.uriMediaAlbum)
+                 binding.imgBack.setImageURI(Uri.parse(sound.uriMediaAlbum))
                  if (binding.imgBack.drawable == null) {
                      binding.imgBack.setImageResource(R.drawable.music_player_logo_v1)
                  }

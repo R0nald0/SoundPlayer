@@ -3,6 +3,7 @@ package com.example.soundplayer.presentation.adapter
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -71,7 +72,7 @@ class SoundAdapter(
 
             configSelectionedItemApperence(position,soudd)
             if (soudd.uriMediaAlbum != null) {
-                binding.imageView.setImageURI(soudd.uriMediaAlbum)
+                binding.imageView.setImageURI(Uri.parse(soudd.uriMediaAlbum))
                 if (binding.imageView.drawable == null) {
                     binding.imageView.setImageResource(R.drawable.music_player_logo_v1)
                 }

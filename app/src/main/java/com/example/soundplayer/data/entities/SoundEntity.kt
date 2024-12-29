@@ -1,6 +1,5 @@
 package com.example.soundplayer.data.entities
 
-import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.soundplayer.model.Sound
@@ -28,7 +27,7 @@ fun SoundEntity.toSound() = Sound(
     albumName = this.albumName,
     duration = this.duration,
     title = this.title,
-    uriMedia = Uri.parse(this.urlMediaImage),
-    uriMediaAlbum = Uri.parse(this.urlAlbumImage),
+    uriMedia = this.urlMediaImage,
+    uriMediaAlbum = this.urlAlbumImage,
     insertedDate = this.insertedDate
 )

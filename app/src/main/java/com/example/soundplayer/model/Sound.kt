@@ -1,6 +1,5 @@
 package com.example.soundplayer.model
 
-import android.net.Uri
 import android.os.Parcelable
 import com.example.soundplayer.data.entities.SoundEntity
 import kotlinx.parcelize.Parcelize
@@ -13,8 +12,8 @@ data class Sound(
     val albumName :String?,
     val duration:String ="",
     var title: String ="",
-    var uriMedia: Uri? = null,
-    var uriMediaAlbum: Uri? =null,
+    var uriMedia: String? = null,
+    var uriMediaAlbum: String? =null,
     val insertedDate : Long?
 ):Parcelable{
     constructor(soundEntity: SoundEntity):this(
@@ -24,14 +23,14 @@ data class Sound(
         path = soundEntity.path,
         duration = soundEntity.duration,
         title = soundEntity.title,
-        uriMedia = Uri.parse(soundEntity.urlMediaImage),
-        uriMediaAlbum = Uri.parse(soundEntity.urlAlbumImage),
+        uriMedia = soundEntity.urlMediaImage,
+        uriMediaAlbum = soundEntity.urlAlbumImage,
         insertedDate = soundEntity.insertedDate
     )
 }
 
 fun Sound.toSoundEntity()= SoundEntity(
-    soundId = idSound ?: 0,
+    soundId = this.idSound!!,
     title = this.title,
     artistsName = artistName ?: "",
     albumName = albumName ?:"",

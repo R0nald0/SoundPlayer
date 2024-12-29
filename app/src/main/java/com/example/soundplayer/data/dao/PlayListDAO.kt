@@ -13,13 +13,16 @@ import com.example.soundplayer.data.entities.PlayListWithSong
 interface PlayListDAO {
     @Insert
     suspend   fun createPlayList(playList : PlayListEntity):Long
+
     @Query(value = "SELECT * FROM playList")
     fun findAllPlayList():List<PlayListWithSong>
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-   suspend fun updatePlayList(playList: PlayListEntity):Int
 
-   @Query(value = "UPDATE playList SET title = :name WHERE playListId = :id")
-   suspend fun updateNamePlayList(id:Long ,name :String):Int
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updatePlayList(playList: PlayListEntity):Int
+
+    @Query(value = "UPDATE playList SET title = :name WHERE playListId =:id")
+    suspend fun updateNamePlayList(id:Long ,name :String):Int
+
     @Delete
-  suspend  fun deletePlayList(playList: PlayListEntity) :Int
+    suspend  fun deletePlayList(playList: PlayListEntity) :Int
 }

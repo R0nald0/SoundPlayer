@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 interface SoundDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend  fun saveSound(sound : SoundEntity):Long
+
     @Query(value = "SELECT * FROM sound")
     suspend  fun findAllSound():List<SoundEntity>
 

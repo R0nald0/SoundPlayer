@@ -78,8 +78,8 @@ object MyContetntProvider {
                    albumName = cursor.getString(albumIndex),
                    duration =cursor.getInt(duarution).toString(),
                    title= cursor.getString(title),
-                   uriMedia = mediaUri,
-                   uriMediaAlbum = mediaUriAlbum,
+                   uriMedia = mediaUri.toString(),
+                   uriMediaAlbum = mediaUriAlbum.toString(),
                    insertedDate = null
                )
 

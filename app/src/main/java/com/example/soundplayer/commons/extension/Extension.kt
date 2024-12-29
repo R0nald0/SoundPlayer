@@ -88,7 +88,7 @@ fun  MediaItem.toSound(duration: Long,insertedDate : Long?,path:String) = Sound(
     path = path,
     title = mediaMetadata.displayTitle.toString(),
     duration = duration.convertMilesSecondToMinSec() ,
-    uriMediaAlbum = mediaMetadata.artworkUri,
+    uriMediaAlbum = mediaMetadata.artworkUri.toString(),
     insertedDate = insertedDate
 )
 

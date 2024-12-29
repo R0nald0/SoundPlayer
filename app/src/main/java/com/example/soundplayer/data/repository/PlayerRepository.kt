@@ -1,5 +1,6 @@
 package com.example.soundplayer.data.repository
 
+import android.net.Uri
 import androidx.annotation.OptIn
 import androidx.lifecycle.MutableLiveData
 import androidx.media3.common.MediaItem
@@ -135,7 +136,7 @@ class PlayerRepository @Inject constructor(
                        path = "",
                        title = mediaMetadata.displayTitle.toString(),
                        duration = exoPlayer.duration.convertMilesSecondToMinSec() ,
-                       uriMediaAlbum = mediaMetadata.artworkUri,
+                       uriMediaAlbum = mediaMetadata.artworkUri.toString(),
                        insertedDate = null
                    )
 
@@ -164,7 +165,7 @@ class PlayerRepository @Inject constructor(
                        path = "",
                        title = mediaMetadata.displayTitle.toString(),
                        duration = exoPlayer.duration.convertMilesSecondToMinSec() ,
-                       uriMediaAlbum = mediaMetadata.artworkUri,
+                       uriMediaAlbum = mediaMetadata.artworkUri.toString(),
                        insertedDate = null
                    )
 
@@ -203,7 +204,7 @@ class PlayerRepository @Inject constructor(
                   path = "",
                   title = mediaMetadata.displayTitle.toString(),
                   duration = exoPlayer.duration.convertMilesSecondToMinSec() ,
-                  uriMediaAlbum = mediaMetadata.artworkUri,
+                  uriMediaAlbum = mediaMetadata.artworkUri.toString(),
                   insertedDate = null
                )
 
@@ -225,7 +226,7 @@ class PlayerRepository @Inject constructor(
 
       return MediaMetadata.Builder()
          .setTitle(sound.title)
-         .setArtworkUri(sound.uriMediaAlbum)
+         .setArtworkUri(Uri.parse(sound.uriMediaAlbum))
          .setDisplayTitle(sound.title)
          .setArtist(sound.artistName)
          .setAlbumTitle(sound.albumName)

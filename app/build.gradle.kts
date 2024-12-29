@@ -9,12 +9,12 @@ plugins {
 
 android {
     namespace = "com.example.soundplayer"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.soundplayer"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -94,17 +94,21 @@ dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    testImplementation("junit:junit:4.12")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    androidTestImplementation ("androidx.room:room-testing:2.6.1")
+    androidTestImplementation ("com.google.truth:truth:1.2.0")
 
     testImplementation ("com.google.truth:truth:1.2.0")
     //Kotlin-coroutineTeste
     testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
     //Dependência da Biblioteca Mockito
-    testImplementation ("org.mockito:mockito-core:5.+")
+    testImplementation ("org.mockito:mockito-core:5.14.2")
+
 }
 kapt {
     correctErrorTypes = true

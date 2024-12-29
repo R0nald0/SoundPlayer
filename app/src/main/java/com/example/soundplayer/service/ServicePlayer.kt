@@ -6,6 +6,7 @@ import com.example.soundplayer.commons.execptions.PlayBackErrorException
 import com.example.soundplayer.data.entities.toSound
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.data.repository.PlayerRepository
+import com.example.soundplayer.data.repository.RepositoryException
 import com.example.soundplayer.data.repository.SoundPlayListRepository
 import com.example.soundplayer.data.repository.SoundRepository
 import com.example.soundplayer.model.PlayList
@@ -55,7 +56,22 @@ class ServicePlayer @Inject constructor(
     }
 
     suspend fun createPlayList(playList: PlayList): List<Long> {
-        return soundPlayListRepository.savePlayList(playList = playList)
+       try {
+           val  playListsFromDatabase = soundPlayListRepository.findAllPlayListWithSong()
+
+           playListsFromDatabase.forEach { playListDb ->
+               if (playListDb.playList.name == playList.name) return emptyList()
+           }
+           // service tera que grantir que o id do sound não seja nulo
+           if (playList.listSound.isEmpty()){
+               return  emptyList()
+           }
+           return  soundPlayListRepository.savePlayList(playList = playList)
+       } catch (repositoryException : RepositoryException){
+           throw repositoryException
+       }catch ( nullPointer : NullPointerException){
+           throw nullPointer
+       }
     }
 
     suspend fun updateNamePlayList(id: Long, newName: String): Int {
@@ -66,7 +82,7 @@ class ServicePlayer @Inject constructor(
         return soundPlayListRepository.deletePlaylist(playList)
     }
 
-    suspend fun getActualSound(): MutableLiveData<Sound> {
+     fun getActualSound(): MutableLiveData<Sound> {
         return playerRepository.getActaulSound()
     }
 

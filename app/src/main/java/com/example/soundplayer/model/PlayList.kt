@@ -12,6 +12,7 @@ data class PlayList(
     val name :String,
     var currentMusicPosition : Int,
     val listSound :MutableSet<Sound>
+
 ):Parcelable{
     constructor(playListEntity:PlayListWithSong):this(
         idPlayList =playListEntity.playList.playListId,
