@@ -101,7 +101,7 @@ class ServicePlayer @Inject constructor(
     ): List<Long> {
 
         val afectedLines =
-            soundPlayListRepository.addSountToPlayList(idPlayList, soundsToInsertPlayList)
+            soundPlayListRepository.addSoundToPlayList(idPlayList, soundsToInsertPlayList)
         if (afectedLines.isNotEmpty()) {
             playerRepository.getAcutalPlayList()?.let { playlistCurrentlyPlaying ->
                 if (idPlayList == playlistCurrentlyPlaying.idPlayList) {

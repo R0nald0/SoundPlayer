@@ -102,7 +102,7 @@ class PlayerRepository @Inject constructor(
 
       if (mediaItem != null) {
          val sound =Sound(
-            idSound = null,
+            idSound = mediaItem.mediaId.toLong(),
             albumName = mediaItem.mediaMetadata.albumTitle.toString(),
             artistName = mediaItem.mediaMetadata.artist.toString(),
             path = "",
@@ -129,8 +129,9 @@ class PlayerRepository @Inject constructor(
 
                    val mediaMetadata = exoPlayer.mediaMetadata
                    val mediaID = exoPlayer.currentMediaItem?.mediaId
+
                    val sound =Sound(
-                       idSound = mediaID?.toLong(),
+                       idSound =mediaID?.toLong() ?: 0,
                        artistName = mediaMetadata.artist.toString() ,
                        albumName = mediaMetadata.albumTitle.toString() ,
                        path = "",
@@ -159,7 +160,7 @@ class PlayerRepository @Inject constructor(
                    val mediaID = exoPlayer.currentMediaItem?.mediaId
 
                    val sound =Sound(
-                       idSound = mediaID?.toLong(),
+                       idSound = mediaID?.toLong() ?: 0,
                        artistName = mediaMetadata.artist.toString() ,
                        albumName = mediaMetadata.albumTitle.toString() ,
                        path = "",
@@ -195,10 +196,10 @@ class PlayerRepository @Inject constructor(
 
                   val artistName =mediaMetadata.artist ?: "Desconhecido"
                   val albumName =mediaMetadata.albumTitle ?: "Desconhecido"
-                  val mediaID = exoPlayer.currentMediaItem?.mediaId
+                  val mediaID = exoPlayer.currentMediaItem?.mediaId?.toLong() ?: 0
 
             val sound =Sound(
-                  idSound = mediaID?.toLong(),
+                  idSound = mediaID,
                   artistName = artistName.toString() ,
                   albumName = albumName.toString(),
                   path = "",

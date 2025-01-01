@@ -7,8 +7,12 @@ import com.example.soundplayer.data.entities.toSongWithPlayListDomain
 import com.example.soundplayer.model.SongWithPlayListDomain
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.toSoundEntity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SoundRepository @Inject constructor(
@@ -16,7 +20,8 @@ class SoundRepository @Inject constructor(
     private val playListCrossSounddao: PlaylistAndSoundCrossDao
 ){
     suspend fun saveSound(sound: Sound):Long{
-        return  soundDao.saveSound(sound = sound.toSoundEntity())
+        val soundEntity = sound.toSoundEntity()
+        return soundDao.saveSound(sound = soundEntity)
     }
 
     suspend fun findSountByTitle(title:String):Flow<List<SongWithPlayListDomain>>{
@@ -39,4 +44,5 @@ class SoundRepository @Inject constructor(
     suspend fun delete(sound: Sound):Int{
       return  soundDao.deleteSound(sound.toSoundEntity())
     }
+
 }

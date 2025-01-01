@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Sound(
-    val idSound : Long?,
+    val idSound : Long,
     val path : String ="",
     val artistName :String?,
     val albumName :String?,
