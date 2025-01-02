@@ -17,9 +17,6 @@ interface SoundDao {
     @Query(value = "SELECT * FROM sound")
     suspend  fun findAllSound():List<SoundEntity>
 
-    @Query(value = "SELECT title FROM sound")
-    suspend  fun findAllSoundTiitle():List<String>
-
     @Query(value = "SELECT * FROM sound WHERE soundId = :idSound")
     suspend  fun findSoundById(idSound:Long?):SoundEntity
 

@@ -44,6 +44,7 @@ android {
 }
 
 dependencies {
+    androidTestImplementation(project(":app"))
     val lottieVersion = "6.1.0"
     val lifecycle_version = "2.6.2"
     val roomVersion = "2.5.0"

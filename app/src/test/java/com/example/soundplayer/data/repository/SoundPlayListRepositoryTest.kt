@@ -43,7 +43,7 @@ class SoundPlayListRepositoryTest {
 
     private lateinit var playList: PlayList
 
-    private val soundEntityList = listOf(
+    val soundEntityList = listOf(
         SoundEntity(
             soundId = 1L,
             title = "Song One",
@@ -173,36 +173,30 @@ class SoundPlayListRepositoryTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun ` findAllPlayListWithSong should return a list of PlaylistWithSoundDomain`() = runTest {
-        // Preparando dados de teste
+    fun `When findAllPlayListWithSong method is executed,it should return a list of PlaylistWithSoundDomain`() = runTest {
         val mockPlayListWithSongList = listOf(
             PlayListWithSong(playList = playList.toEntity(), soundOfPlayList = soundEntityList),
         )
 
-        // Mockando o comportamento do método `findAllPlayListWithSong`
         Mockito.`when`(playlistAndSoundCrossDao.findAllPlayListWithSong())
             .thenReturn(mockPlayListWithSongList)
 
-
-        // Chamando o método que será testado
         val result = soundPlayListRepository.findAllPlayListWithSong()
 
-        // Asserção para garantir que o resultado é o esperado
         assertThat(result).isNotEmpty()
+        assertThat(result.size).isEqualTo(1)
         assertThat(result.first().playList.name).isEqualTo("Teste")
-
+        verify(playlistAndSoundCrossDao, times(1)).findAllPlayListWithSong()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `savePlayList must receive a playlist and return a long`() = runTest {
+    fun `Given a valid playlist,when savePlaylist method is executed,it should save a playlist and return a list of long value`() = runTest {
 
         Mockito.`when`(playListDAO.createPlayList(playList.toEntity())).thenReturn(1L)
         Mockito.`when`(
             playlistAndSoundCrossDao.insertPlayListAndSoundCroos(Mockito.anyList())
-        ).thenReturn(
-            listOf(1,2)
-        )
+        ).thenReturn(listOf(1,2))
 
         val result = soundPlayListRepository.savePlayList(playList)
 

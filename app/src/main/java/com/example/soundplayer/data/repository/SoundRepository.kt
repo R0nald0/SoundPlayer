@@ -7,12 +7,8 @@ import com.example.soundplayer.data.entities.toSongWithPlayListDomain
 import com.example.soundplayer.model.SongWithPlayListDomain
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.toSoundEntity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SoundRepository @Inject constructor(
@@ -40,7 +36,7 @@ class SoundRepository @Inject constructor(
             Sound(soundEntity)
         }
     }
-    suspend fun findAllSoundTiitle():List<String> = soundDao.findAllSoundTiitle()
+
     suspend fun delete(sound: Sound):Int{
       return  soundDao.deleteSound(sound.toSoundEntity())
     }

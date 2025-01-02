@@ -11,12 +11,9 @@ class SoundDomainService @Inject constructor(
       val linesModiefied  = sounds.map { sound->
             soundRepository.saveSound(sound)
         }
-
         return linesModiefied
     }
-    suspend fun findSoundById(idSound :Long?)= soundRepository.findSoundById(idSound = idSound)
     suspend fun findAllSound() = soundRepository.findAllSound()
-    suspend fun findAllSoundTiitle():List<String> = soundRepository.findAllSoundTiitle()
     suspend fun delete(sound: Sound)= soundRepository.delete(sound)
     suspend fun findSoundByTitle(title: String)= soundRepository.findSountByTitle(title)
 
