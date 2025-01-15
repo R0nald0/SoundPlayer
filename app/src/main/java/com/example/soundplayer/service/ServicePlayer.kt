@@ -39,7 +39,7 @@ class ServicePlayer @Inject constructor(
         }
     }
 
-    suspend  fun findPlayListById(id: Long): PlayList? {
+    suspend  fun findPlayListById(id: Long): PlayList {
         val orderBy = dataStorePreferenceRepository
             .readUserPrefference(key = Constants.ID_ORDERED_SONS_PREFFERENCE)
             .first() ?: 0
@@ -51,7 +51,7 @@ class ServicePlayer @Inject constructor(
         }
 
         val playListById = soundPlayListRepository.findPlayListById(id)
-        val listOrdered = ordernate(playListById!!.listSound, orderBy)
+        val listOrdered = ordernate(playListById.listSound, orderBy)
         return playListById.copy(listSound = listOrdered)
     }
 
@@ -117,7 +117,7 @@ class ServicePlayer @Inject constructor(
         val afectedLines = soundPlayListRepository.removeSoundItemFromPlayList(idPlayList, idSound)
         if (afectedLines != 0) {
             if (idPlayList == 1L) {
-                val soundById = soundRepository.findSoundById(idSound).toSound()
+                val soundById = soundRepository.findSoundById(idSound)
                 soundRepository.delete(soundById)
             }
             playerRepository.getAcutalPlayList()?.let { playlistCurrentlyPlaying ->

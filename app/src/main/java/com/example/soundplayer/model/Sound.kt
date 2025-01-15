@@ -30,7 +30,7 @@ data class Sound(
 }
 
 fun Sound.toSoundEntity()= SoundEntity(
-    soundId = this.idSound!!,
+    soundId = this.idSound,
     title = this.title,
     artistsName = artistName ?: "",
     albumName = albumName ?:"",
@@ -38,4 +38,5 @@ fun Sound.toSoundEntity()= SoundEntity(
     duration =this.duration,
     urlAlbumImage = this.uriMediaAlbum.toString(),
     urlMediaImage = this.uriMedia.toString(),
+    insertedDate = this.insertedDate ?: 0
 )

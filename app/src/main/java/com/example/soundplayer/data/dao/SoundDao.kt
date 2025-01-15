@@ -21,7 +21,7 @@ interface SoundDao {
     suspend  fun findSoundById(idSound:Long?):SoundEntity
 
     @Query(value = "SELECT * FROM sound WHERE title LIKE :title || '%'")
-      fun findSoundByName(title:String):Flow<List<SoundEntity>>
+      fun findSoundByName(title:String):Flow<SoundEntity>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend   fun updateSound(sound: SoundEntity)

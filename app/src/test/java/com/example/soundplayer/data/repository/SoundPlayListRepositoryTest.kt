@@ -236,7 +236,7 @@ class SoundPlayListRepositoryTest {
             soundOfPlayList = soundEntityList,
         )
 
-        Mockito.`when`(playlistAndSoundCrossDao.findPlayListById(Mockito.anyLong())).thenReturn(
+        Mockito.`when`(playListDAO.findPlayListById(Mockito.anyLong())).thenReturn(
             playListWithSong
         )
 
@@ -244,20 +244,20 @@ class SoundPlayListRepositoryTest {
 
         assertThat(result.name).isEqualTo("Teste")
         assertThat(result.listSound).isNotEmpty()
-        verify(playlistAndSoundCrossDao, times(1)).findPlayListById(Mockito.anyLong())
+        verify(playListDAO, times(1)).findPlayListById(Mockito.anyLong())
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test(expected = RepositoryException::class)
     fun `findPlayListById should launch NullPointerException when invalid id`()= runTest{
 
-        Mockito.`when`(playlistAndSoundCrossDao.findPlayListById(Mockito.anyLong())).thenThrow(NullPointerException())
+        Mockito.`when`(playListDAO.findPlayListById(Mockito.anyLong())).thenThrow(NullPointerException())
         try {
             soundPlayListRepository.findPlayListById(1)
        }catch (e:RepositoryException){
            assertThat(e.message).isEqualTo("Erro ao bucar playList,id inválido")
            assertThat(e).isInstanceOf(RepositoryException::class.java)
-           verify(playlistAndSoundCrossDao, times(1)).findPlayListById(Mockito.anyLong())
+           verify(playListDAO, times(1)).findPlayListById(Mockito.anyLong())
            throw e
        }
 

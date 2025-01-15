@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.soundplayer.R
 import com.example.soundplayer.databinding.FragmentSearchBinding
+import com.example.soundplayer.model.SongWithPlayListDomain
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.presentation.adapter.SearchAdapter
 import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
@@ -42,6 +43,7 @@ class SearchFragment : Fragment() {
 
     private var soundChosed : Sound? = null
     private var timer : Timer? =null
+   val listSoundSeaches= mutableListOf<SongWithPlayListDomain>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,10 +86,14 @@ class SearchFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             searchSoundViewModel.uiState.flowWithLifecycle(lifecycle)
                 .collect{uiState ->
-                    if (uiState.listSoundsSearch.isNotEmpty()){
+                    val songWithPlayListDomain = uiState.songWithPlayListDomain
+
+                    if (songWithPlayListDomain != null){
                         binding.rvItemSoundSearch.isVisible =true
                         binding.txvSoundEmpty.isVisible =false
-                        searchAdapter.getSoundOFSearch(uiState.listSoundsSearch)
+
+                        listSoundSeaches.add(songWithPlayListDomain)
+                        searchAdapter.getSoundOFSearch(listSoundSeaches)
                     }else{
                         searchAdapter.getSoundOFSearch(emptyList())
                         binding.rvItemSoundSearch.isVisible =false

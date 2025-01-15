@@ -6,7 +6,11 @@ import com.example.soundplayer.data.database.DatabasePlaylist
 import com.example.soundplayer.data.entities.SoundEntity
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -126,7 +130,6 @@ class SoundDaoTest {
         assertThat(result.title).isEqualTo("Song Two")
         assertThat(result.artistsName).isEqualTo("Artist Two")
         assertThat(result.path).isEqualTo("/music/song_two.mp3")
-
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -135,9 +138,9 @@ class SoundDaoTest {
         soundEntityList.forEach { soundDao.saveSound(it) }
 
         val result = soundDao.findSoundByName("Song")
-
-        assertThat(result.first().first().title).isEqualTo("Song One")
-        assertThat(result.first().size).isEqualTo(5)
+        val soundTest  = result.first()
+        result.cancellable()
+        assertThat(soundTest.title).isEqualTo("Song One")
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

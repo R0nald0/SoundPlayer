@@ -1,6 +1,5 @@
 package com.example.soundplayer.data.repository
 
-import android.util.Log
 import com.example.soundplayer.data.dao.PlayListDAO
 import com.example.soundplayer.data.dao.PlaylistAndSoundCrossDao
 import com.example.soundplayer.data.entities.PlayListAndSoundCrossEntity
@@ -62,7 +61,7 @@ class SoundPlayListRepository @Inject constructor(
 
     suspend fun findPlayListById(idPlayList: Long): PlayList {
         try {
-            val playListWithSong = playlistAndSoundCross.findPlayListById(idPlayList)
+            val playListWithSong = playListDAO.findPlayListById(idPlayList)
 
             return PlayList(
                 idPlayList = playListWithSong.playList.playListId,

@@ -19,14 +19,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class  StateUi(
-    val listSoundsSearch :List<SongWithPlayListDomain> = emptyList(),
-    val error : String? =null
+    val songWithPlayListDomain :SongWithPlayListDomain? = null,
+    val error : String? = null
 )
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val service: SoundDomainService
 ) : ViewModel() {
+
     private val _uiState = MutableStateFlow(StateUi())
     var uiState: StateFlow<StateUi> = _uiState.asStateFlow()
 
@@ -38,7 +39,7 @@ class SearchViewModel @Inject constructor(
         if (title.isEmpty()) {
             _uiState
                 .update {
-                it.copy(listSoundsSearch = emptyList())
+                it.copy(songWithPlayListDomain = null)
             }
             return
         }
@@ -57,9 +58,9 @@ class SearchViewModel @Inject constructor(
                     }
                     _loader.value = false
                 }
-                .collect { sounds ->
-                     _uiState.update {uiStateUpDate->
-                        uiStateUpDate.copy(listSoundsSearch = sounds)
+                .collect { songWithPlayListDomain ->
+                    _uiState.update {
+                          it.copy(songWithPlayListDomain = songWithPlayListDomain)
                      }
                     _loader.value = false
                 }
