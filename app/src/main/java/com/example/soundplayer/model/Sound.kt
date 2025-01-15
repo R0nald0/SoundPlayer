@@ -16,6 +16,7 @@ data class Sound(
     var uriMediaAlbum: String? =null,
     val insertedDate : Long?
 ):Parcelable{
+
     constructor(soundEntity: SoundEntity):this(
         idSound = soundEntity.soundId,
         artistName = soundEntity.artistsName,

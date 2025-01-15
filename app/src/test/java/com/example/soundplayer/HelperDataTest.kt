@@ -86,12 +86,12 @@ object HelperDataTest {
         PlayListAndSoundCrossEntity(1, 5),
         PlayListAndSoundCrossEntity(1, 22),
     )
-    fun listSoundWIthPlayLists() = listOf(
+    fun listSoundWIthPlayLists() = List(5) {
         SongWithPlaylists(
             song = soundEntityList().last(),
             playlists = listOfPlayListEtity()
         )
-    )
+    }
     fun listSound() = mutableSetOf(
         Sound(
             idSound = 1,

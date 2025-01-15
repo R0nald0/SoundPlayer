@@ -198,7 +198,7 @@ class PlayListViewModel @Inject constructor(
     fun updateSoundList(sounds : Set<Sound>){
         viewModelScope.launch {
             runCatching {
-                soundDomainService.saveSound(sounds)
+                soundDomainService.saveSounds(sounds)
             }.fold(
                 onSuccess = {item->
                      if (item.isNotEmpty()){

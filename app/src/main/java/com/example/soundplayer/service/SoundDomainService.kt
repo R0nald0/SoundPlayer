@@ -5,13 +5,13 @@ import com.example.soundplayer.model.Sound
 import javax.inject.Inject
 
 class SoundDomainService @Inject constructor(
-    private val soundRepository: SoundRepository,
+    private val soundRepository: SoundRepository
 ){
-    suspend fun saveSound(sounds: Set<Sound>) :List<Long> {
-      val linesModiefied  = sounds.map { sound->
-            soundRepository.saveSound(sound)
-        }
-        return linesModiefied
+    suspend fun saveSounds(sounds: Set<Sound>) :List<Long> {
+        val listOfAfectedsLines = sounds.map {
+            soundRepository.saveSound(sounds.first())
+         }
+        return listOfAfectedsLines
     }
     suspend fun findAllSound() = soundRepository.findAllSound()
     suspend fun delete(sound: Sound)= soundRepository.delete(sound)

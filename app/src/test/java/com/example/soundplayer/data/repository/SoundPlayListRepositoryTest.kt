@@ -3,13 +3,10 @@ package com.example.soundplayer.data.repository
 
 import com.example.soundplayer.data.dao.PlayListDAO
 import com.example.soundplayer.data.dao.PlaylistAndSoundCrossDao
-import com.example.soundplayer.data.dao.SoundDao
-import com.example.soundplayer.data.entities.PlayListAndSoundCrossEntity
 import com.example.soundplayer.data.entities.PlayListEntity
 import com.example.soundplayer.data.entities.PlayListWithSong
 import com.example.soundplayer.data.entities.SoundEntity
 import com.example.soundplayer.model.PlayList
-import com.example.soundplayer.model.PlaylistWithSoundDomain
 import com.example.soundplayer.model.Sound
 import com.example.soundplayer.model.toEntity
 import com.google.common.truth.Truth.assertThat
@@ -25,7 +22,6 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
-import java.sql.SQLException
 import java.util.Date
 
 @RunWith(MockitoJUnitRunner::class)
@@ -36,8 +32,6 @@ class SoundPlayListRepositoryTest {
     @Mock
     lateinit var playlistAndSoundCrossDao: PlaylistAndSoundCrossDao
 
-    @Mock
-    lateinit var soundDao: SoundDao
 
     private lateinit var soundPlayListRepository: SoundPlayListRepository
 
@@ -123,24 +117,6 @@ class SoundPlayListRepositoryTest {
             uriMedia = "",
             insertedDate = 2313231
         )
-    )
-    private val lisfOfPlayListWithSoundDomain = List(10) {
-        PlaylistWithSoundDomain(
-            soundOfPlayList = mutableSetOf<Sound>(),
-            playList = PlayList(
-                idPlayList = null,
-                listSound = mutableSetOf(),
-                name = "Teste",
-                currentMusicPosition = 1,
-            )
-        )
-    }
-    private val listPlayListAndSoundCrossEntity = listOf(
-        PlayListAndSoundCrossEntity(1, 1),
-        PlayListAndSoundCrossEntity(1, 2),
-        PlayListAndSoundCrossEntity(1, 4),
-        PlayListAndSoundCrossEntity(1, 5),
-        PlayListAndSoundCrossEntity(1, 22),
     )
 
     @Before
@@ -263,6 +239,7 @@ class SoundPlayListRepositoryTest {
 
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
      fun `deletePlaylist Should delete playlist `() = runTest{
          val playListEntity =playList.toEntity().copy(playListId = 1)
@@ -276,6 +253,7 @@ class SoundPlayListRepositoryTest {
          verify(playlistAndSoundCrossDao, times(1)).deletePlayListAndSoundCrossByIdPlayList(1L)
      }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test(expected = RepositoryException::class)
     fun `deletePlaylist should launch NullPointerException when id notFound or invalid`()= runTest {
         val playListEntity =playList.toEntity()
@@ -294,6 +272,7 @@ class SoundPlayListRepositoryTest {
 
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
    fun `addSountToPlayList should add sound in playlist` ()= runTest{
 
@@ -306,6 +285,7 @@ class SoundPlayListRepositoryTest {
         verify(playlistAndSoundCrossDao, times(1)).insertPlayListAndSoundCroos(Mockito.anyList())
    }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test(expected = RepositoryException::class)
     fun `addSountToPlayList should launch NullPointerException when id is invalid` ()= runTest{
 
@@ -322,6 +302,7 @@ class SoundPlayListRepositoryTest {
 
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `removeSoundItemFromPlayList should remove Sound in to PlayList`()= runTest {
         Mockito.`when`(playlistAndSoundCrossDao.deleteItemPlayListAndSoundCroos(Mockito.anyLong(),Mockito.anyLong())).thenReturn(1)
@@ -331,6 +312,7 @@ class SoundPlayListRepositoryTest {
         verify(playlistAndSoundCrossDao, times(1)).deleteItemPlayListAndSoundCroos(Mockito.anyLong(),Mockito.anyLong())
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test(expected = RepositoryException::class)
     fun `removeSoundItemFromPlayList should lauch NullPointerException when id invalid`()= runTest {
         Mockito.`when`(playlistAndSoundCrossDao.deleteItemPlayListAndSoundCroos(Mockito.anyLong(),Mockito.anyLong())).thenThrow(NullPointerException())
@@ -344,6 +326,7 @@ class SoundPlayListRepositoryTest {
          }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `updateNamePlayList should update name of the playlist `()= runTest {
          Mockito.`when`(playListDAO.updateNamePlayList(Mockito.anyLong(),Mockito.anyString())).thenReturn(1)
@@ -353,6 +336,7 @@ class SoundPlayListRepositoryTest {
         verify(playListDAO, times(1)).updateNamePlayList(Mockito.anyLong(),Mockito.anyString())
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test(expected = RepositoryException::class)
     fun `updateNamePlayList should launch NullPointer if id invalid`()= runTest {
         Mockito.`when`(playListDAO.updateNamePlayList(Mockito.anyLong(),Mockito.anyString())).thenThrow(NullPointerException("erro id"))
