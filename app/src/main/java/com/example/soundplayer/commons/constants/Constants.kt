@@ -5,13 +5,13 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 
 object Constants {
-     const val DATABASE_NAME ="playlist_database"
-     const val  ALL_MUSIC_NAME ="Todas as músicas"
-     const val  PREFERENCE_NAME ="settings"
+    const val DATABASE_NAME = "playlist_database"
+    const val ALL_MUSIC_NAME = "Todas as m\u00fasicas"
+    const val PREFERENCE_NAME = "settings"
 
-      val POSITION_KEY = intPreferencesKey("postionKey")
-      val ID_PLAYLIST_KEY = longPreferencesKey("playlist")
-      val ID_DARK_MODE_KEY = intPreferencesKey("isDarkMode")
-      val ID_SIZE_TEXT_TITLE_MUSIC= floatPreferencesKey("sizeTextTitleMusic")
-     val  ID_ORDERED_SONS_PREFFERENCE = intPreferencesKey("orderedKey")
+    val POSITION_KEY = intPreferencesKey("postionKey")
+    val ID_PLAYLIST_KEY = longPreferencesKey("playlist")
+    val ID_DARK_MODE_KEY = intPreferencesKey("isDarkMode")
+    val ID_SIZE_TEXT_TITLE_MUSIC = floatPreferencesKey("sizeTextTitleMusic")
+    val ID_ORDERED_SOUNDS_PREFERENCE = intPreferencesKey("orderedKey")
 }

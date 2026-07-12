@@ -13,3 +13,12 @@
 .externalNativeBuild
 .cxx
 local.properties
+.kotlin/
+gradle/truststore/
+/.idea/AndroidProjectSystem.xml
+/.idea/androidTestResultsUserPreferences.xml
+/.idea/appInsightsSettings.xml
+/.idea/deploymentTargetSelector.xml
+/.idea/deviceManager.xml
+/.idea/other.xml
+/.idea/runConfigurations.xml

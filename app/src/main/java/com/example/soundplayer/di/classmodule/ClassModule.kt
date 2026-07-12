@@ -17,6 +17,9 @@ import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.data.repository.PlayerRepository
 import com.example.soundplayer.data.repository.SoundPlayListRepository
 import com.example.soundplayer.data.repository.SoundRepository
+import com.example.soundplayer.service.DeviceSoundSyncService
+import com.example.soundplayer.service.PlaybackController
+import com.example.soundplayer.service.PlaylistOrderingService
 import com.example.soundplayer.service.ServicePlayer
 import dagger.Module
 import dagger.Provides
@@ -34,69 +37,84 @@ class ClassModule {
     @Singleton
     @Provides
     fun provideServicePlayer(
-        playerRepository: PlayerRepository,
+        playerRepository: PlaybackController,
         soundRepository: SoundRepository,
         soundPlayListRepository: SoundPlayListRepository,
-        dataStorePreferenceRepository: DataStorePreferenceRepository
-    ) :ServicePlayer{
-        return  ServicePlayer(playerRepository,soundPlayListRepository,soundRepository,dataStorePreferenceRepository)
-    }
-    @Singleton
-    @Provides
-    fun providePlayerRepository(exoPlayer: ExoPlayer):PlayerRepository = PlayerRepository(exoPlayer)
+        dataStorePreferenceRepository: DataStorePreferenceRepository,
+        playlistOrderingService: PlaylistOrderingService,
+        deviceSoundSyncService: DeviceSoundSyncService,
+    ): ServicePlayer =
+        ServicePlayer(
+            playerRepository,
+            soundPlayListRepository,
+            soundRepository,
+            dataStorePreferenceRepository,
+            playlistOrderingService,
+            deviceSoundSyncService,
+        )
 
     @Singleton
     @Provides
-    fun provideDataStore( @ApplicationContext context :Context) :DataStore<Preferences> {
-        return  PreferenceDataStoreFactory.create(
-                corruptionHandler = ReplaceFileCorruptionHandler(
-                    produceNewData = { emptyPreferences() }
+    fun providePlayerRepository(exoPlayer: ExoPlayer): PlayerRepository = PlayerRepository(exoPlayer)
+
+    @Singleton
+    @Provides
+    fun providePlaybackController(playerRepository: PlayerRepository): PlaybackController = playerRepository
+
+    @Singleton
+    @Provides
+    fun provideDataStore(
+        @ApplicationContext context: Context,
+    ): DataStore<Preferences> =
+        PreferenceDataStoreFactory.create(
+            corruptionHandler =
+                ReplaceFileCorruptionHandler(
+                    produceNewData = { emptyPreferences() },
                 ),
-                scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-                produceFile = { context.preferencesDataStoreFile(Constants.PREFERENCE_NAME) }
-            )
-    }
+            scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+            produceFile = { context.preferencesDataStoreFile(Constants.PREFERENCE_NAME) },
+        )
 
     @Provides
-    fun provideDataStorePreferenceRespository(dataStore: DataStore<Preferences>):DataStorePreferenceRepository{
-          return  DataStorePreferenceRepository(dataStore)
-    }
+    fun provideDataStorePreferenceRespository(dataStore: DataStore<Preferences>): DataStorePreferenceRepository =
+        DataStorePreferenceRepository(dataStore)
 
     @Singleton
     @Provides
-    fun provideExoPlayer(@ApplicationContext context : Context):ExoPlayer{
-        return  ExoPlayer.Builder(context)
+    fun provideExoPlayer(
+        @ApplicationContext context: Context,
+    ): ExoPlayer =
+        ExoPlayer
+            .Builder(context)
             .build()
-    }
 
     @Provides
-    fun providePlayListDao(databasePlaylist: DatabasePlaylist):PlayListDAO{
-        return databasePlaylist.playlistDao()
-    }
-    @Provides
-    fun provideSoundDao(databasePlaylist: DatabasePlaylist):SoundDao{
-        return databasePlaylist.soundDao()
-    }
+    fun providePlayListDao(databasePlaylist: DatabasePlaylist): PlayListDAO = databasePlaylist.playlistDao()
 
     @Provides
-    fun providePlaylistAndSoundCross(databasePlaylist: DatabasePlaylist):PlaylistAndSoundCrossDao{
-        return  databasePlaylist.playListAndSoundCrossDao()
-    }
+    fun provideSoundDao(databasePlaylist: DatabasePlaylist): SoundDao = databasePlaylist.soundDao()
+
+    @Provides
+    fun providePlaylistAndSoundCross(databasePlaylist: DatabasePlaylist): PlaylistAndSoundCrossDao =
+        databasePlaylist.playListAndSoundCrossDao()
 
     @Singleton
     @Provides
     fun provideSoundPlayListRepository(
-        playListDAO: PlayListDAO ,
-        playlistAndSoundCross : PlaylistAndSoundCrossDao
-    ):SoundPlayListRepository{
-         return  SoundPlayListRepository(playListDAO, playlistAndSoundCross)
-    }
+        playListDAO: PlayListDAO,
+        playlistAndSoundCross: PlaylistAndSoundCrossDao,
+    ): SoundPlayListRepository = SoundPlayListRepository(playListDAO, playlistAndSoundCross)
 
     @Singleton
     @Provides
-    fun provideSoundRepository(soundDao: SoundDao,playListCrossSounddao : PlaylistAndSoundCrossDao):SoundRepository = SoundRepository(soundDao,playListCrossSounddao )
+    fun provideSoundRepository(
+        soundDao: SoundDao,
+        playListCrossSounddao: PlaylistAndSoundCrossDao,
+    ): SoundRepository = SoundRepository(soundDao, playListCrossSounddao)
 
     @Singleton
     @Provides
-    fun provideRoomDatabase(@ApplicationContext context: Context):DatabasePlaylist = DatabasePlaylist.getInstance(context)
+    fun provideRoomDatabase(
+        @ApplicationContext context: Context,
+    ): DatabasePlaylist = DatabasePlaylist.getInstance(context)
 }

@@ -11,16 +11,16 @@ import com.example.soundplayer.model.Sound
 )
 data class PlayListEntity(
     @PrimaryKey(autoGenerate = true)
-    val playListId:Long?,
+    val playListId: Long?,
     @ColumnInfo(name = "current_sound_position")
-    val currentSoundPosition : Int = 0,
-    val title :String ,
+    val currentSoundPosition: Int = 0,
+    val title: String,
 )
 
-
-fun PlayListEntity.toPlayList()= PlayList(
-    idPlayList = this.playListId,
-    name = this.title,
-    currentMusicPosition = this.currentSoundPosition,
-    listSound= mutableSetOf<Sound>(),
-)
+fun PlayListEntity.toPlayList() =
+    PlayList(
+        idPlayList = this.playListId,
+        name = this.title,
+        currentMusicPosition = this.currentSoundPosition,
+        listSound = mutableSetOf<Sound>(),
+    )
