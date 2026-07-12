@@ -5,60 +5,60 @@ import android.content.pm.PackageManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.ContextCompat
+import com.example.soundplayer.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class Permission {
-
-    companion object{
-        fun verifyIfPermissionHasDenied( activity :Activity,permission :String, gerenciarPermissoes: ActivityResultLauncher<Array<String>> , listPemissions:Set<String>,onPositiveBotton :()->Unit){
-            if (shouldShowRequestPermissionRationale(activity ,permission)){
-               MaterialAlertDialogBuilder(activity)
-                   .setTitle("Permissão Necessária")
-                   .setMessage("Precisamos da sua permissão para accessar as mídias de audio do aparelho")
-                    .setPositiveButton("Aceitar"){diolog,n->
-                         onPositiveBotton()
-                        diolog.dismiss()
-                    }
-                    .setNegativeButton("Negar"){diolog,n->
-                        diolog.dismiss()
-                    }
-                   .show()
-            }else{
-                gerenciarPermissoes.launch(listPemissions.toTypedArray())
+    companion object {
+        fun requestWithRationaleIfNeeded(
+            activity: Activity,
+            permission: String,
+            gerenciarPermissoes: ActivityResultLauncher<Array<String>>,
+            permissions: Set<String>,
+            onPositiveButton: () -> Unit,
+        ) {
+            if (shouldShowRequestPermissionRationale(activity, permission)) {
+                MaterialAlertDialogBuilder(activity)
+                    .setTitle(activity.getString(R.string.permission_required_title))
+                    .setMessage(activity.getString(R.string.permission_required_audio_message))
+                    .setPositiveButton(activity.getString(R.string.accept)) { dialog, _ ->
+                        onPositiveButton()
+                        dialog.dismiss()
+                    }.setNegativeButton(activity.getString(R.string.deny)) { dialog, _ ->
+                        dialog.dismiss()
+                    }.show()
+            } else {
+                gerenciarPermissoes.launch(permissions.toTypedArray())
             }
         }
 
-        fun chekPerMission(context : Activity,listPemissions: Set<String>):List<String>{
-           val lit= listPemissions.filter {
-               ContextCompat.checkSelfPermission(context,it) == PackageManager.PERMISSION_DENIED
-            }
-            return lit
-        }
-
-        fun getPermissions(permission: Map<String, Boolean>):Boolean{
-            if (permission.values.contains(false)) {
-                return false
-            }
-            return  true
-        }
-        fun  requestPermission(
+        fun checkPermissions(
             context: Activity,
-            gerenciarPermissoes: ActivityResultLauncher<Array<String>> ,
-            listPemissions:Set<String>
-        ){
-            val l = chekPerMission(context,listPemissions)
-            if (l.isEmpty()) return
-            verifyIfPermissionHasDenied(
+            permissions: Set<String>,
+        ): List<String> =
+            permissions.filter {
+                ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_DENIED
+            }
+
+        fun getPermissions(permission: Map<String, Boolean>): Boolean = !permission.values.contains(false)
+
+        fun requestPermission(
+            context: Activity,
+            gerenciarPermissoes: ActivityResultLauncher<Array<String>>,
+            permissions: Set<String>,
+        ) {
+            val missingPermissions = checkPermissions(context, permissions)
+            if (missingPermissions.isEmpty()) return
+
+            requestWithRationaleIfNeeded(
                 activity = context,
-                permission = l[0],
+                permission = missingPermissions.first(),
                 gerenciarPermissoes = gerenciarPermissoes,
-                listPemissions = listPemissions,
-                onPositiveBotton = {
-                    gerenciarPermissoes.launch(l.toTypedArray())
-                 }
+                permissions = permissions,
+                onPositiveButton = {
+                    gerenciarPermissoes.launch(missingPermissions.toTypedArray())
+                },
             )
         }
-
     }
-
 }

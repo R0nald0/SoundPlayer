@@ -1,93 +1,106 @@
 package com.example.soundplayer.presentation
 
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.graphics.ColorUtils
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import com.example.soundplayer.R
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.soundplayer.commons.extension.checkThemeMode
 import com.example.soundplayer.commons.extension.exibirToast
-import com.example.soundplayer.databinding.ActivityMainBinding
+import com.example.soundplayer.presentation.navigation.SoundPlayerNavHost
+import com.example.soundplayer.presentation.theme.SoundPlayerPreferenceTheme
+import com.example.soundplayer.presentation.viewmodel.PlayListViewModel
+import com.example.soundplayer.presentation.viewmodel.PreferencesIntent
 import com.example.soundplayer.presentation.viewmodel.PreferencesViewModel
+import com.example.soundplayer.presentation.viewmodel.SearchViewModel
+import com.example.soundplayer.presentation.viewmodel.SoundIntent
 import com.example.soundplayer.presentation.viewmodel.SoundViewModel
-import com.example.soundplayer.presentation.viewmodel.StatePrefre
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private val binding by lazy {
-        ActivityMainBinding.inflate(layoutInflater)
-    }
-
-    private val  soundViewModel by viewModels<SoundViewModel>()
+    private val soundViewModel by viewModels<SoundViewModel>()
+    private val playListViewModel by viewModels<PlayListViewModel>()
+    private val searchViewModel by viewModels<SearchViewModel>()
     private val preferencesViewModel by viewModels<PreferencesViewModel>()
     private var isLoading = true
-    private lateinit var  navController : NavController
-    private lateinit var appBarConfiguration :AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen().apply {
-            setKeepOnScreenCondition{
-                isLoading
-            }
+            setKeepOnScreenCondition { isLoading }
         }
-        setContentView(binding.root)
-        getNavHost()
-        observer()
-        setupNavitionBarColor()
-    }
-
-    private fun setupNavitionBarColor() {
-        val color = 0xffFF400404
-        window.navigationBarColor = ColorUtils.setAlphaComponent(color.toInt(), 230)
+        setupComposeContent()
+        collectState()
+        setupNavigationBarColor()
     }
 
     override fun onStart() {
-        preferencesViewModel.readDarkModePreference()
         super.onStart()
-        soundViewModel.updateAudioFocos()
+        preferencesViewModel.onIntent(PreferencesIntent.ReadDarkMode)
+        soundViewModel.onIntent(SoundIntent.UpdateAudioFocus)
     }
 
-    private fun observer(){
-           preferencesViewModel.isDarkMode.observe(this){statePreference->
-                when(statePreference){
-                    is StatePrefre.Sucess<*> ->{
-                       val result =  statePreference.succssResult as Int
-                        when(result){
-                            0 ->{ AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) }
-                            1-> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                            2 -> {
-                               this.checkThemeMode()
-                            }
-                        }
-                    }
-                    is StatePrefre.Error ->{
-                        exibirToast(statePreference.mensagem)
+    override fun onStop() {
+        super.onStop()
+        soundViewModel.uiState.value.currentPlayList?.idPlayList?.let { id ->
+            preferencesViewModel.onIntent(PreferencesIntent.SavePlaylistId(id))
+        }
+    }
+
+    private fun collectState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    preferencesViewModel.uiState.collect { state ->
+                        applyDarkMode(state.darkMode)
+                        isLoading = false
                     }
                 }
-               isLoading =false
+                launch {
+                    preferencesViewModel.uiEvent.collect { event ->
+                        when (event) {
+                            is com.example.soundplayer.presentation.viewmodel.PreferencesUiEvent.ShowError ->
+                                exibirToast(event.message)
+                        }
+                    }
+                }
             }
-
-    }
-
-    private fun getNavHost() {
-        val navHost = supportFragmentManager.findFragmentById(R.id.myHostFragment) as NavHostFragment
-        navController = navHost.navController
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-    }
-    override fun onStop() {
-        val idPlayList = soundViewModel.currentPlayList.value?.idPlayList
-        if (idPlayList  !=  null){
-            preferencesViewModel.savePlayListIdPlayList(idPlayList)
         }
-
-        super.onStop()
     }
 
+    private fun applyDarkMode(mode: Int) {
+        when (mode) {
+            0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            2 -> checkThemeMode()
+        }
+    }
+
+    private fun setupComposeContent() {
+        setContent {
+            val preferencesState = preferencesViewModel.uiState.collectAsStateWithLifecycle()
+            SoundPlayerPreferenceTheme(darkMode = preferencesState.value.darkMode) {
+                SoundPlayerNavHost(
+                    playListViewModel = playListViewModel,
+                    soundViewModel = soundViewModel,
+                    preferencesViewModel = preferencesViewModel,
+                    searchViewModel = searchViewModel,
+                )
+            }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun setupNavigationBarColor() {
+        val color = 0xffFF400404
+        window.navigationBarColor = ColorUtils.setAlphaComponent(color.toInt(), 230)
+    }
 }

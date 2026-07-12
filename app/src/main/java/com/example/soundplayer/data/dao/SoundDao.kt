@@ -12,19 +12,20 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SoundDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend  fun saveSound(sound : SoundEntity):Long
+    suspend fun saveSound(sound: SoundEntity): Long
 
     @Query(value = "SELECT * FROM sound")
-    suspend  fun findAllSound():List<SoundEntity>
+    suspend fun findAllSound(): List<SoundEntity>
 
     @Query(value = "SELECT * FROM sound WHERE soundId = :idSound")
-    suspend  fun findSoundById(idSound:Long?):SoundEntity
+    suspend fun findSoundById(idSound: Long?): SoundEntity
 
     @Query(value = "SELECT * FROM sound WHERE title LIKE :title || '%'")
-      fun findSoundByName(title:String):Flow<SoundEntity>
+    fun findSoundByName(title: String): Flow<SoundEntity>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend   fun updateSound(sound: SoundEntity)
+    suspend fun updateSound(sound: SoundEntity)
+
     @Delete
-    suspend  fun deleteSound( sound: SoundEntity):Int
+    suspend fun deleteSound(sound: SoundEntity): Int
 }

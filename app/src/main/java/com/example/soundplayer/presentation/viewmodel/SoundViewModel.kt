@@ -1,134 +1,125 @@
 package com.example.soundplayer.presentation.viewmodel
 
-
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.AudioAttributes
 import androidx.media3.exoplayer.ExoPlayer
-import com.example.soundplayer.commons.execptions.PlayBackErrorException
-import com.example.soundplayer.data.entities.UserDataPreferecence
 import com.example.soundplayer.data.repository.DataStorePreferenceRepository
 import com.example.soundplayer.model.PlayList
-import com.example.soundplayer.model.Sound
 import com.example.soundplayer.service.ServicePlayer
-import com.example.soundplayer.service.UserPrefferencesService
+import com.example.soundplayer.service.UserPreferencesService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SoundViewModel @Inject constructor(
-    private  val dataStorePreferenceRepository: DataStorePreferenceRepository,
-    private val userPrefferencesService: UserPrefferencesService,
-    private val servicePlayer: ServicePlayer
-) :ViewModel(){
+class SoundViewModel
+    @Inject
+    constructor(
+        private val dataStorePreferenceRepository: DataStorePreferenceRepository,
+        private val userPreferencesService: UserPreferencesService,
+        private val servicePlayer: ServicePlayer,
+    ) : ViewModel() {
+        private val tag = "SoundViewModel"
 
-    var actualSound  : LiveData<Sound> ? = null
-    lateinit var playBackError  : LiveData<PlayBackErrorException?>
-    var isPlayingObserver  = MutableLiveData<Boolean>()
+        private val _uiState = MutableStateFlow(SoundUiState())
+        val uiState: StateFlow<SoundUiState> = _uiState.asStateFlow()
 
-    private var _currentPlayingPlayList = MutableLiveData<PlayList>()
-    val currentPlayList :LiveData<PlayList> =_currentPlayingPlayList
+        private val _uiEvent = MutableSharedFlow<SoundUiEvent>()
+        val uiEvent: SharedFlow<SoundUiEvent> = _uiEvent.asSharedFlow()
 
-    private val _userDataPreferecenceObs = MutableLiveData<UserDataPreferecence>()
-    val userDataPreferecence : LiveData<UserDataPreferecence>
-        get() = _userDataPreferecenceObs
+        // Acesso direto ao player necessário para o Media3 PlayerView
+        val player: ExoPlayer get() = servicePlayer.getPlayer()
 
-    lateinit var myPlayer :ExoPlayer
-
-    init {
-         getPlayer()
-         isPlaying()
-         getActualSound()
-         getPlayback()
-    }
-
-
-    fun getPlayback() {
-        viewModelScope.launch {
-            playBackError = servicePlayer.getPlayBackError()
+        init {
+            observePlayerState()
         }
-    }
-    fun getCurrentPositionSound():Int{
-      return  _currentPlayingPlayList.value?.currentMusicPosition ?: 0
-    }
-    fun getActualSound()
-        { viewModelScope.launch { actualSound = servicePlayer.getActualSound() } }
 
-    private fun isPlaying()  {
-        viewModelScope.launch { isPlayingObserver = servicePlayer.isiPlaying() }
-    }
-
-    fun getActualPlayList() {
-        viewModelScope.launch {
-            _currentPlayingPlayList.value =  servicePlayer.getActualPlayList()
+        fun onIntent(intent: SoundIntent) {
+            when (intent) {
+                is SoundIntent.PlayPlayList -> playPlayList(intent.playList)
+                is SoundIntent.LoadActualPlayList -> loadActualPlayList()
+                is SoundIntent.UpdateAudioFocus -> updateAudioFocus()
+                is SoundIntent.SavePreference -> savePreference()
+            }
         }
-    }
-    fun setPlayListToPlay(playList: PlayList) = viewModelScope.launch {
-          runCatching {
-             servicePlayer.playPlaylist(playList)
-          }.fold(
-              onSuccess = {currentPlayList ->
-                  if (currentPlayList != null ){
-                      _currentPlayingPlayList.value = currentPlayList!!
-                      savePreference()
-                      getActualSound()
-                      isPlaying()
-                  }
-              },
-              onFailure = {erro ->
-                  Log.e("INFO_", "savePreference: erro ao salvar preferencias ${erro.message}")
-              }
-          )
-       }
-    fun savePreference(){
-        viewModelScope.launch {
-            runCatching {
-                if(_currentPlayingPlayList.value != null){
-                    dataStorePreferenceRepository
-                        .savePreference(
-                            playlistKeyId =  _currentPlayingPlayList.value!!.idPlayList,
-                            positionSoundKey = _currentPlayingPlayList.value!!.currentMusicPosition
+
+        fun currentSoundPosition(): Int = _uiState.value.currentPlayList?.currentMusicPosition ?: 0
+
+        private fun observePlayerState() {
+            viewModelScope.launch {
+                servicePlayer
+                    .getPlaybackState()
+                    .collect { playbackState ->
+                        _uiState.update {
+                            it.copy(
+                                currentSound = playbackState.currentSound,
+                                currentPlayList = playbackState.currentPlayList,
+                                isPlaying = playbackState.isPlaying,
+                            )
+                        }
+                    }
+            }
+            viewModelScope.launch {
+                servicePlayer
+                    .getPlaybackError()
+                    .collect { error ->
+                        _uiEvent.emit(
+                            SoundUiEvent.PlaybackError(
+                                message = error.message ?: "Erro de reprodução",
+                                data = error.dataSoundPlayListToUpdate,
+                            ),
                         )
-                }
-            }.fold(
-                onSuccess = {
-                    readPreferences()
-                },
-                onFailure = {
-                    Log.i("INFO_", "savePreference: erro ao salvar preferencias ${it.message}")
-                }
-            )
+                    }
+            }
+        }
+
+        private fun playPlayList(playList: PlayList) {
+            viewModelScope.launch {
+                runCatching { servicePlayer.playPlaylist(playList) }
+                    .onSuccess { currentPlayList ->
+                        if (currentPlayList != null) {
+                            _uiState.update { it.copy(currentPlayList = currentPlayList) }
+                            savePreference()
+                        }
+                    }.onFailure { Log.e(tag, "playPlayList: ${it.message}") }
+            }
+        }
+
+        private fun loadActualPlayList() {
+            _uiState.update { it.copy(currentPlayList = servicePlayer.getActualPlayList()) }
+        }
+
+        private fun updateAudioFocus() {
+            player.setAudioAttributes(AudioAttributes.DEFAULT, true)
+        }
+
+        private fun savePreference() {
+            viewModelScope.launch {
+                val currentPlayList = _uiState.value.currentPlayList ?: return@launch
+                runCatching {
+                    dataStorePreferenceRepository.savePreference(
+                        playlistKeyId = currentPlayList.idPlayList,
+                        positionSoundKey = currentPlayList.currentMusicPosition,
+                    )
+                }.onSuccess { readPreferences() }
+                    .onFailure { Log.e(tag, "savePreference: ${it.message}") }
+            }
+        }
+
+        private fun readPreferences() {
+            viewModelScope.launch {
+                runCatching { userPreferencesService.readAppAllPreferences() }
+                    .onSuccess { prefs -> _uiState.update { it.copy(preferences = prefs) } }
+                    .onFailure { Log.e(tag, "readPreferences: ${it.message}") }
+            }
         }
     }
-
-      private fun readPreferences(){
-         viewModelScope.launch {
-             runCatching {
-                 userPrefferencesService.readAppAllPrefferences()
-             }.fold(
-                 onSuccess = {readAllPreferecenceData->
-                     _userDataPreferecenceObs.value = readAllPreferecenceData
-                     Log.d("INFO_", "readPreferences: $readAllPreferecenceData")
-                 },
-                 onFailure = {
-                     Log.i("Play_", "readPreferences: erro ao ler dados da store : ${it.message}")
-                 }
-             )
-         }
-    }
-
-     fun getPlayer() {
-        myPlayer = servicePlayer.getPlayer()
-    }
-
-    fun updateAudioFocos(){
-        myPlayer.setAudioAttributes(
-            AudioAttributes.DEFAULT,true
-        )
-    }
-
-}

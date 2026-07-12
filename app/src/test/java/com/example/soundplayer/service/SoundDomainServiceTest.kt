@@ -6,101 +6,139 @@ import com.example.soundplayer.data.repository.SoundRepository
 import com.example.soundplayer.model.SongWithPlayListDomain
 import com.example.soundplayer.model.Sound
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
-import org.mockito.junit.MockitoJUnitRunner
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 
-@RunWith(MockitoJUnitRunner::class)
+@DisplayName("SoundDomainService")
 class SoundDomainServiceTest {
-
-    @Mock
-    lateinit var soundRepository: SoundRepository
-
+    private val soundRepository: SoundRepository = mockk()
     private lateinit var soundDomainService: SoundDomainService
 
-    @Before
+    @BeforeEach
     fun setUp() {
-        MockitoAnnotations.openMocks(this)
         soundDomainService = SoundDomainService(soundRepository)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `Given a Set of sound,When saveSounds is executed,should save sounds and return list of long`()= runTest {
-        val soundSave = HelperDataTest.listSound().first()
-        val listSounds = HelperDataTest.listSound()
+    @Nested
+    @DisplayName("saveSounds")
+    inner class SaveSoundsTest {
+        @Test
+        fun `dado set com sons distintos, quando saveSounds, entao salva cada som individualmente`() =
+            runTest {
+                val sounds = HelperDataTest.listSound()
+                coEvery { soundRepository.saveSound(any()) } returns 1L
 
-        Mockito.`when`(soundRepository.saveSound(soundSave)).thenReturn(1)
+                soundDomainService.saveSounds(sounds)
 
-        val resultLong = soundDomainService.saveSounds(listSounds)
-
-         assertThat(resultLong.size).isEqualTo(2)
-
-
-         verify(soundRepository, times(2)).saveSound(soundSave)
-    }
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `When findAllSound is executed,Should find all songs`() = runTest {
-        Mockito.`when`(soundRepository.findAllSound()).thenReturn(HelperDataTest.listSound().toList())
-
-        val results = soundDomainService.findAllSound()
-
-        assertThat(results.size).isEqualTo(2)
-        assertThat(results.first()).isInstanceOf(Sound::class.java)
-        verify(soundRepository, times(1)).findAllSound()
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `Given a sound,When delete is executed,Should remove sound and return number of afected line`() = runTest {
-        val sound = HelperDataTest.listSound().first()
-
-        Mockito.`when`(soundRepository.delete(sound)).thenReturn(1)
-
-        val results = soundDomainService.delete(sound)
-
-        assertThat(results).isEqualTo(1)
-        verify(soundRepository, times(1)).delete(sound)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `Given a  title,When findSoundByTitle is executed,Should find  Flow of SongWithPlayListDomain with this title`() = runTest {
-
-        val flowSoundWithPlayListDomain =  flow {
-            HelperDataTest.listSoundWIthPlayLists().forEach {
-                emit(it.toSongWithPlayListDomain())
+                sounds.forEach { sound ->
+                    coVerify(exactly = 1) { soundRepository.saveSound(sound) }
+                }
             }
-        }
-        Mockito.`when`(soundRepository.findSountByTitle(Mockito.anyString())).thenReturn(flowSoundWithPlayListDomain)
 
-        val result = soundDomainService.findSoundByTitle("son")
+        @Test
+        fun `dado set com 2 sons, quando saveSounds, entao retorna lista com 2 ids`() =
+            runTest {
+                val sounds = HelperDataTest.listSound()
+                coEvery { soundRepository.saveSound(any()) } returns 1L
 
-        assertThat(result.toList().size).isEqualTo(5)
-        assertThat(result.first()).isInstanceOf(SongWithPlayListDomain::class.java)
-        assertThat(result.last().sound.title).isEqualTo("Song Five")
-        verify(soundRepository, times(1)).findSountByTitle(Mockito.anyString())
+                val result = soundDomainService.saveSounds(sounds)
+
+                assertThat(result).hasSize(2)
+            }
+
+        @Test
+        fun `dado set vazio, quando saveSounds, entao retorna lista vazia sem chamar repositorio`() =
+            runTest {
+                val result = soundDomainService.saveSounds(emptySet())
+
+                assertThat(result).isEmpty()
+                coVerify(exactly = 0) { soundRepository.saveSound(any()) }
+            }
+
+        @Test
+        fun `dado set com 3 sons, quando saveSounds, entao nao salva o mesmo som mais de uma vez`() =
+            runTest {
+                val sound1 = HelperDataTest.listSound().elementAt(0)
+                val sound2 = HelperDataTest.listSound().elementAt(1)
+                val sound3 =
+                    Sound(
+                        idSound = 3L,
+                        title = "Terceira música",
+                        duration = "2:00",
+                        albumName = "Album",
+                        artistName = "Artista",
+                        path = "path3",
+                        insertedDate = 111L,
+                    )
+                val sounds = setOf(sound1, sound2, sound3)
+                coEvery { soundRepository.saveSound(any()) } returns 1L
+
+                soundDomainService.saveSounds(sounds)
+
+                coVerify(exactly = 1) { soundRepository.saveSound(sound1) }
+                coVerify(exactly = 1) { soundRepository.saveSound(sound2) }
+                coVerify(exactly = 1) { soundRepository.saveSound(sound3) }
+            }
     }
 
+    @Nested
+    @DisplayName("findAllSound")
+    inner class FindAllSoundTest {
+        @Test
+        fun `quando findAllSound, entao retorna lista de sons do repositorio`() =
+            runTest {
+                val expected = HelperDataTest.listSound().toList()
+                coEvery { soundRepository.findAllSound() } returns expected
 
+                val result = soundDomainService.findAllSound()
 
+                assertThat(result).hasSize(2)
+                assertThat(result.first()).isInstanceOf(Sound::class.java)
+                coVerify(exactly = 1) { soundRepository.findAllSound() }
+            }
+    }
 
+    @Nested
+    @DisplayName("delete")
+    inner class DeleteTest {
+        @Test
+        fun `dado um som valido, quando delete, entao remove e retorna linhas afetadas`() =
+            runTest {
+                val sound = HelperDataTest.listSound().first()
+                coEvery { soundRepository.delete(sound) } returns 1
 
-    @After
-    fun tearDown() {
+                val result = soundDomainService.delete(sound)
+
+                assertThat(result).isEqualTo(1)
+                coVerify(exactly = 1) { soundRepository.delete(sound) }
+            }
+    }
+
+    @Nested
+    @DisplayName("findSoundByTitle")
+    inner class FindSoundByTitleTest {
+        @Test
+        fun `dado um titulo, quando findSoundByTitle, entao retorna flow com sons correspondentes`() =
+            runTest {
+                val flowResult =
+                    flow {
+                        HelperDataTest.listSoundWIthPlayLists().forEach { emit(it.toSongWithPlayListDomain()) }
+                    }
+                coEvery { soundRepository.findSountByTitle(any()) } returns flowResult
+
+                val result = soundDomainService.findSoundByTitle("son").toList()
+
+                assertThat(result).hasSize(5)
+                assertThat(result.first()).isInstanceOf(SongWithPlayListDomain::class.java)
+                assertThat(result.last().sound.title).isEqualTo("Song Five")
+            }
     }
 }

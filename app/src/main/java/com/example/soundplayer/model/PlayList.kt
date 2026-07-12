@@ -9,24 +9,25 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class PlayList(
     val idPlayList: Long?,
-    val name :String,
-    var currentMusicPosition : Int,
-    val listSound :MutableSet<Sound>
-
-):Parcelable{
-    constructor(playListEntity:PlayListWithSong):this(
-        idPlayList =playListEntity.playList.playListId,
+    val name: String,
+    var currentMusicPosition: Int,
+    val listSound: MutableSet<Sound>,
+) : Parcelable {
+    constructor(playListEntity: PlayListWithSong) : this(
+        idPlayList = playListEntity.playList.playListId,
         name = playListEntity.playList.title,
-        currentMusicPosition= playListEntity.playList.currentSoundPosition,
-        listSound = playListEntity.soundOfPlayList.map { soundEntity ->
-               soundEntity.toSound()
-        }.toMutableSet()
+        currentMusicPosition = playListEntity.playList.currentSoundPosition,
+        listSound =
+            playListEntity.soundOfPlayList
+                .map { soundEntity ->
+                    soundEntity.toSound()
+                }.toMutableSet(),
     )
 }
 
-fun PlayList.toEntity() = PlayListEntity(
-    playListId = this.idPlayList,
-    currentSoundPosition = this.currentMusicPosition,
-    title = this.name,
-)
-
+fun PlayList.toEntity() =
+    PlayListEntity(
+        playListId = this.idPlayList,
+        currentSoundPosition = this.currentMusicPosition,
+        title = this.name,
+    )

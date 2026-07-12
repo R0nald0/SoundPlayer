@@ -7,22 +7,23 @@ import com.example.soundplayer.model.PlaylistWithSoundDomain
 
 data class PlayListWithSong(
     @Embedded
-    val playList : PlayListEntity,
+    val playList: PlayListEntity,
     @Relation(
         parentColumn = "playListId",
         entity = SoundEntity::class,
         entityColumn = "soundId",
-        associateBy = Junction(
-             value =  PlayListAndSoundCrossEntity::class,
-             parentColumn = "playListId",
-             entityColumn = "soundId",
-        )
+        associateBy =
+            Junction(
+                value = PlayListAndSoundCrossEntity::class,
+                parentColumn = "playListId",
+                entityColumn = "soundId",
+            ),
     )
-    val soundOfPlayList :List<SoundEntity>
+    val soundOfPlayList: List<SoundEntity>,
 )
 
-
-fun PlayListWithSong.toPlaylistWithSoundDomain()= PlaylistWithSoundDomain(
-    playList = this.playList.toPlayList(),
-    soundOfPlayList = this.soundOfPlayList.map { soundEntity -> soundEntity.toSound() }.toMutableSet()
-)
+fun PlayListWithSong.toPlaylistWithSoundDomain() =
+    PlaylistWithSoundDomain(
+        playList = this.playList.toPlayList(),
+        soundOfPlayList = this.soundOfPlayList.map { soundEntity -> soundEntity.toSound() }.toMutableSet(),
+    )

@@ -1,141 +1,130 @@
 package com.example.soundplayer.presentation.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.soundplayer.commons.constants.Constants
-import com.example.soundplayer.commons.constants.Constants.ID_PLAYLIST_KEY
-import com.example.soundplayer.commons.constants.Constants.POSITION_KEY
-import com.example.soundplayer.data.entities.UserDataPreferecence
 import com.example.soundplayer.service.ServicePlayer
-import com.example.soundplayer.service.UserPrefferencesService
+import com.example.soundplayer.service.UserPreferencesService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @HiltViewModel
-class PreferencesViewModel @Inject constructor(
-    private val  serviceDataPreference: UserPrefferencesService,
-    private val servicePlayer: ServicePlayer
-) :ViewModel() {
+class PreferencesViewModel
+    @Inject
+    constructor(
+        private val serviceDataPreference: UserPreferencesService,
+        private val servicePlayer: ServicePlayer,
+    ) : ViewModel() {
+        private val tag = "PreferencesViewModel"
 
-     private val _isDarkMode =  MutableLiveData<StatePrefre>()
-     var isDarkMode : LiveData<StatePrefre> = _isDarkMode
+        private val _uiState = MutableStateFlow(PreferencesUiState())
+        val uiState: StateFlow<PreferencesUiState> = _uiState.asStateFlow()
 
-    private val  _sizeTextMusic =MutableLiveData<StatePrefre>()
-    var sizeTextTitleMusic : LiveData<StatePrefre> = _sizeTextMusic
+        private val _uiEvent = MutableSharedFlow<PreferencesUiEvent>()
+        val uiEvent: SharedFlow<PreferencesUiEvent> = _uiEvent.asSharedFlow()
 
-    private val  _uiStatePreffs =MutableLiveData<UserDataPreferecence>()
-    var uiStatePreffs : LiveData<UserDataPreferecence> = _uiStatePreffs
+        fun onIntent(intent: PreferencesIntent) {
+            when (intent) {
+                is PreferencesIntent.ReadAllPreferences -> readAllPreferences()
+                is PreferencesIntent.ReadDarkMode -> readDarkMode()
+                is PreferencesIntent.ReadTextSize -> readTextSize()
+                is PreferencesIntent.SaveDarkMode -> saveDarkMode(intent.value)
+                is PreferencesIntent.SaveTextSize -> saveTextSize(intent.size)
+                is PreferencesIntent.SaveOrderedSound -> saveOrderedSound(intent.value)
+                is PreferencesIntent.SavePlaylistId -> savePlaylistId(intent.id)
+                is PreferencesIntent.SaveCurrentSoundPosition -> saveCurrentSoundPosition(intent.position)
+            }
+        }
 
+        private fun readAllPreferences() {
+            viewModelScope.launch {
+                runCatching { serviceDataPreference.readAppAllPreferences() }
+                    .onSuccess { prefs ->
+                        _uiState.update { it.copy(preferences = prefs) }
+                    }.onFailure { Log.e(tag, "readAllPreferences: ${it.message}") }
+            }
+        }
 
-    fun readAllPrefference(){
-        viewModelScope.launch {
-            runCatching {
-                serviceDataPreference.readAppAllPrefferences()
-            }.fold(
-                onSuccess = {userPreff->
-                    Log.d("INFO_", "readAllPrefference: $userPreff")
-                    _uiStatePreffs.value = userPreff
-                },
-                onFailure = {}
-            )
+        private fun readDarkMode() {
+            viewModelScope.launch {
+                serviceDataPreference
+                    .readUserPreference(Constants.ID_DARK_MODE_KEY)
+                    .catch { error ->
+                        Log.e(tag, "readDarkMode: ${error.message}")
+                        _uiEvent.emit(PreferencesUiEvent.ShowError("Erro ao ler modo de visualização"))
+                    }.collect { result ->
+                        _uiState.update { it.copy(darkMode = result ?: 2) }
+                    }
+            }
+        }
+
+        private fun readTextSize() {
+            viewModelScope.launch {
+                serviceDataPreference
+                    .readUserPreference(Constants.ID_SIZE_TEXT_TITLE_MUSIC)
+                    .catch { error ->
+                        Log.e(tag, "readTextSize: ${error.message}")
+                        _uiEvent.emit(PreferencesUiEvent.ShowError("Erro ao ler tamanho do texto"))
+                    }.collect { result ->
+                        _uiState.update { it.copy(textSize = result ?: 16f) }
+                    }
+            }
+        }
+
+        private fun saveDarkMode(value: Int) {
+            viewModelScope.launch {
+                runCatching {
+                    serviceDataPreference.saveUserPreference(value, Constants.ID_DARK_MODE_KEY)
+                }.onSuccess { _uiState.update { it.copy(darkMode = value) } }
+                    .onFailure { Log.e(tag, "saveDarkMode: ${it.message}") }
+            }
+        }
+
+        private fun saveTextSize(size: Float) {
+            viewModelScope.launch {
+                runCatching {
+                    serviceDataPreference.saveUserPreference(size, Constants.ID_SIZE_TEXT_TITLE_MUSIC)
+                }.onSuccess { _uiState.update { it.copy(textSize = size) } }
+                    .onFailure { Log.e(tag, "saveTextSize: ${it.message}") }
+            }
+        }
+
+        private fun saveOrderedSound(value: Int) {
+            viewModelScope.launch {
+                runCatching {
+                    serviceDataPreference.saveUserPreference(value, Constants.ID_ORDERED_SOUNDS_PREFERENCE)
+                }.onSuccess {
+                    _uiState.update { state ->
+                        state.copy(preferences = state.preferences?.copy(orderedSound = value))
+                    }
+                }.onFailure { Log.e(tag, "saveOrderedSound: ${it.message}") }
+            }
+        }
+
+        private fun savePlaylistId(id: Long) {
+            viewModelScope.launch {
+                runCatching {
+                    serviceDataPreference.saveUserPreference(id, Constants.ID_PLAYLIST_KEY)
+                }.onSuccess { readAllPreferences() }
+                    .onFailure { Log.e(tag, "savePlaylistId: ${it.message}") }
+            }
+        }
+
+        private fun saveCurrentSoundPosition(position: Int) {
+            viewModelScope.launch {
+                runCatching {
+                    serviceDataPreference.saveUserPreference(position, Constants.POSITION_KEY)
+                }.onFailure { Log.e(tag, "saveCurrentSoundPosition: ${it.message}") }
+            }
         }
     }
-    fun saveDarkModePrefrence(valueModeUi :Int){
-       viewModelScope.launch {
-           serviceDataPreference.savePrefferenceUser(
-               value = valueModeUi,
-               key = Constants.ID_DARK_MODE_KEY
-           )
-       }
-    }
-    fun readDarkModePreference(){
-         viewModelScope.launch {
-             serviceDataPreference.readUserPrefference(Constants.ID_DARK_MODE_KEY).
-                 catch {error->
-                     Log.i("INFO_", "preferências music sound: ${error.message}")
-                     StatePrefre.Error("Erro ao ler as preferências de Mode ui")
-                 }
-                 .collect{result ->
-                     _isDarkMode.value = StatePrefre.Sucess(result ?: 2)
-                 }
-         }
-    }
-    fun saveSizeTextMusicPrefrence(size :Float){
-        viewModelScope.launch {
-            serviceDataPreference.savePrefferenceUser(
-                value =  size,
-                key = Constants.ID_SIZE_TEXT_TITLE_MUSIC
-            )
-        }
-    }
-    fun readSizeTextMusicPreference(){
-        viewModelScope.launch {
-            serviceDataPreference
-                .readUserPrefference(Constants.ID_SIZE_TEXT_TITLE_MUSIC)
-                .catch {
-                    Log.i("INFO_", "readDarkModePreference: ${it.message}")
-                    StatePrefre.Error("Erro ao ler as preferências de titulo da música ")
-                }
-                .collect{result->
-                    _sizeTextMusic.value = StatePrefre.Sucess(result ?: 16f)
-                }
-        }
-    }
-    fun saveOrderedSoundPrefference(value : Int){
-        viewModelScope.launch {
-            runCatching {
-                serviceDataPreference.savePrefferenceUser(
-                    value = value,
-                    key = Constants.ID_ORDERED_SONS_PREFFERENCE
-                )
-            }.fold(
-                onSuccess = {
-                    serviceDataPreference
-                        .readUserPrefference(Constants.ID_ORDERED_SONS_PREFFERENCE)
-                        .collect{
-
-                        }
-                },
-                onFailure = {}
-            )
-        }
-    }
-    fun savePlayListIdPlayList(idPlayList :Long){
-        viewModelScope.launch {
-           runCatching {
-               serviceDataPreference.savePrefferenceUser(idPlayList ,ID_PLAYLIST_KEY)
-           }.fold(
-               onSuccess = {
-                   readAllPrefference()
-               } ,
-               onFailure ={
-
-               }
-           )
-        }
-    }
-    fun savePlayListIdCurrenPositionSound(currentMusicPosition : Int){
-        viewModelScope.launch {
-           runCatching {
-               serviceDataPreference.savePrefferenceUser(currentMusicPosition,POSITION_KEY)
-           }.fold(
-               onSuccess = {} ,
-               onFailure ={
-
-               }
-           )
-        }
-    }
-
-}
-
-sealed interface StatePrefre{
-    class Sucess <T> (val succssResult : T) : StatePrefre
-    class Error(val mensagem : String) :StatePrefre
-}
